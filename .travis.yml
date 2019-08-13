@@ -22,6 +22,8 @@ jobs:
     - stage: Documentation
       julia: 1.1
       os: linux
+      env:
+        - GKSwstype=nul
       script:
         - julia --project=docs -e 'using Pkg; Pkg.instantiate()'
         - julia --project=docs --color=yes docs/make.jl

@@ -174,7 +174,7 @@ estimates(estimator) = estimates(Random.GLOBAL_RNG, estimator)
 
         ## indicate mean of estimates
         @series begin
-            title := "\$\\textrm{$m classes, }\\pi = $π\$"
+            title := "$m classes, pi = $π"
             seriestype := :vline
             subplot := i
             linewidth := 2
