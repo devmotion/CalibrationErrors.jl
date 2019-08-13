@@ -10,6 +10,10 @@ const OUTPUT = joinpath(@__DIR__, "src", "generated")
 rm(OUTPUT; force=true, recursive=true)
 mkpath(OUTPUT)
 
+# fix align environments inside of equation environments in notebooks
+# by using $$...$$ instead of \begin{equation}...\end{equation}
+replace_math(content) = replace(content, r"```math(.*?)```"s => s"$$\1$$")
+
 # generate Markdown and Jupyter notebook
 for file in readdir(EXAMPLES)
     endswith(file, ".jl") || continue
@@ -17,7 +21,7 @@ for file in readdir(EXAMPLES)
     fullpath = joinpath(EXAMPLES, file)
 
     Literate.markdown(fullpath, OUTPUT)
-    Literate.notebook(fullpath, OUTPUT)
+    Literate.notebook(fullpath, OUTPUT; preprocess = replace_math)
 end
 
 makedocs(
