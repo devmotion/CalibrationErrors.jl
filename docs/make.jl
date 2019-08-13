@@ -21,14 +21,18 @@ for file in readdir(EXAMPLES)
 end
 
 makedocs(
-sitename = "CalibrationErrors.jl",
-    pages = [
-        "Home" => "index.md",
-        "Background" => "background.md",
-        "Calibration" => "calibration.md",
-        "Estimators" => "estimators.md",
-        "Examples" => [
-            "Distribution" => "generated/distribution.md"
+    sitename = "CalibrationErrors.jl",
+        pages = [
+            "Home" => "index.md",
+            "Background" => "background.md",
+            "Calibration" => "calibration.md",
+            "Estimators" => "estimators.md",
+            "Examples" => [
+                "Distribution" => "generated/distribution.md"
+            ]
         ]
-    ]
+)
+
+deploydocs(
+    repo = "github.com/devmotion/CalibrationErrors.jl.git",
 )
