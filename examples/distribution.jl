@@ -1,7 +1,7 @@
 # # Distribution of calibration error estimates
 #
-#md # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__generated/example.ipynb)
-#md # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__generated/example.ipynb)
+#md # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/generated/distribution.ipynb)
+#md # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/generated/distribution.ipynb)
 
 # ## Introduction
 #
@@ -117,7 +117,7 @@ function estimates(rng::AbstractRNG, estimator)
     estimatesvec = Vector{Vector{Float64}}(undef, 0)
 
     ## for all combinations of m and π
-    for m in (2, 10, 100, 1_000), π in (0.0, 0.5, 1.0)
+    for m in (2, 10, 100), π in (0.0, 0.5, 1.0)
         ## compute estimates
         push!(estimatesvec, estimates(Random.GLOBAL_RNG, estimator, π, m))
 
@@ -141,11 +141,11 @@ estimates(estimator) = estimates(Random.GLOBAL_RNG, estimator)
 
 @recipe function f(set::EstimatesSet)
     ## default settings
-    layout := (4, 3)
+    layout := (3, 3)
     legend := false
     xlabel := "calibration estimate"
     ylabel := "# runs"
-    size --> (1440, 960)
+    size --> (1080, 960)
     seriestype := :histogram
 
     ## add subplots
