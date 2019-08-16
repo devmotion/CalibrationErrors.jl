@@ -11,12 +11,12 @@
 # 
 # We estimate calibration errors of the model
 # ```math
-# \begin{align*}
+# \begin{aligned}
 #    g(X) &\sim \textrm{Dir}(\alpha),\\
 #    Z &\sim \textrm{Ber}(\pi),\\
 #    Y \,|\, g(X) = \gamma, Z = 1 &\sim \textrm{Categorical}(\beta),\\
 #    Y \,|\, g(X) = \gamma, Z = 0 &\sim \textrm{Categorical}(\gamma),
-# \end{align*}
+# \end{aligned}
 # ```
 # where $\alpha \in \mathbb{R}_{>0}^m$ determines the distribution of
 # predictions $g(X)$, $\pi > 0$ determines the degree of miscalibration, and
