@@ -5,10 +5,10 @@
 
 # ## Introduction
 #
-# This example is taken from the forthcoming publication
-# "Calibration tests in multi-class classification: A unifying framework" by Widmann, Lindsten,
-# and Zachariah.
-# 
+# This example is taken from the publication
+# "Calibration tests in multi-class classification: A unifying framework" by Widmann,
+# Lindsten, and Zachariah.
+#
 # We estimate calibration errors of the model
 # ```math
 # \begin{aligned}
@@ -27,7 +27,7 @@
 # probability simplex, and $\beta = (1, 0, \ldots, 0)$.
 #
 # In our experiments we sample 250 predictions from the Dirichlet distribution
-# $\textrm{Dir}(\alpha)$, and then we generate corresponding labels according to 
+# $\textrm{Dir}(\alpha)$, and then we generate corresponding labels according to
 # the model stated above, for different choices of $\pi$ and number of classes $m$.
 #
 # We evaluate the standard estimators of expected calibration error (ECE) based on a
@@ -60,7 +60,7 @@ gr(fmt = :png, dpi = 600)
 
 # ## Estimates
 #
-# 
+#
 
 function estimates(rng::AbstractRNG, estimator, π::Real, m::Int)
     ## check arguments
