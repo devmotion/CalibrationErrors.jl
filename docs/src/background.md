@@ -5,7 +5,7 @@
 A probabilistic model predicts a probability distribution of possible outputs
 for a given input.
 
-A very simple probabilistic model is a model that predicts a uniform 
+A very simple probabilistic model is a model that predicts a uniform
 distribution for a dice roll; there is no input and the possible outputs are
 the numbers $1,2,3,4,5,6$. A probably more complicated probabilistic model
 would be a model that predicts the distribution of stock price changes from
@@ -34,5 +34,5 @@ and [integral probability metrics](https://arxiv.org/pdf/0901.2698.pdf).
 Here we restrict ourselves to classification models, i.e., models for which output
 $Y$ takes only values from a finite set.
 
-The dice roll model above is a classification model, whereas the model that predicts
-stock price changes is not.
+The dice roll model above is a classification model, whereas the model that
+predicts stock price changes is not.
