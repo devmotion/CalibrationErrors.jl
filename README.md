@@ -6,6 +6,7 @@ Estimation of calibration errors.
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://devmotion.github.io/CalibrationErrors.jl/dev)
 [![Build Status](https://travis-ci.com/devmotion/CalibrationErrors.jl.svg?branch=master)](https://travis-ci.com/devmotion/CalibrationErrors.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/devmotion/CalibrationErrors.jl?svg=true)](https://ci.appveyor.com/project/devmotion/CalibrationErrors-jl)
+[![DOI](https://zenodo.org/badge/188981243.svg)](https://zenodo.org/badge/latestdoi/188981243)
 [![Codecov](https://codecov.io/gh/devmotion/CalibrationErrors.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/devmotion/CalibrationErrors.jl)
 [![Coveralls](https://coveralls.io/repos/github/devmotion/CalibrationErrors.jl/badge.svg?branch=master)](https://coveralls.io/github/devmotion/CalibrationErrors.jl?branch=master)
 
