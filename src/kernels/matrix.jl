@@ -19,9 +19,6 @@ UniformScalingKernel(kernel) = UniformScalingKernel(1, kernel)
 
 (kernel::UniformScalingKernel)(x, y) = UniformScaling(kernel.λ * kernel.kernel(x, y))
 
-kernel_result_type(kernel::UniformScalingKernel, x, y) =
-    typeof(zero(kernel.λ) * kernel.kernel(zero(eltype(x)), zero(eltype(y))))
-
 # scaling of scalar-valued kernel by diagonal matrix
 struct DiagonalKernel{V<:AbstractVector{<:Real},K} <: MatrixKernel
     diag::V
@@ -39,6 +36,3 @@ DiagonalKernel(diag::AbstractVector{<:Real}, kernel) =
     DiagonalKernel{typeof(diag),typeof(kernel)}(diag, kernel)
 
 (kernel::DiagonalKernel)(x, y) = Diagonal(kernel.diag .* kernel.kernel(x, y))
-
-kernel_result_type(kernel::DiagonalKernel, x, y) =
-    typeof(zero(eltype(kernel.diag)) * kernel.kernel(zero(eltype(x)), zero(eltype(y))))

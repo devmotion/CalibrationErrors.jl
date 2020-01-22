@@ -1,35 +1,36 @@
 abstract type CalibrationErrorEstimator end
 
-function check_size(predictions::AbstractMatrix{<:Real}, labels::AbstractVector{<:Integer})
-    nclasses, nsamples = size(predictions)
+# extract predictions and targets from tuple
+predictions_targets((predictions, targets)::Tuple{<:Any,<:Any}) =
+    predictions_targets(predictions, targets)
 
-    nsamples == length(labels) ||
-        throw(DimensionMismatch("number of predictions and labels must be equal"))
-    nclasses > 1 ||
-        throw(ArgumentError("the number of classes has to be greater than 1"))
+# extract predictions and targets from a vector of tuples
+predictions_targets(data::AbstractVector{<:Tuple{<:Any,<:Any}}) =
+    predictions_targets(first.(data), last.(data))
 
-    nclasses, nsamples
-end
+# extract predictions from a matrix
+predictions_targets(predictions::AbstractMatrix{<:Real}, targets::AbstractVector) =
+    predictions_targets([predictions[:, i] for i in axes(predictions, 2)], targets)
 
-function get_predictions_labels((predictions,labels)::Tuple{<:AbstractMatrix{<:Real},
-                                                            <:AbstractVector{<:Integer}})
-    # check size
-    check_size(predictions, labels)
-
-    predictions, labels
+# do not transform vectors
+function predictions_targets(predictions::AbstractVector, targets::AbstractVector)
+    predictions, targets
 end
 
 """
-    calibrationerror(estimator, data)
+    calibrationerror(estimator::CalibrationErrorEstimator, data...)
 
-Estimate the calibration error of a model from the `data` set of predicted probabilities
-and corresponding labels using the `estimator`.
+Estimate the calibration error of a model from the `data` set of predictions
+and corresponding targets using the `estimator`.
+
+The `data` can be a tuple of predictions and targets or an array of tuples of
+predictions and targets.
 """
-function calibrationerror(estimator::CalibrationErrorEstimator,
-                          data::Tuple{<:AbstractMatrix{<:Real},<:AbstractVector{<:Integer}})
-    # check whether the number of predictions and labels is equal
-    predictions, labels = get_predictions_labels(data)
+function calibrationerror(estimator::CalibrationErrorEstimator, data...)
+    predictions, targets = predictions_targets(data...)
 
-    # estimate the calibration error
-    _calibrationerror(estimator, predictions, labels)
+    length(predictions) == length(targets) ||
+        throw(DimensionMismatch("number of predictions and targets must be equal"))
+
+    _calibrationerror(estimator, predictions, targets)
 end
