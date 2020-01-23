@@ -14,23 +14,18 @@ algorithm and `distance` function.
 ECE(binning::AbstractBinningAlgorithm) = ECE(binning, TotalVariation())
 
 # estimate ECE
-function _calibrationerror(ece::ECE, predictions::AbstractMatrix{<:Real},
-                           labels::AbstractVector{<:Integer})
+function _calibrationerror(ece::ECE, predictions::AbstractVector{<:AbstractVector{<:Real}},
+                           targets::AbstractVector{<:Integer})
     @unpack binning, distance = ece
 
+    # check number of samples
+    nsamples = length(predictions)
+    nsamples > 0 || error("there must be at least one sample")
+
     # bin predictions and labels
-    bins = perform(binning, predictions, labels)
+    bins = perform(binning, predictions, targets)
+    length(bins) > 0 || error("there must exist at least one bin")
 
-    # compute output type of estimates in each bin
-    T = typeof(bin_eval_end(distance,
-                            zero(result_type(distance, predictions, Int[])), 1))
-
-    # compute weighted sum of distances
-    d = zero(T)
-    for bin in values(bins)
-        d += bin_eval(bin, distance)
-    end
-
-    # normalize result
-    inv(length(labels)) * d
+    # evaluate distances in each bin and normalize the result
+    sum(bin -> scaled_evaluate(distance, bin), bins) / nsamples
 end

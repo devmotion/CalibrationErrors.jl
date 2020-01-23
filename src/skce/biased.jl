@@ -3,36 +3,38 @@ struct BiasedSKCE{K<:MatrixKernel} <: SKCE
     kernel::K
 end
 
-function _calibrationerror(skce::BiasedSKCE, predictions::AbstractMatrix{<:Real},
-                           labels::AbstractVector{<:Integer})
+function _calibrationerror(skce::BiasedSKCE,
+                           predictions::AbstractVector{<:AbstractVector{<:Real}},
+                           targets::AbstractVector{<:Integer})
     @unpack kernel = skce
 
     # obtain number of samples
-    nsamples = size(predictions, 2)
+    nsamples = length(predictions)
+    nsamples > 1 || error("there must be at least one sample")
 
-    # initialize estimate
-    s = zero(skce_result_type(skce, predictions))
+    @inbounds begin
+        # evaluate kernel function for the first sample
+        prediction = predictions[1]
+        target = targets[1]
+        result = skce_kernel(kernel, prediction, target, prediction, target)
 
-    # for all samples
-    @inbounds for j in axes(predictions, 2)
-        # obtain predictions and labels
-        p̃ = view(predictions, :, j)
-        ỹ = labels[j]
+        # add evaluations of all other pairs of samples
+        for i in 2:nsamples
+            predictioni = predictions[i]
+            targeti = targets[i]
 
-        # for all previous samples
-        for i in 1:(j-1)
-            # obtain predictions and labels
-            p = view(predictions, :, i)
-            y = labels[i]
+            for j in 1:(i - 1)
+                predictionj = predictions[j]
+                targetj = targets[j]
 
-            # evaluate kernel function and update estimate
-            s += 2 * skce_kernel(kernel, p, y, p̃, ỹ)
+                # evaluate kernel function and update estimate
+                result += 2 * skce_kernel(kernel, predictioni, targeti, predictionj, targetj)
+            end
+
+            result += skce_kernel(kernel, predictioni, targeti, predictioni, targeti)
         end
-
-        # evaluate kernel function and update estimate
-        s += skce_kernel(kernel, p̃, ỹ, p̃, ỹ)
     end
 
     # normalize estimate
-    inv(nsamples^2) * s
+    result / nsamples^2
 end

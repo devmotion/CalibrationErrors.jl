@@ -1,43 +1,39 @@
 using CalibrationErrors, Distances, Distributions, StatsBase
-using CalibrationErrors: Bin, bin_eval, adddata!
+using CalibrationErrors: Bin, scaled_evaluate, adddata!
 
 using Random
+using Test
 
 Random.seed!(1234)
 
 @testset "Simple example ($nclasses classes)" for nclasses in (2, 10, 100)
-    # sample predictions and labels
+    # sample predictions and targets
     nsamples = 1_000
-    predictions = rand(Dirichlet(nclasses, 1), nsamples)
-    labels = rand(1:nclasses, nsamples)
+    dist = Dirichlet(nclasses, 1)
+    predictions = [rand(dist) for _ in 1:nsamples]
+    targets = rand(1:nclasses, nsamples)
 
-    # create bin with all predictions and labels
-    bin = Bin(predictions, labels)
+    # create bin with all predictions and targets
+    bin = Bin(predictions, targets)
 
     # check statistics
-    @test bin.nsamples[] == nsamples
-    @test bin.prediction_sum ≈ vec(sum(predictions, dims=2))
-    @test bin.label_counts == counts(labels, nclasses)
+    @test bin.nsamples == nsamples
+    @test bin.sum_predictions ≈ sum(predictions)
+    @test bin.counts_targets == counts(targets, nclasses)
 
     # check distance calculations
     for distance in (TotalVariation(), Cityblock(), Euclidean(), SqEuclidean())
-        @test bin_eval(bin, distance) ≈
-            nsamples * evaluate(distance, vec(mean(predictions; dims=2)),
-                                proportions(labels, nclasses))
+        @test scaled_evaluate(distance, bin) ≈
+            nsamples * evaluate(distance, mean(predictions),
+                                proportions(targets, nclasses))
     end
 
     # compare with adding data to empty bin
-    bin2 = Bin(eltype(predictions), nclasses)
-    adddata!(bin2, predictions, labels)
-    @test bin2.nsamples[] == bin.nsamples[]
-    @test bin2.prediction_sum == bin.prediction_sum
-    @test bin2.label_counts == bin.label_counts
-
-    bin3 = Bin(eltype(predictions), nclasses)
-    for i in axes(predictions, 2)
-        adddata!(bin3, view(predictions, :, i), labels[i])
+    bin2 = Bin{eltype(predictions[1])}(nclasses)
+    for (prediction, target) in zip(predictions, targets)
+        adddata!(bin2, prediction, target)
     end
-    @test bin3.nsamples[] == bin.nsamples[]
-    @test bin3.prediction_sum == bin.prediction_sum
-    @test bin3.label_counts == bin.label_counts
+    @test bin2.nsamples == bin.nsamples
+    @test bin2.sum_predictions == bin.sum_predictions
+    @test bin2.counts_targets == bin.counts_targets
 end

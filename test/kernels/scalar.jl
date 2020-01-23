@@ -1,4 +1,7 @@
-using CalibrationErrors, Distances
+using CalibrationErrors
+using Distances
+
+using Test
 
 const x1, y1 = 1, 3
 const x2, y2 = [1, -1], [2, 1]
