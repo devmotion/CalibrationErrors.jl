@@ -133,7 +133,10 @@ function unsafe_median_split!(idxs::Vector{Int},
         # partially sort the indices `idxs` according to the corresponding values in the
         # `d`th component of`x`
         m = div(n + 1, 2)
-        partialsort!(idxs, 1:(m + 1); by = idx -> x[idx][dim])
+        f = let x=x, dim=dim
+            idx -> x[idx][dim]
+        end
+        partialsort!(idxs, 1:(m + 1); by = f)
 
         # check that we actually capture all values ≤ median
         # the median is `x[m][dim]`` for vectors of odd length
@@ -145,10 +148,10 @@ function unsafe_median_split!(idxs::Vector{Int},
         else
             # otherwise we sort the remaining indices
             otheridxs = unsafe_wrap(Array, pointer(idxs, m + 2), n - m - 1)
-            sort!(otheridxs; by = idx -> x[idx][dim])
+            sort!(otheridxs; by = f)
         
             # then we obtain the last value ≤ median
-            cutoff = m + 1 + searchsortedlast(otheridxs, m; by = idx -> x[idx][dim])
+            cutoff = m + 1 + searchsortedlast(otheridxs, m; by = f)
         end
     end
 
