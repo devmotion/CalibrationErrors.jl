@@ -3,6 +3,7 @@ struct MedianVarianceBinning <: AbstractBinningAlgorithm
     maxbins::Int
 
     function MedianVarianceBinning(minsize, maxbins)
+        minsize ≥ 1 || error("minimum number of samples must be positive")
         maxbins ≥ 1 || error("maximum number of bins must be positive")
 
         new(minsize, maxbins)
@@ -65,7 +66,7 @@ function perform(alg::MedianVarianceBinning,
             # in total one additional bin was created
             nbins += 1
         end
-        
+
         # add remaining bins
         while !isempty(queue)
             # pop queue
@@ -139,9 +140,9 @@ function unsafe_median_split!(idxs::Vector{Int},
         partialsort!(idxs, 1:(m + 1); by = f)
 
         # check that we actually capture all values ≤ median
-        # the median is `x[m][dim]`` for vectors of odd length
-        # and `(x[m][dim] + x[m + 1][dim]) / 2` for vectors of even length
-        if x[m][dim] < x[m + 1][dim]
+        # the median is `x[idxs[m]][dim]`` for vectors of odd length
+        # and `(x[idxs[m]][dim] + x[idxs[m + 1]][dim]) / 2` for vectors of even length
+        if x[idxs[m]][dim] < x[idxs[m + 1]][dim]
             cutoff = m
         elseif m + 1 == n
             cutoff = n
