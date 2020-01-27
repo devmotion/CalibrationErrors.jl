@@ -1,5 +1,11 @@
 struct UniformBinning <: AbstractBinningAlgorithm
     nbins::Int
+
+    function UniformBinning(nbins::Int)
+        nbins > 0 || error("number of bins must be positive")
+
+        new(nbins)
+    end
 end
 
 function perform(binning::UniformBinning,
