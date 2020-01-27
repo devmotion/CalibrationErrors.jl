@@ -19,16 +19,18 @@ Julia language.
 ## Example
 
 Calibration errors can be estimated from a data set of predicted probabilities
-and and a set of labels by executing
+and and a set of targets by executing
 ```julia
-calibrationerror(estimator, data)
+calibrationerror(estimator, predictions, targets)
 ```
 
-The data set `data` has to be a tuple of predictions and labels. The predictions
-have to be provided as a matrix of size `(m, n)`, in which each of the `n`
-columns corresponds to predicted probabilities of the labels `1,…,m`. The
-corresponding labels have to be provided as a vector of length `n`, in which
-every element is from the set `1,…,m`.
+The predictions can be provided as a vector of `n` vectors of predicted probabilities
+of length `m` or as a matrix of size `(m, n)`, in which each of the `n` columns corresponds
+to predicted probabilities of the targets `1,…,m`. The corresponding targets have to be
+provided as a vector of length `n`, in which every element is from the set `1,…,m`.
+
+Alternatively, it is possible to specify a tuple of predictions and targets or a vector of
+tuples of predictions and targets.
 
 This package implements the estimator `ECE` of the ECE and the estimators
 `BiasedSKCE`, `QuadraticUnbiasedSKCE`, and `LinearUnbiasedSKCE` for the SKCE.
