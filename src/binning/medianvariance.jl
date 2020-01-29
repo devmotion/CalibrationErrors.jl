@@ -35,7 +35,8 @@ function perform(alg::MedianVarianceBinning,
         queue = PriorityQueue(
             (idxs_predictions, argmax_var_predictions) => max_var_predictions,
             Base.Order.Reverse)
-        bins = Vector{Bin{T}}(undef, 0)
+        S = typeof(zero(T) / 1)
+        bins = Vector{Bin{S}}(undef, 0)
     
         nbins = 1
         while nbins < maxbins && !isempty(queue)

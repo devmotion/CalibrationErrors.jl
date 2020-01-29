@@ -24,8 +24,33 @@ function _calibrationerror(ece::ECE, predictions::AbstractVector{<:AbstractVecto
 
     # bin predictions and labels
     bins = perform(binning, predictions, targets)
-    length(bins) > 0 || error("there must exist at least one bin")
+    nbins = length(bins)
+    nbins > 0 || error("there must exist at least one bin")
 
-    # evaluate distances in each bin and normalize the result
-    sum(bin -> scaled_evaluate(distance, bin), bins) / nsamples
+    # compute the weighted mean of the distances in each bin
+    # use West's algorithm for numerical stability
+
+    # evaluate the distance in the first bin
+    @inbounds begin
+        bin = bins[1]
+        x = evaluate(distance, bin)
+
+        # initialize the estimate
+        estimate = x / 1
+
+        # for all other bins
+        n = bin.nsamples
+        for i in 2:nbins
+            # evaluate the distance
+            bin = bins[i]
+            x = evaluate(distance, bin)
+
+            # update the estimate
+            m = bin.nsamples
+            n += m
+            estimate += (m / n) * (x - estimate)
+        end
+    end
+
+    estimate
 end

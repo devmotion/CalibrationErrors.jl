@@ -19,16 +19,36 @@ function _perform(binning::UniformBinning,
                   targets::AbstractVector{<:Integer}, nclasses::Val{N}) where {T<:Real,N}
     @unpack nbins = binning
 
-    # create empty dictionary of bins
-    bins = Dict{NTuple{N,Int},Bin{T}}()
+    # create bin for the initial sample
+    binindices = NTuple{N,Int}[binindex(predictions[1], nbins, nclasses)]
+    bins = [Bin(predictions[1], targets[1])]
 
-    # bin all samples
-    @inbounds for (prediction, target) in zip(predictions, targets)
-        bin = get!(bins, binindex(prediction, nbins, nclasses), Bin{T}(N))
-        adddata!(bin, prediction, target)
+    # reserve some memory (very rough guess)
+    nsamples = length(predictions)
+    sizehint!(bins, nsamples)
+    sizehint!(binindices, nsamples)
+
+    # for all other samples
+    @inbounds for i in 2:nsamples
+        # obtain prediction and corresponding target
+        prediction = predictions[i]
+        target = targets[i]
+
+        # compute index of bin
+        index = binindex(prediction, nbins, nclasses)
+
+        # create new bin or update existing one
+        j = searchsortedfirst(binindices, index)
+        if j > length(binindices) || (binindices[j] !== index)
+            insert!(binindices, j, index)
+            insert!(bins, j, Bin(prediction, target))
+        else
+            bin = bins[j]
+            adddata!(bin, prediction, target)
+        end
     end
 
-    collect(Bin{T}, values(bins))
+    bins
 end
 
 function binindex(probs::AbstractVector{<:Real}, nbins::Int, ::Val{N})::NTuple{N,Int} where N
