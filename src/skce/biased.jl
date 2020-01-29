@@ -10,15 +10,19 @@ function _calibrationerror(skce::BiasedSKCE,
 
     # obtain number of samples
     nsamples = length(predictions)
-    nsamples > 1 || error("there must be at least one sample")
+    nsamples ≥ 1 || error("there must be at least one sample")
 
     @inbounds begin
         # evaluate kernel function for the first sample
         prediction = predictions[1]
         target = targets[1]
-        result = skce_kernel(kernel, prediction, target, prediction, target)
+        hij = skce_kernel(kernel, prediction, target, prediction, target)
 
-        # add evaluations of all other pairs of samples
+        # initialize the calibration error estimate
+        estimate = hij / 1
+
+        # for all other pairs of samples
+        n = 1
         for i in 2:nsamples
             predictioni = predictions[i]
             targeti = targets[i]
@@ -27,14 +31,22 @@ function _calibrationerror(skce::BiasedSKCE,
                 predictionj = predictions[j]
                 targetj = targets[j]
 
-                # evaluate kernel function and update estimate
-                result += 2 * skce_kernel(kernel, predictioni, targeti, predictionj, targetj)
+                # evaluate the kernel function
+                hij = skce_kernel(kernel, predictioni, targeti, predictionj, targetj)
+
+                # update the estimate (add two terms due to symmetry!)
+                n += 2
+                estimate += 2 * (hij - estimate) / n
             end
 
-            result += skce_kernel(kernel, predictioni, targeti, predictioni, targeti)
+            # evaluate the kernel function
+            hij = skce_kernel(kernel, predictioni, targeti, predictioni, targeti)
+
+            # update the estimate
+            n += 1
+            estimate += (hij - estimate) / n
         end
     end
 
-    # normalize estimate
-    result / nsamples^2
+    estimate
 end
