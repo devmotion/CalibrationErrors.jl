@@ -3,6 +3,7 @@ using CalibrationErrors: perform, binindex
 
 using LinearAlgebra
 using Random
+using Statistics
 using Test
 
 Random.seed!(1234)
@@ -44,14 +45,14 @@ end
         # check all bins
         for bin in bins
             # compute index of bin from average prediction
-            idx = binindex(bin.sum_predictions ./ bin.nsamples, nbins, Val(nclasses))
+            idx = binindex(bin.mean_predictions, nbins, Val(nclasses))
 
             # compute indices of all predictions in the same bin
             idxs = filter(i -> idx == binindex(predictions[i], nbins, Val(nclasses)), 1:nsamples)
 
             @test bin.nsamples == length(idxs)
-            @test bin.sum_predictions ≈ sum(predictions[idxs])
-            @test bin.counts_targets ≈ counts(targets[idxs], 1:nclasses)
+            @test bin.mean_predictions ≈ mean(predictions[idxs])
+            @test bin.proportions_targets ≈ proportions(targets[idxs], 1:nclasses)
         end
     end
 end
@@ -63,42 +64,46 @@ end
     bins = perform(UniformBinning(2), predictions, targets)
     @test length(bins) == 2
     sort!(bins; by = x -> x.nsamples)
+    @test all(bin -> sum(bin.mean_predictions) == 1, bins)
+    @test all(bin -> sum(bin.proportions_targets) == 1, bins)
     for (i, idxs) in enumerate(([3], [1, 2]))
         @test bins[i].nsamples == length(idxs)
-        @test bins[i].sum_predictions == sum(predictions[idxs])
-        @test bins[i].counts_targets == vec(sum(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims = 2))
+        @test bins[i].mean_predictions == mean(predictions[idxs])
+        @test bins[i].proportions_targets == vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims = 2))
     end
 
     bins = perform(UniformBinning(1), predictions, targets)
     @test length(bins) == 1
     @test bins[1].nsamples == 3
-    @test bins[1].sum_predictions == sum(predictions)
-    @test bins[1].counts_targets == [1, 1, 1]
+    @test bins[1].mean_predictions ≈ mean(predictions)
+    @test bins[1].proportions_targets ≈ [1/3, 1/3, 1/3]
 
     predictions = [[0.4, 0.1, 0.5], [0.5, 0.3, 0.2], [0.3, 0.7, 0.0], [0.1, 0.0, 0.9], [0.8, 0.1, 0.1]]
     targets = [1, 2, 3, 1, 2]
 
     bins = perform(UniformBinning(3), predictions, targets)
-    sort!(bins; by = x -> x.sum_predictions[1])
+    sort!(bins; by = x -> x.mean_predictions[1])
     @test length(bins) == 5
     @test all(bin -> bin.nsamples == 1, bins)
     for (i, idx) in enumerate((4, 3, 1, 2, 5))
-        @test bins[i].sum_predictions == predictions[idx]
-        @test bins[i].counts_targets == Matrix{Float64}(I, 3, 3)[:, targets[idx]]
+        @test bins[i].mean_predictions == predictions[idx]
+        @test bins[i].proportions_targets == Matrix{Float64}(I, 3, 3)[:, targets[idx]]
     end
 
     bins = perform(UniformBinning(2), predictions, targets)
-    sort!(bins; by = x -> x.sum_predictions[1])
+    sort!(bins; by = x -> x.mean_predictions[1])
     @test length(bins) == 4
-    for (i, idxs) in enumerate(([4], [3], [5], [1, 2]))
+    @test all(bin -> sum(bin.mean_predictions) == 1, bins)
+    @test all(bin -> sum(bin.proportions_targets) == 1, bins)
+    for (i, idxs) in enumerate(([4], [3], [1, 2], [5]))
         @test bins[i].nsamples == length(idxs)
-        @test bins[i].sum_predictions == sum(predictions[idxs])
-        @test bins[i].counts_targets == vec(sum(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims = 2))
+        @test bins[i].mean_predictions == mean(predictions[idxs])
+        @test bins[i].proportions_targets == vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims = 2))
     end
 
     bins = perform(UniformBinning(1), predictions, targets)
     @test length(bins) == 1
     @test bins[1].nsamples == 5
-    @test bins[1].sum_predictions == sum(predictions)
-    @test bins[1].counts_targets == [2, 2, 1]
+    @test bins[1].mean_predictions ≈ mean(predictions)
+    @test bins[1].proportions_targets == [0.4, 0.4, 0.2]
 end

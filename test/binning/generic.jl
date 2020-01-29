@@ -1,7 +1,8 @@
 using CalibrationErrors, Distances, Distributions, StatsBase
-using CalibrationErrors: Bin, scaled_evaluate, adddata!
+using CalibrationErrors: Bin, adddata!
 
 using Random
+using Statistics
 using Test
 
 Random.seed!(1234)
@@ -18,22 +19,23 @@ Random.seed!(1234)
 
     # check statistics
     @test bin.nsamples == nsamples
-    @test bin.sum_predictions ≈ sum(predictions)
-    @test bin.counts_targets == counts(targets, nclasses)
+    @test bin.mean_predictions ≈ mean(predictions)
+    @test bin.proportions_targets == proportions(targets, nclasses)
+    @test sum(bin.mean_predictions) ≈ 1
+    @test sum(bin.proportions_targets) ≈ 1
 
     # check distance calculations
     for distance in (TotalVariation(), Cityblock(), Euclidean(), SqEuclidean())
-        @test scaled_evaluate(distance, bin) ≈
-            nsamples * evaluate(distance, mean(predictions),
-                                proportions(targets, nclasses))
+        @test evaluate(distance, bin) == evaluate(distance, mean(predictions),
+            proportions(targets, nclasses))
     end
 
-    # compare with adding data to empty bin
-    bin2 = Bin{eltype(predictions[1])}(nclasses)
-    for (prediction, target) in zip(predictions, targets)
-        adddata!(bin2, prediction, target)
+    # compare with adding data
+    bin2 = Bin(predictions[1], targets[1])
+    for i in 2:nsamples
+        adddata!(bin2, predictions[i], targets[i])
     end
     @test bin2.nsamples == bin.nsamples
-    @test bin2.sum_predictions == bin.sum_predictions
-    @test bin2.counts_targets == bin.counts_targets
+    @test bin2.mean_predictions ≈ bin.mean_predictions
+    @test bin2.proportions_targets ≈ bin.proportions_targets
 end
