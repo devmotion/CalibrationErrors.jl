@@ -19,7 +19,7 @@ function _calibrationerror(skce::BiasedSKCE,
         # evaluate kernel function for the first sample
         prediction = predictions[1]
         target = targets[1]
-        hij = skce_kernel(kernel, prediction, target, prediction, target)
+        hij = unsafe_skce_eval(kernel, prediction, target, prediction, target)
 
         # initialize the calibration error estimate
         estimate = hij / 1
@@ -35,7 +35,7 @@ function _calibrationerror(skce::BiasedSKCE,
                 targetj = targets[j]
 
                 # evaluate the kernel function
-                hij = skce_kernel(kernel, predictioni, targeti, predictionj, targetj)
+                hij = unsafe_skce_eval(kernel, predictioni, targeti, predictionj, targetj)
 
                 # update the estimate (add two terms due to symmetry!)
                 n += 2
@@ -43,7 +43,7 @@ function _calibrationerror(skce::BiasedSKCE,
             end
 
             # evaluate the kernel function
-            hij = skce_kernel(kernel, predictioni, targeti, predictioni, targeti)
+            hij = unsafe_skce_eval(kernel, predictioni, targeti, predictioni, targeti)
 
             # update the estimate
             n += 1

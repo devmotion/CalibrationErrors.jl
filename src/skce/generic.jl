@@ -1,7 +1,7 @@
 abstract type SKCE <: CalibrationErrorEstimator end
 
 """
-    skce_kernel(k, p, y, p̃, ỹ)
+    unsafe_skce_eval(k, p, y, p̃, ỹ)
 
 Evaluate (or estimate)
 ```math
@@ -12,12 +12,12 @@ for kernel `k` and predictions `p` and `p̃` with corresponding targets `y` and 
 This method assumes that `p`, `p̃`, `y`, and `ỹ` are valid and specified correctly, and
 does not perform any checks.
 """
-function skce_kernel end
+function unsafe_skce_eval end
 
 # default implementation for classification
 # we do not use the symmetry of `kernel` since it seems unlikely that `(p, y) == (p̃, ỹ)`
-function skce_kernel(kernel::Kernel, p::AbstractVector{<:Real}, y::Integer,
-                     p̃::AbstractVector{<:Real}, ỹ::Integer)
+function unsafe_skce_eval(kernel::Kernel, p::AbstractVector{<:Real}, y::Integer,
+                          p̃::AbstractVector{<:Real}, ỹ::Integer)
     # precomputations
     n = length(p)
 
@@ -83,10 +83,10 @@ function skce_kernel(kernel::Kernel, p::AbstractVector{<:Real}, y::Integer,
     result
 end
 
-function skce_kernel(kernel::TensorProductKernel, p::AbstractVector{<:Real}, y::Integer,
-                     p̃::AbstractVector{<:Real}, ỹ::Integer)
+function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}, y::Integer,
+                          p̃::AbstractVector{<:Real}, ỹ::Integer)
     # ensure that y ≤ ỹ (simplifies the implementation)
-    y > ỹ && return skce_kernel(kernel, p̃, ỹ, p, y)
+    y > ỹ && return unsafe_skce_eval(kernel, p̃, ỹ, p, y)
 
     # precomputations
     n = length(p)
@@ -221,8 +221,8 @@ function skce_kernel(kernel::TensorProductKernel, p::AbstractVector{<:Real}, y::
     result * kappa(kernel.kernel1, p, p̃)
 end
 
-function skce_kernel(kernel::TensorProductKernel{<:Kernel,<:WhiteKernel},
-                     p::AbstractVector{<:Real}, y::Integer, p̃::AbstractVector{<:Real},
-                     ỹ::Integer)
+function unsafe_skce_eval(kernel::TensorProductKernel{<:Kernel,<:WhiteKernel},
+                          p::AbstractVector{<:Real}, y::Integer,
+                          p̃::AbstractVector{<:Real}, ỹ::Integer)
     @inbounds ((y == ỹ) - p[ỹ] - p̃[y] + dot(p, p̃)) * kappa(kernel.kernel1, p, p̃)
 end

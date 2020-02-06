@@ -17,7 +17,7 @@ function _calibrationerror(skce::QuadraticUnbiasedSKCE,
 
     @inbounds begin
         # evaluate the kernel function for the first pair of samples
-        hij = skce_kernel(kernel, predictions[1], targets[1], predictions[2], targets[2])
+        hij = unsafe_skce_eval(kernel, predictions[1], targets[1], predictions[2], targets[2])
 
         # initialize the estimate
         estimate = hij / 1
@@ -33,7 +33,7 @@ function _calibrationerror(skce::QuadraticUnbiasedSKCE,
                 targeti = targets[i]
 
                 # evaluate the kernel function
-                hij = skce_kernel(kernel, predictioni, targeti, predictionj, targetj)
+                hij = unsafe_skce_eval(kernel, predictioni, targeti, predictionj, targetj)
 
                 # update the estimate
                 n += 1
@@ -64,7 +64,7 @@ function _calibrationerror(skce::LinearUnbiasedSKCE,
 
     @inbounds begin
         # evaluate the kernel function for the first pair of samples
-        hij = skce_kernel(kernel, predictions[1], targets[1], predictions[2], targets[2])
+        hij = unsafe_skce_eval(kernel, predictions[1], targets[1], predictions[2], targets[2])
 
         # initialize the estimate
         estimate = hij / 1
@@ -75,7 +75,7 @@ function _calibrationerror(skce::LinearUnbiasedSKCE,
             j = i + 1
 
             # evaluate the kernel function
-            hij = skce_kernel(kernel, predictions[i], targets[i], predictions[j],
+            hij = unsafe_skce_eval(kernel, predictions[i], targets[i], predictions[j],
                               targets[j])
 
             # update the estimate

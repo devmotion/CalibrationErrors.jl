@@ -1,5 +1,5 @@
 using CalibrationErrors
-using CalibrationErrors: skce_kernel
+using CalibrationErrors: unsafe_skce_eval
 using KernelFunctions
 
 using Random
@@ -28,18 +28,18 @@ KernelFunctions.kappa(kernel::TensorProductKernel2, (x1, x2), (y1, y2)) =
     @test kernel((x1, x2), (y1, y2)) == kappa(kernel.kernel1, x1, y1) * kappa(kernel.kernel2, x2, y2)
 end
 
-@testset "skce_kernel" begin
+@testset "unsafe_skce_eval" begin
     kernel1 = TensorProductKernel(SqExponentialKernel(2), WhiteKernel())
     kernel2 = TensorProductKernel(SqExponentialKernel(2), WhiteKernel2())
     kernel3 = TensorProductKernel2(SqExponentialKernel(2), WhiteKernel())
 
     x1, x2 = rand(10), rand(1:10)
 
-    @test skce_kernel(kernel1, x1, x2, x1, x2) ≈ skce_kernel(kernel2, x1, x2, x1, x2)
-    @test skce_kernel(kernel1, x1, x2, x1, x2) ≈ skce_kernel(kernel3, x1, x2, x1, x2)
+    @test unsafe_skce_eval(kernel1, x1, x2, x1, x2) ≈ unsafe_skce_eval(kernel2, x1, x2, x1, x2)
+    @test unsafe_skce_eval(kernel1, x1, x2, x1, x2) ≈ unsafe_skce_eval(kernel3, x1, x2, x1, x2)
 
     y1, y2 = rand(10), rand(1:10)
 
-    @test skce_kernel(kernel1, x1, x2, y1, y2) ≈ skce_kernel(kernel2, x1, x2, y1, y2)
-    @test skce_kernel(kernel1, x1, x2, y1, y2) ≈ skce_kernel(kernel3, x1, x2, y1, y2)
+    @test unsafe_skce_eval(kernel1, x1, x2, y1, y2) ≈ unsafe_skce_eval(kernel2, x1, x2, y1, y2)
+    @test unsafe_skce_eval(kernel1, x1, x2, y1, y2) ≈ unsafe_skce_eval(kernel3, x1, x2, y1, y2)
 end
