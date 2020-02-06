@@ -7,17 +7,17 @@ using Test
 Random.seed!(1234)
 
 @testset "Two-dimensional example" begin
-    skce = BiasedSKCE(UniformScalingKernel(4, SquaredExponentialKernel(2)))
+    skce = BiasedSKCE(SqExponentialKernel(2), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
-    @test @inferred(calibrationerror(skce, [1 0; 0 1], [1, 1])) ≈ 2
-    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ 4 - 4 * exp(-4)
-    @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 2
+    @test @inferred(calibrationerror(skce, [1 0; 0 1], [1, 1])) ≈ 0.5
+    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ 1 - exp(-8)
+    @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 0.5
 end
 
 @testset "Basic properties" begin
-    skce = BiasedSKCE(UniformScalingKernel(ExponentialKernel(0.1)))
+    skce = BiasedSKCE(ExponentialKernel(0.1), WhiteKernel())
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)

@@ -1,7 +1,10 @@
-struct BiasedSKCE{K<:MatrixKernel} <: SKCE
+struct BiasedSKCE{K<:Kernel} <: SKCE
     """Kernel of estimator."""
     kernel::K
 end
+
+BiasedSKCE(kernel1::Kernel, kernel2::Kernel) =
+    BiasedSKCE(TensorProductKernel(kernel1, kernel2))
 
 function _calibrationerror(skce::BiasedSKCE,
                            predictions::AbstractVector{<:AbstractVector{<:Real}},

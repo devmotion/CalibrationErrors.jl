@@ -1,7 +1,10 @@
-struct QuadraticUnbiasedSKCE{K<:MatrixKernel} <: SKCE
+struct QuadraticUnbiasedSKCE{K<:Kernel} <: SKCE
     """Kernel of estimator."""
     kernel::K
 end
+
+QuadraticUnbiasedSKCE(kernel1::Kernel, kernel2::Kernel) =
+    QuadraticUnbiasedSKCE(TensorProductKernel(kernel1, kernel2))
 
 function _calibrationerror(skce::QuadraticUnbiasedSKCE,
                            predictions::AbstractVector{<:AbstractVector{<:Real}},
@@ -42,10 +45,13 @@ function _calibrationerror(skce::QuadraticUnbiasedSKCE,
     estimate
 end
 
-struct LinearUnbiasedSKCE{K<:MatrixKernel} <: SKCE
+struct LinearUnbiasedSKCE{K<:Kernel} <: SKCE
     """Kernel of estimator."""
     kernel::K
 end
+
+LinearUnbiasedSKCE(kernel1::Kernel, kernel2::Kernel) =
+    LinearUnbiasedSKCE(TensorProductKernel(kernel1, kernel2))
 
 function _calibrationerror(skce::LinearUnbiasedSKCE,
                            predictions::AbstractVector{<:AbstractVector{<:Real}},
