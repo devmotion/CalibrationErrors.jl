@@ -86,7 +86,7 @@ function max_argmax_var(x::AbstractVector{<:AbstractVector{<:Real}}, idxs)
     maxvar = unsafe_variance_welford(x, idxs, 1)
 
     maxdim = 1
-    for d in 1:length(x[1])
+    for d in 2:length(x[1])
         # compute variance along the d-th dimension
         vard = unsafe_variance_welford(x, idxs, d)
 
@@ -100,7 +100,7 @@ function max_argmax_var(x::AbstractVector{<:AbstractVector{<:Real}}, idxs)
     maxvar, maxdim
 end
 
-# use Welford algorithm to compute the biased sample variance
+# use Welford algorithm to compute the unbiased sample variance
 # taken from: https://github.com/JuliaLang/Statistics.jl/blob/da6057baf849cbc803b952ef7adf979ae3a9f9d2/src/Statistics.jl#L184-L199
 # this function is unsafe since it does not perform any bounds checking
 function unsafe_variance_welford(x::AbstractVector{<:AbstractVector{<:Real}},
@@ -111,8 +111,7 @@ function unsafe_variance_welford(x::AbstractVector{<:AbstractVector{<:Real}},
         M = x[idxs[1]][dim] / 1
         S = zero(M)
         for i in 2:n
-            idx = idxs[i]
-            value = x[idx][dim]
+            value = x[idxs[i]][dim]
 
             new_M = M + (value - M) / i
             S += (value - M) * (value - new_M)
@@ -120,7 +119,7 @@ function unsafe_variance_welford(x::AbstractVector{<:AbstractVector{<:Real}},
         end
     end
 
-    return S / n
+    return S / (n - 1)
 end
 
 # this function is unsafe since it leads to undefined behaviour if the
@@ -130,30 +129,25 @@ function unsafe_median_split!(idxs::Vector{Int},
     n = length(idxs)
 
     if length(idxs) < 2
-        cutoff = n
+        cutoff = 0
     else
         # partially sort the indices `idxs` according to the corresponding values in the
         # `d`th component of`x`
-        m = div(n + 1, 2)
+        m = div(n, 2) + 1
         f = let x=x, dim=dim
             idx -> x[idx][dim]
         end
-        partialsort!(idxs, 1:(m + 1); by = f)
+        partialsort!(idxs, 1:m; by = f)
 
-        # check that we actually capture all values ≤ median
+        # figure out all values < median
         # the median is `x[idxs[m]][dim]`` for vectors of odd length
-        # and `(x[idxs[m]][dim] + x[idxs[m + 1]][dim]) / 2` for vectors of even length
-        if x[idxs[m]][dim] < x[idxs[m + 1]][dim]
-            cutoff = m
-        elseif m + 1 == n
-            cutoff = n
+        # and `(x[idxs[m - 1]][dim] + x[idxs[m]][dim]) / 2` for vectors of even length
+        if x[idxs[m - 1]][dim] < x[idxs[m]][dim]
+            cutoff = m - 1
         else
-            # otherwise we sort the remaining indices
-            otheridxs = unsafe_wrap(Array, pointer(idxs, m + 2), n - m - 1)
-            sort!(otheridxs; by = f)
-        
-            # then we obtain the last value ≤ median
-            cutoff = m + 1 + searchsortedlast(otheridxs, m; by = f)
+            # otherwise obtain the last value < median
+            firstidxs = unsafe_wrap(Array, pointer(idxs, 1), m - 1)
+            cutoff = searchsortedfirst(firstidxs, idxs[m]; by = f) - 1
         end
     end
 
