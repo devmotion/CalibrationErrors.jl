@@ -1,4 +1,5 @@
-struct TensorProductKernel{K1<:Kernel,K2<:Kernel} <: Kernel{IdentityTransform}
+## tensor product kernel
+struct TensorProductKernel{K1<:Kernel,K2<:Kernel} <: Kernel
     kernel1::K1
     kernel2::K2
 end

@@ -8,7 +8,7 @@ using Test
 Random.seed!(1234)
 
 @testset "Quadratic: Two-dimensional example" begin
-    skce = QuadraticUnbiasedSKCE(SqExponentialKernel(2), WhiteKernel())
+    skce = QuadraticUnbiasedSKCE(sqexponentialkernel(2), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
@@ -18,7 +18,7 @@ Random.seed!(1234)
 end
 
 @testset "Quadratic: Basic properties" begin
-    skce = QuadraticUnbiasedSKCE(ExponentialKernel(0.1), WhiteKernel())
+    skce = QuadraticUnbiasedSKCE(exponentialkernel(0.1), WhiteKernel())
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)
@@ -38,7 +38,7 @@ end
 end
 
 @testset "Linear: Two-dimensional example" begin
-    skce = LinearUnbiasedSKCE(SqExponentialKernel(2), WhiteKernel())
+    skce = LinearUnbiasedSKCE(sqexponentialkernel(2), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
@@ -48,7 +48,7 @@ end
 end
 
 @testset "Linear: Basic properties" begin
-    skce = LinearUnbiasedSKCE(ExponentialKernel(0.1), WhiteKernel())
+    skce = LinearUnbiasedSKCE(exponentialkernel(0.1), WhiteKernel())
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)

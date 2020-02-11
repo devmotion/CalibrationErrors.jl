@@ -8,11 +8,11 @@ using Test
 Random.seed!(1234)
 
 # alternative implementation of white kernel
-struct WhiteKernel2 <: Kernel{IdentityTransform} end
+struct WhiteKernel2 <: Kernel end
 KernelFunctions.kappa(::WhiteKernel2, x, y) = x == y 
 
 # alternative implementation TensorProductKernel
-struct TensorProductKernel2{K1<:Kernel,K2<:Kernel} <: Kernel{IdentityTransform}
+struct TensorProductKernel2{K1<:Kernel,K2<:Kernel} <: Kernel
     kernel1::K1
     kernel2::K2
 end
@@ -29,9 +29,9 @@ KernelFunctions.kappa(kernel::TensorProductKernel2, (x1, x2), (y1, y2)) =
 end
 
 @testset "unsafe_skce_eval" begin
-    kernel1 = TensorProductKernel(SqExponentialKernel(2), WhiteKernel())
-    kernel2 = TensorProductKernel(SqExponentialKernel(2), WhiteKernel2())
-    kernel3 = TensorProductKernel2(SqExponentialKernel(2), WhiteKernel())
+    kernel1 = TensorProductKernel(sqexponentialkernel(2), WhiteKernel())
+    kernel2 = TensorProductKernel(sqexponentialkernel(2), WhiteKernel2())
+    kernel3 = TensorProductKernel2(sqexponentialkernel(2), WhiteKernel())
 
     x1, x2 = rand(10), rand(1:10)
 
