@@ -10,7 +10,7 @@ KernelFunctions.kappa(kernel::TensorProductKernel, (x1, x2), (y1, y2)) =
 (kernel::TensorProductKernel)(x, y) = kappa(kernel, x, y)
 
 # exponential kernel with total variation distance
-struct TVExponentialKernel <: Kernel end
+struct TVExponentialKernel <: KernelFunctions.BaseKernel end
 
 KernelFunctions.kappa(kernel::TVExponentialKernel, d) = exp(-d) 
 KernelFunctions.metric(::TVExponentialKernel) = TotalVariation()
