@@ -7,8 +7,8 @@ BiasedSKCE(kernel1::Kernel, kernel2::Kernel) =
     BiasedSKCE(TensorProductKernel(kernel1, kernel2))
 
 function _calibrationerror(skce::BiasedSKCE,
-                           predictions::AbstractVector{<:AbstractVector{<:Real}},
-                           targets::AbstractVector{<:Integer})
+                           predictions::AbstractVector,
+                           targets::AbstractVector)
     @unpack kernel = skce
 
     # obtain number of samples

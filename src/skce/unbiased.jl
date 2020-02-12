@@ -7,8 +7,8 @@ QuadraticUnbiasedSKCE(kernel1::Kernel, kernel2::Kernel) =
     QuadraticUnbiasedSKCE(TensorProductKernel(kernel1, kernel2))
 
 function _calibrationerror(skce::QuadraticUnbiasedSKCE,
-                           predictions::AbstractVector{<:AbstractVector{<:Real}},
-                           targets::AbstractVector{<:Integer})
+                           predictions::AbstractVector,
+                           targets::AbstractVector)
     @unpack kernel = skce
 
     # obtain number of samples
@@ -54,8 +54,8 @@ LinearUnbiasedSKCE(kernel1::Kernel, kernel2::Kernel) =
     LinearUnbiasedSKCE(TensorProductKernel(kernel1, kernel2))
 
 function _calibrationerror(skce::LinearUnbiasedSKCE,
-                           predictions::AbstractVector{<:AbstractVector{<:Real}},
-                           targets::AbstractVector{<:Integer})
+                           predictions::AbstractVector,
+                           targets::AbstractVector)
     @unpack kernel = skce
 
     # obtain number of samples
