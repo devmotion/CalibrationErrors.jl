@@ -8,17 +8,17 @@ using Test
 Random.seed!(1234)
 
 @testset "Quadratic: Two-dimensional example" begin
-    skce = QuadraticUnbiasedSKCE(UniformScalingKernel(4, SquaredExponentialKernel(2)))
+    skce = QuadraticUnbiasedSKCE(transform(SqExponentialKernel(), 2), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
     @test @inferred(calibrationerror(skce, [1 0; 0 1], [1, 1])) ≈ 0
-    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -8 * exp(-4)
+    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-8)
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 0
 end
 
 @testset "Quadratic: Basic properties" begin
-    skce = QuadraticUnbiasedSKCE(UniformScalingKernel(ExponentialKernel(0.1)))
+    skce = QuadraticUnbiasedSKCE(transform(ExponentialKernel(), 0.1), WhiteKernel())
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)
@@ -38,17 +38,17 @@ end
 end
 
 @testset "Linear: Two-dimensional example" begin
-    skce = LinearUnbiasedSKCE(UniformScalingKernel(4, SquaredExponentialKernel(2)))
+    skce = LinearUnbiasedSKCE(transform(SqExponentialKernel(), 2), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
     @test @inferred(calibrationerror(skce, [1 0; 0 1], [1, 1])) ≈ 0
-    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -8 * exp(-4)
+    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-8)
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 0
 end
 
 @testset "Linear: Basic properties" begin
-    skce = LinearUnbiasedSKCE(UniformScalingKernel(ExponentialKernel(0.1)))
+    skce = LinearUnbiasedSKCE(transform(ExponentialKernel(), 0.1), WhiteKernel())
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)
