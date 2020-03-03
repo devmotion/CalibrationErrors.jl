@@ -3,9 +3,9 @@ abstract type SKCE <: CalibrationErrorEstimator end
 """
     unsafe_skce_eval(k, p, y, p̃, ỹ)
 
-Evaluate (or estimate)
+Evaluate
 ```math
-h(p, y, p̃, ỹ) = k((p, y), (p̃, ỹ)) - E_{z ∼ p}[k((p, z), (p̃, ỹ))] - E_{z̃ ∼ p̃}[k((p, y), (p̃, z̃))] + E_{z ∼ p, z̃ ∼ p̃}[k((p, z), (p̃, z̃))]
+k((p, y), (p̃, ỹ)) - E_{z ∼ p}[k((p, z), (p̃, ỹ))] - E_{z̃ ∼ p̃}[k((p, y), (p̃, z̃))] + E_{z ∼ p, z̃ ∼ p̃}[k((p, z), (p̃, z̃))]
 ```
 for kernel `k` and predictions `p` and `p̃` with corresponding targets `y` and `ỹ`.
 
