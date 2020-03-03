@@ -39,18 +39,19 @@ end
     x, y = rand(10), rand(10)
     @test kappa(kernel, x, y) == exp(-totalvariation(x, y))
 
-    # syntactic sugar
-    @test tvexponentialkernel() === kernel
-    @test kappa(tvexponentialkernel(0.1), x, y) == exp(- 0.1 * totalvariation(x, y))
+    # transformations
+    @test kappa(transform(kernel, 0.1), x, y) == exp(- 0.1 * totalvariation(x, y))
+    @test kappa(transform(kernel, ScaleTransform(0.1)), x, y) ==
+        exp(- 0.1 * totalvariation(x, y))
     ard = rand(10)
-    @test kappa(tvexponentialkernel(ard), x, y) == exp(- totalvariation(ard .* x, ard .* y))
-    @test kappa(tvexponentialkernel(ScaleTransform(0.1)), x, y) == exp(- 0.1 * totalvariation(x, y))
+    @test kappa(transform(kernel, ard), x, y) == exp(- totalvariation(ard .* x, ard .* y))
 end
 
 @testset "unsafe_skce_eval" begin
-    kernel1 = TensorProductKernel(sqexponentialkernel(2), WhiteKernel())
-    kernel2 = TensorProductKernel(sqexponentialkernel(2), WhiteKernel2())
-    kernel3 = TensorProductKernel2(sqexponentialkernel(2), WhiteKernel())
+    kernel = transform(SqExponentialKernel(), 2)
+    kernel1 = TensorProductKernel(kernel, WhiteKernel())
+    kernel2 = TensorProductKernel(kernel, WhiteKernel2())
+    kernel3 = TensorProductKernel2(kernel, WhiteKernel())
 
     x1, x2 = rand(10), rand(1:10)
 

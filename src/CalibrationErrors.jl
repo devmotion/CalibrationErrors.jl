@@ -22,7 +22,6 @@ export UniformBinning, MedianVarianceBinning
 
 # kernels
 export TensorProductKernel, TVExponentialKernel
-export tvexponentialkernel
 
 include("generic.jl")
 include("binning/generic.jl")

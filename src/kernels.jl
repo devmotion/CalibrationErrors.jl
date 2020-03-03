@@ -16,15 +16,6 @@ KernelFunctions.kappa(kernel::TVExponentialKernel, d) = exp(-d)
 KernelFunctions.metric(::TVExponentialKernel) = TotalVariation()
 KernelFunctions.iskroncompatible(::TVExponentialKernel) = true
 
-# syntactic sugar
-tvexponentialkernel() = TVExponentialKernel()
-tvexponentialkernel(ρ::Real) =
-    KernelFunctions.TransformedKernel(TVExponentialKernel(), ScaleTransform(ρ))
-tvexponentialkernel(ρ::AbstractVector{<:Real}) =
-    KernelFunctions.TransformedKernel(TVExponentialKernel(), ARDTransform(ρ))
-tvexponentialkernel(t::Transform) =
-    KernelFunctions.TransformedKernel(TVExponentialKernel(), t)
-
 # more efficient application of ScaleTransform
 KernelFunctions._scale(t::ScaleTransform, metric::TotalVariation, x, y) = 
     first(t.s) * evaluate(metric, x, y)
