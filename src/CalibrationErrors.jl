@@ -21,7 +21,7 @@ export ECE, BiasedSKCE, UnbiasedSKCE, BlockUnbiasedSKCE
 export UniformBinning, MedianVarianceBinning
 
 # kernels
-export TensorProductKernel, TVExponentialKernel
+export TVExponentialKernel
 
 include("generic.jl")
 include("binning/generic.jl")

@@ -1,21 +1,23 @@
-## tensor product kernel
-struct TensorProductKernel{K1<:Kernel,K2<:Kernel} <: Kernel
-    kernel1::K1
-    kernel2::K2
+# exponential kernel with total variation distance
+struct TVExponentialKernel <: KernelFunctions.SimpleKernel end
+
+# TODO: Not needed in KernelFunctions 1.0
+function (kernel::TVExponentialKernel)(x, y)
+    return kappa(kernel, evaluate(KernelFunctions.metric(kernel), x, y))
 end
 
-KernelFunctions.kappa(kernel::TensorProductKernel, (x1, x2), (y1, y2)) =
-    kappa(kernel.kernel1, x1, y1) * kappa(kernel.kernel2, x2, y2)
-
-(kernel::TensorProductKernel)(x, y) = kappa(kernel, x, y)
-
-# exponential kernel with total variation distance
-struct TVExponentialKernel <: KernelFunctions.BaseKernel end
-
-KernelFunctions.kappa(kernel::TVExponentialKernel, d) = exp(-d) 
+KernelFunctions.kappa(kernel::TVExponentialKernel, d) = exp(-d)
 KernelFunctions.metric(::TVExponentialKernel) = TotalVariation()
-KernelFunctions.iskroncompatible(::TVExponentialKernel) = true
 
 # more efficient application of ScaleTransform
-KernelFunctions._scale(t::ScaleTransform, metric::TotalVariation, x, y) = 
-    first(t.s) * evaluate(metric, x, y)
+# Optimizations for scale transforms of simple kernels to save allocations:
+# Instead of a multiplying every element of the inputs before evaluating the metric,
+# we perform a scalar multiplcation of the distance of the original inputs, if possible.
+function (k::TransformedKernel{<:TVExponentialKernel,<:ScaleTransform})(
+    x::AbstractVector{<:Real},
+    y::AbstractVector{<:Real},
+)
+    return kappa(k.kernel,
+                 KernelFunctions._scale(k.transform,
+                                        KernelFunctions.metric(k.kernel), x, y))
+end

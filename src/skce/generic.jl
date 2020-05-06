@@ -16,8 +16,13 @@ function unsafe_skce_eval end
 
 # default implementation for classification
 # we do not use the symmetry of `kernel` since it seems unlikely that `(p, y) == (p̃, ỹ)`
-function unsafe_skce_eval(kernel::Kernel, p::AbstractVector{<:Real}, y::Integer,
-                          p̃::AbstractVector{<:Real}, ỹ::Integer)
+function unsafe_skce_eval(
+    kernel::Kernel,
+    p::AbstractVector{<:Real},
+    y::Integer,
+    p̃::AbstractVector{<:Real},
+    ỹ::Integer
+)
     # precomputations
     n = length(p)
 
@@ -30,7 +35,7 @@ function unsafe_skce_eval(kernel::Kernel, p::AbstractVector{<:Real}, y::Integer,
     tuple_p̃_ỹ = (p̃, ỹ)
 
     # i = y, j = ỹ
-    result = kappa(kernel, (p, y), (p̃, ỹ)) * (1 - py - p̃ỹ + py * p̃ỹ)
+    result = kernel((p, y), (p̃, ỹ)) * (1 - py - p̃ỹ + py * p̃ỹ)
 
     # i < y
     for i in 1:(y - 1)
@@ -39,26 +44,26 @@ function unsafe_skce_eval(kernel::Kernel, p::AbstractVector{<:Real}, y::Integer,
 
         # j < ỹ
         @inbounds for j in 1:(ỹ - 1)
-            result += kappa(kernel, tuple_p_i, (p̃, j)) * pi * p̃[j]
+            result += kernel(tuple_p_i, (p̃, j)) * pi * p̃[j]
         end
 
         # j = ỹ
-        result += kappa(kernel, tuple_p_i, tuple_p̃_ỹ) * pi * p̃ỹm1
+        result += kernel(tuple_p_i, tuple_p̃_ỹ) * pi * p̃ỹm1
 
         # j > ỹ
         @inbounds for j in (ỹ + 1):n
-            result += kappa(kernel, tuple_p_i, (p̃, j)) * pi * p̃[j]
+            result += kernel(tuple_p_i, (p̃, j)) * pi * p̃[j]
         end
     end
 
     # i = y, j < ỹ
     @inbounds for j in 1:(ỹ - 1)
-        result += kappa(kernel, tuple_p_y, (p̃, j)) * pym1 * p̃[j]
+        result += kernel(tuple_p_y, (p̃, j)) * pym1 * p̃[j]
     end
 
     # i = y, j > ỹ
     @inbounds for j in (ỹ + 1):n
-        result += kappa(kernel, tuple_p_y, (p̃, j)) * pym1 * p̃[j]
+        result += kernel(tuple_p_y, (p̃, j)) * pym1 * p̃[j]
     end
 
     # i > y
@@ -68,29 +73,39 @@ function unsafe_skce_eval(kernel::Kernel, p::AbstractVector{<:Real}, y::Integer,
 
         # j < ỹ
         @inbounds for j in 1:(ỹ - 1)
-            result += kappa(kernel, tuple_p_i, (p̃, j)) * pi * p̃[j]
+            result += kernel(tuple_p_i, (p̃, j)) * pi * p̃[j]
         end
 
         # j = ỹ
-        result += kappa(kernel, tuple_p_i, tuple_p̃_ỹ) * pi * p̃ỹm1
+        result += kernel(tuple_p_i, tuple_p̃_ỹ) * pi * p̃ỹm1
 
         # j > ỹ
         @inbounds for j in (ỹ + 1):n
-            result += kappa(kernel, tuple_p_i, (p̃, j)) * pi * p̃[j]
+            result += kernel(tuple_p_i, (p̃, j)) * pi * p̃[j]
         end
     end
 
     result
 end
 
-function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}, y::Integer,
+function unsafe_skce_eval(kernel::TensorProduct, p::AbstractVector{<:Real}, y::Integer,
                           p̃::AbstractVector{<:Real}, ỹ::Integer)
+    return unsafe_skce_eval(kernel.kernels..., p, y, p̃, ỹ)
+end
+
+function unsafe_skce_eval(
+    κpredictions::Kernel,
+    κtargets::Kernel,
+    p::AbstractVector{<:Real},
+    y::Integer,
+    p̃::AbstractVector{<:Real},
+    ỹ::Integer
+)
     # ensure that y ≤ ỹ (simplifies the implementation)
-    y > ỹ && return unsafe_skce_eval(kernel, p̃, ỹ, p, y)
+    y > ỹ && return unsafe_skce_eval(κpredictions, κtargets, p̃, ỹ, p, y)
 
     # precomputations
     n = length(p)
-    κ = kernel.kernel2
 
     @inbounds begin
         py = p[y]
@@ -104,7 +119,7 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
     p̃ỹm1 = p̃ỹ - 1
 
     # i = y, j = ỹ
-    result = kappa(κ, y, ỹ) * (1 - py - p̃ỹ + py * p̃ỹ)
+    result = κtargets(y, ỹ) * (1 - py - p̃ỹ + py * p̃ỹ)
 
     # i < y
     for i in 1:(y - 1)
@@ -112,21 +127,21 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
         @inbounds p̃i = p̃[i]
 
         # i = j < y ≤ ỹ
-        result += kappa(κ, i, i) * pi * p̃i
+        result += κtargets(i, i) * pi * p̃i
 
         # i < j < y ≤ ỹ
         @inbounds for j in (i + 1):(y - 1)
-            result += kappa(κ, i, j) * (pi * p̃[j] + p[j] * p̃i)
+            result += κtargets(i, j) * (pi * p̃[j] + p[j] * p̃i)
         end
 
         # i < y < j < ỹ
         @inbounds for j in (y + 1):(ỹ - 1)
-            result += kappa(κ, i, j) * (pi * p̃[j] + p[j] * p̃i)
+            result += κtargets(i, j) * (pi * p̃[j] + p[j] * p̃i)
         end
 
         # i < y ≤ ỹ < j
         @inbounds for j in (ỹ + 1):n
-            result += kappa(κ, i, j) * (pi * p̃[j] + p[j] * p̃i)
+            result += κtargets(i, j) * (pi * p̃[j] + p[j] * p̃i)
         end
     end
 
@@ -136,16 +151,16 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
         @inbounds p̃i = p̃[i]
 
         # y < i = j < ỹ
-        result += kappa(κ, i, i) * pi * p̃i
+        result += κtargets(i, i) * pi * p̃i
 
         # y < i < j < ỹ
         @inbounds for j in (i + 1):(ỹ - 1)
-            result += kappa(κ, i, j) * (pi * p̃[j] + p[j] * p̃i)
+            result += κtargets(i, j) * (pi * p̃[j] + p[j] * p̃i)
         end
 
         # y < i < ỹ < j
         @inbounds for j in (ỹ + 1):n
-            result += kappa(κ, i, j) * (pi * p̃[j] + p[j] * p̃i)
+            result += κtargets(i, j) * (pi * p̃[j] + p[j] * p̃i)
         end
     end
 
@@ -155,11 +170,11 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
         @inbounds p̃i = p̃[i]
 
         # ỹ < i = j
-        result += kappa(κ, i, i) * pi * p̃i
+        result += κtargets(i, i) * pi * p̃i
 
         # ỹ < i < j
         @inbounds for j in (i + 1):n
-            result += kappa(κ, i, j) * (pi * p̃[j] + p[j] * p̃i)
+            result += κtargets(i, j) * (pi * p̃[j] + p[j] * p̃i)
         end
     end
 
@@ -167,12 +182,12 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
     if y == ỹ
         # i < y = ỹ, j = y = ỹ
         @inbounds for i in 1:(y - 1)
-            result += kappa(κ, i, y) * (p[i] * p̃ym1 + pym1 * p̃[i])
+            result += κtargets(i, y) * (p[i] * p̃ym1 + pym1 * p̃[i])
         end
-        
+
         # i = y = ỹ, j > y = ỹ
         @inbounds for j in (y + 1):n
-            result += kappa(κ, y, j) * (pym1 * p̃[j] + p[j] * p̃ym1)
+            result += κtargets(y, j) * (pym1 * p̃[j] + p[j] * p̃ym1)
         end
     else
         # i < y
@@ -181,14 +196,14 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
             @inbounds p̃i = p̃[i]
 
             # j = y < ỹ
-            result += kappa(κ, i, y) * (pi * p̃y + pym1 * p̃i)
+            result += κtargets(i, y) * (pi * p̃y + pym1 * p̃i)
 
             # y < j = ỹ
-            result += kappa(κ, i, ỹ) * (pi * p̃ỹm1 + pỹ * p̃i)
+            result += κtargets(i, ỹ) * (pi * p̃ỹm1 + pỹ * p̃i)
         end
 
         # i = y = j < ỹ
-        result += kappa(κ, y, y) * pym1 * p̃y
+        result += κtargets(y, y) * pym1 * p̃y
 
         # i = y < j < ỹ and y < i < j = ỹ
         for ij in (y + 1):(ỹ - 1)
@@ -196,14 +211,14 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
             @inbounds p̃ij = p̃[ij]
 
             # i = y < j < ỹ
-            result += kappa(κ, y, ij) * (pym1 * p̃ij + pij * p̃y)
+            result += κtargets(y, ij) * (pym1 * p̃ij + pij * p̃y)
 
             # y < i < j = ỹ
-            result += kappa(κ, ij, ỹ) * (pij * p̃ỹm1 + pỹ * p̃ij)
+            result += κtargets(ij, ỹ) * (pij * p̃ỹm1 + pỹ * p̃ij)
         end
 
         # i = ỹ = j
-        result += kappa(κ, ỹ, ỹ) * pỹ * (p̃ỹ - 1)
+        result += κtargets(ỹ, ỹ) * pỹ * (p̃ỹ - 1)
 
         # i = y < ỹ < j and i = ỹ < j
         for j in (ỹ + 1):n
@@ -211,18 +226,24 @@ function unsafe_skce_eval(kernel::TensorProductKernel, p::AbstractVector{<:Real}
             @inbounds p̃j = p̃[j]
 
             # i = y < ỹ < j
-            result += kappa(κ, y, j) * (pym1 * p̃j + pj * p̃y)
+            result += κtargets(y, j) * (pym1 * p̃j + pj * p̃y)
 
             # i = ỹ < j
-            result += kappa(κ, ỹ, j) * (p̃ỹm1 * pj + p̃j * pỹ)
+            result += κtargets(ỹ, j) * (p̃ỹm1 * pj + p̃j * pỹ)
         end
     end
 
-    result * kappa(kernel.kernel1, p, p̃)
+    return result * κpredictions(p, p̃)
 end
 
-function unsafe_skce_eval(kernel::TensorProductKernel{<:Kernel,<:WhiteKernel},
-                          p::AbstractVector{<:Real}, y::Integer,
-                          p̃::AbstractVector{<:Real}, ỹ::Integer)
-    @inbounds ((y == ỹ) - p[ỹ] - p̃[y] + dot(p, p̃)) * kappa(kernel.kernel1, p, p̃)
+function unsafe_skce_eval(
+    κpredictions::Kernel,
+    ::WhiteKernel,
+    p::AbstractVector{<:Real},
+    y::Integer,
+    p̃::AbstractVector{<:Real},
+    ỹ::Integer
+)
+    @inbounds res = ((y == ỹ) - p[ỹ] - p̃[y] + dot(p, p̃)) * κpredictions(p, p̃)
+    return res
 end
