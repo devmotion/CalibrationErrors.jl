@@ -11,6 +11,15 @@ Random.seed!(1234)
 struct WhiteKernel2 <: Kernel end
 (::WhiteKernel2)(x, y) = x == y
 
+# alternative implementation TensorProductKernel
+struct TensorProduct2{K1<:Kernel,K2<:Kernel} <: Kernel
+    kernel1::K1
+    kernel2::K2
+end
+function (kernel::TensorProduct2)((x1, x2), (y1, y2))
+    return kernel.kernel1(x1, y1) * kernel.kernel2(x2, y2)
+end
+
 @testset "TVExponentialKernel" begin
     kernel = TVExponentialKernel()
 
@@ -33,7 +42,7 @@ end
     kernel = transform(SqExponentialKernel(), 2)
     kernel1 = TensorProduct(kernel, WhiteKernel())
     kernel2 = TensorProduct(kernel, WhiteKernel2())
-    kernel3 = TensorProduct(kernel, WhiteKernel())
+    kernel3 = TensorProduct2(kernel, WhiteKernel())
 
     x1, x2 = rand(10), rand(1:10)
 
