@@ -3,8 +3,7 @@ struct BiasedSKCE{K<:Kernel} <: SKCE
     kernel::K
 end
 
-BiasedSKCE(kernel1::Kernel, kernel2::Kernel) =
-    BiasedSKCE(TensorProductKernel(kernel1, kernel2))
+BiasedSKCE(kernel1::Kernel, kernel2::Kernel) = BiasedSKCE(TensorProduct(kernel1, kernel2))
 
 function _calibrationerror(skce::BiasedSKCE,
                            predictions::AbstractVector,

@@ -4,7 +4,7 @@ struct UnbiasedSKCE{K<:Kernel} <: SKCE
 end
 
 function UnbiasedSKCE(kernel1::Kernel, kernel2::Kernel)
-    return UnbiasedSKCE(TensorProductKernel(kernel1, kernel2))
+    return UnbiasedSKCE(TensorProduct(kernel1, kernel2))
 end
 
 function _calibrationerror(
@@ -37,7 +37,7 @@ struct BlockUnbiasedSKCE{K<:Kernel} <: SKCE
 end
 
 function BlockUnbiasedSKCE(kernel1::Kernel, kernel2::Kernel, blocksize::Int = 2)
-    return BlockUnbiasedSKCE(TensorProductKernel(kernel1, kernel2), blocksize)
+    return BlockUnbiasedSKCE(TensorProduct(kernel1, kernel2), blocksize)
 end
 function BlockUnbiasedSKCE(kernel::Kernel, blocksize::Int = 2)
     return BlockUnbiasedSKCE{typeof(kernel)}(kernel, blocksize)
