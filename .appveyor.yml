@@ -12,8 +12,12 @@ matrix:
     - julia_version: nightly
 branches:
   only:
-    - master
-    - /release-.*/
+    # This is where pull requests from "bors r+" are built.
+    - staging
+    # This is where pull requests from "bors try" are built.
+    - trying
+    # Uncomment this to enable building pull requests.
+    #- master
 notifications:
   - provider: Email
     on_build_success: false
