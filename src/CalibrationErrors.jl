@@ -15,7 +15,7 @@ using Statistics
 export calibrationerror
 
 # estimators
-export ECE, BiasedSKCE, LinearUnbiasedSKCE, QuadraticUnbiasedSKCE
+export ECE, BiasedSKCE, UnbiasedSKCE, BlockUnbiasedSKCE
 
 # binning algorithms
 export UniformBinning, MedianVarianceBinning
