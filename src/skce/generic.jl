@@ -114,7 +114,7 @@ function unsafe_skce_eval_targets(
     ỹ::Integer
 )
     # ensure that y ≤ ỹ (simplifies the implementation)
-    y > ỹ && return unsafe_skce_eval(κpredictions, κtargets, p̃, ỹ, p, y)
+    y > ỹ && return unsafe_skce_eval_targets(κtargets, p̃, ỹ, p, y)
 
     # precomputations
     n = length(p)
