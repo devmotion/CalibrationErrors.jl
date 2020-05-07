@@ -88,13 +88,25 @@ function unsafe_skce_eval(
     result
 end
 
-function unsafe_skce_eval(kernel::TensorProduct, p::AbstractVector{<:Real}, y::Integer,
-                          p̃::AbstractVector{<:Real}, ỹ::Integer)
-    return unsafe_skce_eval(kernel.kernels..., p, y, p̃, ỹ)
+# evaluation for tensor product kernels
+function unsafe_skce_eval(kernel::TensorProduct, p, y, p̃, ỹ)
+    κpredictions, κtargets = kernel.kernels
+    return κpredictions(p, p̃) * unsafe_skce_eval_targets(κtargets, p, y, p̃, ỹ)
 end
 
+# resolve method ambiguity
 function unsafe_skce_eval(
-    κpredictions::Kernel,
+    kernel::TensorProduct,
+    p::AbstractVector{<:Real},
+    y::Integer,
+    p̃::AbstractVector{<:Real},
+    ỹ::Integer
+)
+    κpredictions, κtargets = kernel.kernels
+    return κpredictions(p, p̃) * unsafe_skce_eval_targets(κtargets, p, y, p̃, ỹ)
+end
+
+function unsafe_skce_eval_targets(
     κtargets::Kernel,
     p::AbstractVector{<:Real},
     y::Integer,
@@ -102,7 +114,7 @@ function unsafe_skce_eval(
     ỹ::Integer
 )
     # ensure that y ≤ ỹ (simplifies the implementation)
-    y > ỹ && return unsafe_skce_eval(κpredictions, κtargets, p̃, ỹ, p, y)
+    y > ỹ && return unsafe_skce_eval_targets(κtargets, p̃, ỹ, p, y)
 
     # precomputations
     n = length(p)
@@ -233,17 +245,16 @@ function unsafe_skce_eval(
         end
     end
 
-    return result * κpredictions(p, p̃)
+    return result
 end
 
-function unsafe_skce_eval(
-    κpredictions::Kernel,
+function unsafe_skce_eval_targets(
     ::WhiteKernel,
     p::AbstractVector{<:Real},
     y::Integer,
     p̃::AbstractVector{<:Real},
     ỹ::Integer
 )
-    @inbounds res = ((y == ỹ) - p[ỹ] - p̃[y] + dot(p, p̃)) * κpredictions(p, p̃)
+    @inbounds res = (y == ỹ) - p[ỹ] - p̃[y] + dot(p, p̃)
     return res
 end
