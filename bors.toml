@@ -2,7 +2,7 @@ status = [
   "continuous-integration/travis-ci/push",
   "Julia 1 - windows-latest - x86",
   "Julia 1 - windows-latest - x64",
-  "Julia 1.% - windows-latest - x68",
+  "Julia 1.% - windows-latest - x86",
   "Julia 1.% - windows-latest - x64"
 ]
 delete_merged_branches = true
