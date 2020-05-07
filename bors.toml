@@ -1,6 +1,6 @@
 status = [
   "continuous-integration/travis-ci/push",
-  "CI / Julia 1%"
+  "Julia 1%"
 ]
 delete_merged_branches = true
 # Uncomment this to use a two hour timeout.
