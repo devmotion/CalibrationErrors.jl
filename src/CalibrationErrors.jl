@@ -15,7 +15,7 @@ using Statistics
 export calibrationerror
 
 # estimators
-export ECE, BiasedSKCE, UnbiasedSKCE, BlockUnbiasedSKCE
+export ECE, BiasedSKCE, UnbiasedSKCE, BlockUnbiasedSKCE, SUMCE
 
 # binning algorithms
 export UniformBinning, MedianVarianceBinning
@@ -33,5 +33,7 @@ include("kernels.jl")
 include("skce/generic.jl")
 include("skce/biased.jl")
 include("skce/unbiased.jl")
+
+include("sumce.jl")
 
 end # module
