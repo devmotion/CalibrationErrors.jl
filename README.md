@@ -14,8 +14,8 @@ Estimation of calibration errors.
 ## Overview
 
 This package implements different estimators of the expected calibration error
-(ECE) and the squared kernel calibration error calibration error (SKCE) in the
-Julia language.
+(ECE), the squared kernel calibration error calibration error (SKCE), and the
+squared unnormalized mean calibration embedding (SUMCE) in the Julia language.
 
 ## Example
 
@@ -33,5 +33,6 @@ provided as a vector of length `n`, in which every element is from the set `1,â€
 Alternatively, it is possible to specify a tuple of predictions and targets or a vector of
 tuples of predictions and targets.
 
-This package implements the estimator `ECE` of the ECE and the estimators
-`BiasedSKCE`, `UnbiasedSKCE`, and `BlockUnbiasedSKCE` for the SKCE.
+This package implements the estimator `ECE` of the ECE, the estimators
+`BiasedSKCE`, `UnbiasedSKCE`, and `BlockUnbiasedSKCE` for the SKCE, and `SUMCE` for the
+SUMCE.

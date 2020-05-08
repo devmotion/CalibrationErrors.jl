@@ -8,3 +8,5 @@ using SafeTestsets
 @safetestset "Kernels" begin include("kernels.jl") end
 @safetestset "Biased SKCE" begin include("skce/biased.jl") end
 @safetestset "Unbiased SKCE" begin include("skce/unbiased.jl") end
+
+@safetestset "SUMCE" begin include("sumce.jl") end
