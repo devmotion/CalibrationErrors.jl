@@ -5,8 +5,8 @@ using Reexport
 using DataStructures
 using Distances
 @reexport using KernelFunctions
-using Parameters
 using StatsBase
+using UnPack
 
 using LinearAlgebra
 using Statistics
