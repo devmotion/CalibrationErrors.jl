@@ -34,6 +34,6 @@ include("skce/generic.jl")
 include("skce/biased.jl")
 include("skce/unbiased.jl")
 
-include("sumce.jl")
+include("ucme.jl")
 
 end # module
