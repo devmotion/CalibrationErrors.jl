@@ -15,7 +15,7 @@ Estimation of calibration errors.
 
 This package implements different estimators of the expected calibration error
 (ECE), the squared kernel calibration error calibration error (SKCE), and the
-squared unnormalized mean calibration embedding (SUMCE) in the Julia language.
+unnormalized calibration mean embedding (UCME) in the Julia language.
 
 ## Example
 

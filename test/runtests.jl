@@ -9,4 +9,4 @@ using SafeTestsets
 @safetestset "Biased SKCE" begin include("skce/biased.jl") end
 @safetestset "Unbiased SKCE" begin include("skce/unbiased.jl") end
 
-@safetestset "SUMCE" begin include("sumce.jl") end
+@safetestset "UCME" begin include("ucme.jl") end
