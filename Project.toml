@@ -1,7 +1,7 @@
 name = "CalibrationErrors"
 uuid = "33913031-fe46-5864-950f-100836f47845"
 authors = ["David Widmann <david.widmann@it.uu.se>"]
-version = "0.5.2"
+version = "0.5.3"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
