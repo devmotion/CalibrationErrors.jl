@@ -7,12 +7,12 @@ using Test
 Random.seed!(1234)
 
 @testset "Two-dimensional example" begin
-    skce = BiasedSKCE(transform(SqExponentialKernel(), 2), WhiteKernel())
+    skce = BiasedSKCE(SqExponentialKernel(), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
     @test @inferred(calibrationerror(skce, [1 0; 0 1], [1, 1])) ≈ 0.5
-    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ 1 - exp(-8)
+    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ 1 - exp(-1)
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 0.5
 end
 

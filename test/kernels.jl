@@ -39,7 +39,7 @@ end
 end
 
 @testset "unsafe_skce_eval" begin
-    kernel = transform(SqExponentialKernel(), 2)
+    kernel = SqExponentialKernel()
     kernel1 = TensorProduct(kernel, WhiteKernel())
     kernel2 = TensorProduct(kernel, WhiteKernel2())
     kernel3 = TensorProduct2(kernel, WhiteKernel())
