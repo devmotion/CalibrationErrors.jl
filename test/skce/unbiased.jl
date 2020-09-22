@@ -8,12 +8,12 @@ using Test
 Random.seed!(1234)
 
 @testset "Unbiased: Two-dimensional example" begin
-    skce = UnbiasedSKCE(transform(SqExponentialKernel(), 2), WhiteKernel())
+    skce = UnbiasedSKCE(SqExponentialKernel(), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
     @test @inferred(calibrationerror(skce, [1 0; 0 1], [1, 1])) ≈ 0
-    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-8)
+    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-1)
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 0
 end
 
@@ -39,12 +39,12 @@ end
 
 @testset "Block: Two-dimensional example" begin
     # Blocks of two samples
-    skce = BlockUnbiasedSKCE(transform(SqExponentialKernel(), 2), WhiteKernel())
+    skce = BlockUnbiasedSKCE(SqExponentialKernel(), WhiteKernel())
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
     @test @inferred(calibrationerror(skce, [1 0; 0 1], [1, 1])) ≈ 0
-    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-8)
+    @test @inferred(calibrationerror(skce, [[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-1)
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 0
 
     # two predictions, ten times replicated
@@ -53,7 +53,7 @@ end
     @test @inferred(calibrationerror(skce, repeat([1 0; 0 1], 1, 10),
                                      repeat([1, 1], 10))) ≈ 0
     @test @inferred(calibrationerror(skce, (repeat([[1, 0], [0, 1]], 10),
-                                            repeat([2, 1], 10)))) ≈ -2 * exp(-8)
+                                            repeat([2, 1], 10)))) ≈ -2 * exp(-1)
     @test @inferred(calibrationerror(skce, (repeat([1 0; 0 1], 1, 10),
                                             repeat([2, 2], 10)))) ≈ 0
 end

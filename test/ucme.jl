@@ -9,16 +9,16 @@ Random.seed!(1234)
 
 @testset "UCME: Two-dimensional example" begin
     # three test locations
-    ucme = UCME(transform(SqExponentialKernel(), 2), WhiteKernel(),
+    ucme = UCME(SqExponentialKernel(), WhiteKernel(),
                 [[1.0, 0], [0.5, 0.5], [0.0, 1]], [1, 1, 2])
 
     # two predictions
     @test @inferred(calibrationerror(ucme, ([1 0; 0 1], [1, 2]))) ≈ 0
     @test @inferred(calibrationerror(ucme, [1 0; 0 1], [1, 1])) ≈
-        (exp(-16) + exp(-4) + 1) / 12
-    @test @inferred(calibrationerror(ucme, [[1, 0], [0, 1]], [2, 1])) ≈ (1 - exp(-8))^2 / 6
+        (exp(-2) + exp(-0.5) + 1) / 12
+    @test @inferred(calibrationerror(ucme, [[1, 0], [0, 1]], [2, 1])) ≈ (1 - exp(-1))^2 / 6
     @test @inferred(calibrationerror(ucme, ([1 0; 0 1], [2, 2]))) ≈
-        (exp(-16) + exp(-4) + 1) / 12
+        (exp(-2) + exp(-0.5) + 1) / 12
 end
 
 @testset "UCME: Basic properties" begin
