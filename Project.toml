@@ -16,7 +16,7 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 [compat]
 CalibrationErrors = "0.5"
 Distances = "0.9"
-Distributions = "0.23"
+Distributions = "0.23, 0.24"
 KernelFunctions = "0.8"
 OptimalTransport = "0.1.8"
 PDMats = "0.10"
