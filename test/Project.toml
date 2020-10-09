@@ -11,7 +11,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 Distances = "0.9"
-Distributions = "0.23"
+Distributions = "0.23, 0.24"
 KernelFunctions = "0.8"
 SafeTestsets = "0.0"
 StatsBase = "0.33"
