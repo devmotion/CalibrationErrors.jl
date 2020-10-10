@@ -220,9 +220,9 @@ version = "0.21.1"
 
 [[KernelFunctions]]
 deps = ["Compat", "Distances", "Functors", "InteractiveUtils", "LinearAlgebra", "Random", "Requires", "SpecialFunctions", "StatsBase", "StatsFuns", "Test", "ZygoteRules"]
-git-tree-sha1 = "ce494c70e186d2149bf4e404b50b9d2be8c16847"
+git-tree-sha1 = "6555cfa42f9a5a7327321015579792dfff15c5f4"
 uuid = "ec8451be-7e33-11e9-00cf-bbf324bd1392"
-version = "0.8.6"
+version = "0.8.7"
 
 [[LAME_jll]]
 deps = ["Libdl", "Pkg"]
