@@ -1,38 +1,22 @@
-using Documenter
 using CalibrationErrors
-using Literate
+using Documenter
 
-# define directories
-const EXAMPLES = joinpath(@__DIR__, "..", "examples")
-const OUTPUT = joinpath(@__DIR__, "src", "generated")
-
-# recreate output directory
-rm(OUTPUT; force=true, recursive=true)
-mkpath(OUTPUT)
-
-# generate Markdown and Jupyter notebook
-for file in readdir(EXAMPLES)
-    endswith(file, ".jl") || continue
-
-    fullpath = joinpath(EXAMPLES, file)
-
-    Literate.markdown(fullpath, OUTPUT)
-    Literate.notebook(fullpath, OUTPUT)
-end
-
-makedocs(
+makedocs(;
+    modules = [CalibrationErrors],
+    authors = "David Widmann <david.widmann@it.uu.se>",
+    repo = "https://github.com/devmotion/CalibrationErrors.jl/blob/{commit}{path}#L{line}",
     sitename = "CalibrationErrors.jl",
-        pages = [
-            "Home" => "index.md",
-            "Background" => "background.md",
-            "Calibration" => "calibration.md",
-            "Estimators" => "estimators.md",
-            "Examples" => [
-                "Distribution" => "generated/distribution.md"
-            ]
-        ]
+    format=Documenter.HTML(;
+        prettyurls=get(ENV, "CI", "false") == "true",
+        canonical="https://devmotion.github.io/CalibrationErrors.jl",
+        assets=String[],
+    ),
+    pages = [
+        "Home" => "index.md",
+    ],
 )
 
-deploydocs(
+deploydocs(;
     repo = "github.com/devmotion/CalibrationErrors.jl.git",
+    push_preview = true,
 )
