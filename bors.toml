@@ -1,9 +1,15 @@
 status = [
-  "continuous-integration/travis-ci/push",
+  "Julia 1 - ubuntu-latest - x86",
+  "Julia 1 - ubuntu-latest - x64",
+  "Julia 1.% - ubuntu-latest - x86",
+  "Julia 1.% - ubuntu-latest - x64"
+  "Julia 1 - macOS-latest - x64",
+  "Julia 1.% - macOS-latest - x64"
   "Julia 1 - windows-latest - x86",
   "Julia 1 - windows-latest - x64",
   "Julia 1.% - windows-latest - x86",
-  "Julia 1.% - windows-latest - x64"
+  "Julia 1.% - windows-latest - x64",
+  "Documentation"
 ]
 delete_merged_branches = true
 # Uncomment this to use a two hour timeout.
