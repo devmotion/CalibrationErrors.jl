@@ -38,19 +38,17 @@ makedocs(;
 function deployconfig()
     get(ENV, "GITHUB_REPOSITORY", "") == "devmotion/CalibrationErrors.jl" || return
     get(ENV, "GITHUB_REF", "") == "refs/heads/trying" || return
+    get(ENV, "GITHUB_ACTOR", "") == "bors[bot]" || return
 
     event_path = get(ENV, "GITHUB_EVENT_PATH", nothing)
     event_path === nothing && return
     event = JSON.parsefile(event_path)
-    @show event
-    haskey(event, "push") || return
-    @show event["push"]
-    haskey(event["push"], "commits") || return
-    @show event["push"]["commits"]
-    haskey(event["push"]["commits"][1], "message") || return
-    @show event["push"]["commits"][1]["message"]
+    haskey(event, "head_commit") || return
+    @show event["head_commit"]
+    haskey(event["head_commit"], "message") || return
+    @show event["head_commit"]["message"]
 
-    m = match(r"^Try (.*):$", event["push"]["commits"][1]["message"])
+    m = match(r"^Try #(.*):$", event["head_commit"]["message"])
     m === nothing && return
 
     pr = m.captures[1]
@@ -63,15 +61,8 @@ function deployconfig()
 end
 
 config = deployconfig()
-if config === nothing
-    # fallback
-    deploydocs(;
-        repo = "github.com/devmotion/CalibrationErrors.jl.git",
-    )
-else
-    deploydocs(
-        config;
-        repo = "github.com/devmotion/CalibrationErrors.jl.git",
-        push_preview = true,
-    )
-end
+deploydocs(;
+    repo = "github.com/devmotion/CalibrationErrors.jl.git",
+    deployconfig = config === nothing ? Documenter.auto_detect_deploy_system() : config,
+    push_preview = true,
+)
