@@ -33,36 +33,43 @@ makedocs(;
     ],
 )
 
-# custom configuration if on the trying branch to enable previews
-@show ENV
-function deployconfig()
-    get(ENV, "GITHUB_REPOSITORY", "") == "devmotion/CalibrationErrors.jl" || return
-    get(ENV, "GITHUB_REF", "") == "refs/heads/trying" || return
+# Obtain PR from commit message
+function pr_from_commit()
+    # Check if action is caused by bors on the "trying" branch
     get(ENV, "GITHUB_ACTOR", "") == "bors[bot]" || return
+    get(ENV, "GITHUB_REF", "") == "refs/heads/trying" || return
 
+    # Parse event payload
     event_path = get(ENV, "GITHUB_EVENT_PATH", nothing)
     event_path === nothing && return
     event = JSON.parsefile(event_path)
-    haskey(event, "head_commit") || return
-    @show event["head_commit"]
-    haskey(event["head_commit"], "message") || return
-    @show event["head_commit"]["message"]
+    if haskey(event, "head_commit") && haskey(event["head_commit"], "message")
+        m = match(r"^Try #(.*):$", event["head_commit"]["message"])
+        m === nothing && return
+        return m.captures[1]
+    end
 
-    m = match(r"^Try #(.*):$", event["head_commit"]["message"])
-    m === nothing && return
-
-    pr = m.captures[1]
-    config = Documenter.GitHubActions(
-        "devmotion/CalibrationErrors.jl",
-        "pull_request",
-        "refs/pull/$pr/merge",
-    )
-    return config
+    return
 end
 
-config = deployconfig()
+# Enable preview on the trying branch
+function deploy_config()
+    if haskey(ENV, "GITHUB_ACTIONS")
+        repo = get(ENV, "GITHUB_REPOSITORY", "")
+        if repo == "devmotion/CalibrationErrors.jl" && (pr = pr_from_commit()) !== nothing
+            return Documenter.GitHubActions(
+                "devmotion/CalibrationErrors.jl",
+                "pull_request",
+                "refs/pull/$pr/merge",
+            )
+        end
+    end
+
+    return Documenter.auto_detect_deploy_system()
+end
+
 deploydocs(;
     repo = "github.com/devmotion/CalibrationErrors.jl.git",
-    deployconfig = config === nothing ? Documenter.auto_detect_deploy_system() : config,
+    deploy_config = deploy_config(),
     push_preview = true,
 )
