@@ -1,9 +1,11 @@
 using Documenter
 import JSON
 
-# Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
 if haskey(ENV, "GITHUB_ACTIONS")
+    # Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
     ENV["JULIA_DEBUG"] = "Documenter"
+    # Bypass the accept download prompt
+    ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 end
 
 using CalibrationErrors
@@ -32,6 +34,7 @@ makedocs(;
 )
 
 # custom configuration if on the trying branch to enable previews
+@show ENV
 function deployconfig()
     get(ENV, "GITHUB_REPOSITORY", "") == "devmotion/CalibrationErrors.jl" || return
     get(ENV, "GITHUB_REF", "") == "refs/heads/trying" || return
@@ -39,6 +42,7 @@ function deployconfig()
     event_path = get(ENV, "GITHUB_EVENT_PATH", nothing)
     event_path === nothing && return
     event = JSON.parsefile(event_path)
+    @show event
     haskey(event, "push") || return
     @show event["push"]
     haskey(event["push"], "commits") || return
