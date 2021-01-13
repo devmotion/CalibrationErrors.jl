@@ -8,7 +8,29 @@ if haskey(ENV, "GITHUB_ACTIONS")
     ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 end
 
-using CalibrationErrors
+using Literate, CalibrationErrors
+
+EXAMPLES = joinpath(@__DIR__, "..", "examples")
+OUTPUT = joinpath(@__DIR__, "src", "examples")
+
+ispath(OUTPUT) && rm(OUTPUT; recursive=true)
+
+# Add links to binder and nbviewer below the first heading of level 1
+function preprocess(content)
+    sub = s"""
+        \0
+        #
+        # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/examples/@__NAME__.ipynb)
+        # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/examples/@__NAME__.ipynb)
+    """
+    return replace(content, r"^# # [^\n]*"m => sub; count=1)
+end
+
+for file in readdir(EXAMPLES; join=true)
+    endswith(file, ".jl") || continue
+    Literate.markdown(file, OUTPUT; documenter=true, preprocess=preprocess)
+    Literate.notebook(file, OUTPUT)
+end
 
 # Avoid font caching warning in docs
 using CairoMakie
@@ -30,6 +52,9 @@ makedocs(;
         "introduction.md",
         "ece.md",
         "kce.md",
+        "Examples" => joinpath.(
+            "examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT)),
+        ),
     ],
 )
 

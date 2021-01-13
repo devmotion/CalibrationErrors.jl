@@ -84,7 +84,7 @@ version = "1.16.0+6"
 deps = ["DataStructures", "Distances", "KernelFunctions", "LinearAlgebra", "Reexport", "Statistics", "StatsBase", "UnPack"]
 path = ".."
 uuid = "33913031-fe46-5864-950f-100836f47845"
-version = "0.5.9"
+version = "0.5.10"
 
 [[CategoricalArrays]]
 deps = ["DataAPI", "Future", "JSON", "Missings", "Printf", "Statistics", "StructTypes", "Unicode"]
@@ -539,6 +539,12 @@ version = "2.34.0+7"
 [[LinearAlgebra]]
 deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
+[[Literate]]
+deps = ["Base64", "JSON", "REPL"]
+git-tree-sha1 = "7f289e9db7a93d30b9a44af4a8ae9cf92af74683"
+uuid = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+version = "2.7.0"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"

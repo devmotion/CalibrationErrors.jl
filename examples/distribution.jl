@@ -1,21 +1,18 @@
 # # Distribution of calibration error estimates
 #
-#md # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/generated/distribution.ipynb)
-#md # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/generated/distribution.ipynb)
-
 # ## Introduction
 #
 # This example is taken from the publication
-# "Calibration tests in multi-class classification: A unifying framework" by Widmann,
-# Lindsten, and Zachariah.
+# ["Calibration tests in multi-class classification: A unifying framework"](https://proceedings.neurips.cc/paper/2019/hash/1c336b8080f82bcc2cd2499b4c57261d-Abstract.html)
+# by Widmann, Lindsten, and Zachariah (2019).
 #
 # We estimate calibration errors of the model
 # ```math
 # \begin{aligned}
-#    g(X) &\sim \textrm{Dir}(\alpha),\\
-#    Z &\sim \textrm{Ber}(\pi),\\
-#    Y \,|\, g(X) = \gamma, Z = 1 &\sim \textrm{Categorical}(\beta),\\
-#    Y \,|\, g(X) = \gamma, Z = 0 &\sim \textrm{Categorical}(\gamma),
+#    g(X) &\sim \mathrm{Dir}(\alpha),\\
+#    Z &\sim \mathrm{Ber}(\pi),\\
+#    Y \,|\, g(X) = \gamma, Z = 1 &\sim \mathrm{Categorical}(\beta),\\
+#    Y \,|\, g(X) = \gamma, Z = 0 &\sim \mathrm{Categorical}(\gamma),
 # \end{aligned}
 # ```
 # where $\alpha \in \mathbb{R}_{>0}^m$ determines the distribution of
@@ -42,36 +39,30 @@
 # For our choice of $\alpha$ and $\beta$, the analytical ECE with respect to the
 # total variation distance $\|.\|_{\mathrm{TV}}$ is
 # ```math
-# \mathbb{E}[\|.\|_{\mathrm{TV}},g] = \frac{\pi(m-1)}{m}.
+# \mathrm{ECE}_{\mathrm{TV}} = \frac{\pi(m-1)}{m}.
 # ```
 
 # ## Setup
 
+using CairoMakie
 using CalibrationErrors
 using Distances
 using Distributions
 using StatsBase
+using AbstractPlotting.ColorSchemes
 
 using LinearAlgebra
 using Random
-
-using Plots
-gr(fmt = :png, dpi = 600)
 
 # ## Estimates
 #
 #
 
-function estimates(rng::AbstractRNG, estimator, π::Real, m::Int)
-    ## check arguments
-    m > 0 || throw(ArgumentError("number of classes must be positive"))
-    zero(π) <= π <= one(π) ||
-        throw(ArgumentError("probability π must be between 0 and 1"))
-
+function estimates(estimator, π::Real, m::Int)
     ## cache array for predictions, modified predictions, and labels
     predictions = Matrix{Float64}(undef, m, 250)
-    labels = Vector{Int}(undef, 250)
-    data = (predictions, labels)
+    targets = Vector{Int}(undef, 250)
+    data = (predictions, targets)
 
     ## define sampler of predictions
     sampler_predictions = sampler(Dirichlet(m, 0.1))
@@ -82,20 +73,19 @@ function estimates(rng::AbstractRNG, estimator, π::Real, m::Int)
     ## for each run
     @inbounds for i in eachindex(estimates)
         ## sample predictions
-        rand!(rng, sampler_predictions, predictions)
+        rand!(sampler_predictions, predictions)
 
-        ## sample labels
-        @inbounds for j in eachindex(labels)
-            if rand(rng) < π
-                labels[j] = 1
+        ## sample targets
+        @inbounds for j in eachindex(targets)
+            if rand() < π
+                targets[j] = 1
             else
-                labels[j] = sample(rng, Weights(view(predictions, :, j), 1))
+                targets[j] = sample(Weights(view(predictions, :, j), 1))
             end
         end
 
         ## evaluate estimator
-        estimates[i] = estimator isa CalibrationErrors.CalibrationErrorEstimator ?
-            calibrationerror(estimator, data) : calibrationerror(estimator(data), data)
+        estimates[i] = calibrationerror(estimator(data), data)
     end
 
     estimates
@@ -103,33 +93,20 @@ end
 
 # We use a helper function to run the experiment for all desired parameter settings.
 
-struct EstimatesSet{E}
-    estimator::E
+struct EstimatesSet
     m::Vector{Int}
     π::Vector{Float64}
-    estimates::Vector{Vector{Float64}}
+    estimates::Matrix{Vector{Float64}}
 end
 
-function estimates(rng::AbstractRNG, estimator)
-    ## create arrays
-    mvec = Vector{Int}(undef, 0)
-    πvec = Vector{Float64}(undef, 0)
-    estimatesvec = Vector{Vector{Float64}}(undef, 0)
-
+function estimates(estimator)
     ## for all combinations of m and π
-    for m in (2, 10, 100), π in (0.0, 0.5, 1.0)
-        ## compute estimates
-        push!(estimatesvec, estimates(Random.GLOBAL_RNG, estimator, π, m))
+    mvec = [2, 10, 100]
+    πvec = [0.0, 0.5, 1.0]
+    estimatesmat = estimates.(Ref(estimator), πvec', mvec)
 
-        ## save m and π
-        push!(mvec, m)
-        push!(πvec, π)
-    end
-
-    EstimatesSet(estimator, mvec, πvec, estimatesvec)
+    EstimatesSet(mvec, πvec, estimatesmat)
 end
-
-estimates(estimator) = estimates(Random.GLOBAL_RNG, estimator)
 
 # As mentioned above, we can calculate the analytic expected calibration error. For the squared
 # kernel calibration error, we take the mean of the estimates of the unbiased quadratic
@@ -139,64 +116,78 @@ estimates(estimator) = estimates(Random.GLOBAL_RNG, estimator)
 # estimates is indicated by a solid black vertical line and the analytic
 # calibration error is visualized as a dashed red line.
 
-@recipe function f(set::EstimatesSet)
-    ## default settings
-    layout := (3, 3)
-    legend := false
-    xlabel := "calibration estimate"
-    ylabel := "# runs"
-    size --> (1080, 960)
-    seriestype := :histogram
+function plot(set::EstimatesSet; ece=false)
+    ## create figure
+    f = Figure(resolution = (1080, 960))
 
     ## add subplots
-    for i in 1:length(set.estimates)
-        ## retrieve data
-        m = set.m[i]
-        π = set.π[i]
-        estimates = set.estimates[i]
+    nrows, ncols = size(set.estimates)
+    for (j, π) in enumerate(set.π), (i, m) in enumerate(set.m)
+        ## obtain data
+        estimates = set.estimates[i, j]
+
+        ## create new axis
+        ax = f[i, j] = Axis(f; ticks = LinearTicks(4))
+        i < nrows && hidexdecorations!(current_axis(); grid = false)
+        j > 1 && hideydecorations!(current_axis(); grid = false)
 
         ## plot histogram of estimates
-        @series begin
-            subplot := i
-            x := estimates
-        end
+        h = fit(Histogram, estimates)
+        plot!(
+            h;
+            color = (ColorSchemes.Dark2_8[1], 0.5),
+            strokecolor = :black,
+            strokewidth = 0.5,
+        )
 
         ## indicate analytic calibration error for ECE
-        if set.estimator isa ECE
-            @series begin
-                seriestype := :vline
-                subplot := i
-                linewidth := 2
-                color := :red
-                x := [π * (m - 1) / m]
-            end
+        if ece
+            vlines!(
+                ax, [π * (m - 1) / m];
+                color = ColorSchemes.Dark2_8[2], linewidth = 2,
+            )
         end
 
         ## indicate mean of estimates
-        @series begin
-            title := "$m classes, pi = $π"
-            seriestype := :vline
-            subplot := i
-            linewidth := 2
-            color := :black
-            x := [mean(estimates)]
-        end
+        vlines!(ax, [mean(estimates)]; color = ColorSchemes.Dark2_8[3], linewidth = 2)
     end
+
+    ## add labels and link axes
+    for (j, π) in enumerate(set.π)
+        f[1, j, Top()] = Box(f; color = :gray90)
+        f[1, j, Top()] = Label(f, "π = $π"; padding = (0, 0, 5, 5))
+        linkxaxes!(contents(f[:, j])...)
+    end
+    for (i, m) in enumerate(set.m)
+        f[i, ncols, Right()] = Box(f; color = :gray90)
+        f[i, ncols, Right()] = Label(
+            f, "$m classes"; rotation = -π/2, padding = (5, 5, 0, 0),
+        )
+        linkyaxes!(contents(f[i, :])...)
+    end
+    f[nrows, 1:ncols, Bottom()] = Label(
+        f, "calibration error estimate"; padding = (0, 0, 0, 75),
+    )
+    f[1:nrows, 1, Left()] = Label(f, "# runs"; rotation = π/2, padding = (0, 75, 0, 0))
+
+    f
 end
 
 # ## Kernel choice
 
-# We use an identity matrix scaled with an exponential kernel as matrix-valued
-# kernel. The bandwidth of the exponential kernel is set according to the
-# median heuristic.
+# We use a tensor product kernel consisting of an exponential kernel
+# $k(\mu, \mu') = \exp{(- \gamma \|p - p'\|)}$ on the space of predicted categorical
+# distributions and a white kernel $k(y, y') = \delta(y - y')$ on the space of targets
+# $\{1,\ldots,m\}$. The total variation distance is chosen as the norm on the space of
+# predictions, and the inverse lengthscale $\gamma$ is set according to the median
+# heuristic.
 
-function kernel(data)
-    ## compute median TV distance
-    predictions = data[1]
+function kernel((predictions, targets))
+    ## compute inverse lengthscale with median heuristic
     γ = inv(median(pairwise(TotalVariation(), predictions, dims=2)))
 
     ## create kernel
-    UniformScalingKernel(ExponentialKernel(γ, TotalVariation()))
+    TensorProduct(transform(TVExponentialKernel(), γ), WhiteKernel())
 end
 
 # ## Expected calibration error
@@ -207,8 +198,11 @@ end
 # For our estimation we use 10 bins of uniform width in each dimension.
 
 Random.seed!(1234)
-data = estimates(ECE(UniformBinning(10), TotalVariation()))
-plot(data)
+data = estimates(x -> ECE(UniformBinning(10), TotalVariation()))
+plot(data; ece=true)
+#md AbstractPlotting.save("ece_uniform.svg", ans); nothing #hide
+
+#md # ![](ece_uniform.svg)
 
 # ### Non-uniform binning
 #
@@ -221,26 +215,38 @@ plot(data)
 # than 10.
 
 Random.seed!(1234)
-data = estimates(ECE(MedianVarianceBinning(10), TotalVariation()))
-plot(data)
+data = estimates(x -> ECE(MedianVarianceBinning(10), TotalVariation()))
+plot(data; ece=true)
+#md AbstractPlotting.save("ece_medianvariance.svg", ans); nothing #hide
+
+#md # ![](ece_medianvariance.svg)
 
 # ## Biased estimator of the squared kernel calibration error
 #
 
 Random.seed!(1234)
-data = estimates(x -> BiasedSKCE(kernel(x)))
+data = estimates(BiasedSKCE ∘ kernel)
 plot(data)
+#md AbstractPlotting.save("skce_biased.svg", ans); nothing #hide
 
-# ## Unbiased quadratic estimator of the squared kernel calibration error
+#md # ![](skce_biased.svg)
+
+# ## Unbiased estimator of the squared kernel calibration error
 #
 
 Random.seed!(1234)
-data = estimates(x -> QuadraticUnbiasedSKCE(kernel(x)))
+data = estimates(UnbiasedSKCE ∘ kernel)
 plot(data)
+#md AbstractPlotting.save("skce_unbiased.svg", ans); nothing #hide
 
-# ## Unbiased linear estimator of the squared kernel calibration error
+#md # ![](skce_unbiased.svg)
+
+# ## Unbiased estimator of the squared kernel calibration error (blocks of 2 samples)
 #
 
 Random.seed!(1234)
-data = estimates(x -> LinearUnbiasedSKCE(kernel(x)))
+data = estimates(BlockUnbiasedSKCE ∘ kernel)
 plot(data)
+#md AbstractPlotting.save("skce_blockunbiased.svg", ans); nothing #hide
+
+#md # ![](skce_blockunbiased.svg)
