@@ -24,12 +24,6 @@ Random.seed!(1234)
     @test sum(bin.mean_predictions) ≈ 1
     @test sum(bin.proportions_targets) ≈ 1
 
-    # check distance calculations
-    for distance in (TotalVariation(), Cityblock(), Euclidean(), SqEuclidean())
-        @test evaluate(distance, bin) == evaluate(distance, mean(predictions),
-            proportions(targets, nclasses))
-    end
-
     # compare with adding data
     bin2 = Bin(predictions[1], targets[1])
     for i in 2:nsamples

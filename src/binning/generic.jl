@@ -81,15 +81,3 @@ function adddata!(bin::Bin, prediction::AbstractVector{<:Real}, target::Integer)
 
     nothing
 end
-
-# distance computations
-
-"""
-    evaluate(distance, bin::Bin)
-
-Evaluate the `distance` between the average prediction and the distribution of targets in
-the `bin`.
-"""
-function Distances.evaluate(distance::SemiMetric, bin::Bin)
-    evaluate(distance, bin.mean_predictions, bin.proportions_targets)
-end

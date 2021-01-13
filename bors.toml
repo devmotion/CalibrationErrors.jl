@@ -12,6 +12,8 @@ status = [
   "Documentation"
 ]
 delete_merged_branches = true
+# Squash commits before merging.
+use_squash_merge = true
 # Uncomment this to use a two hour timeout.
 # The default is one hour.
 #timeout_sec = 7200
