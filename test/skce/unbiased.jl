@@ -59,7 +59,10 @@ end
 end
 
 @testset "Block: Basic properties" begin
-    skce = BlockUnbiasedSKCE(transform(ExponentialKernel(), 0.1), WhiteKernel())
+    nsamples = 20
+    skce = UnbiasedSKCE(transform(ExponentialKernel(), 0.1), WhiteKernel())
+    blockskce = BlockUnbiasedSKCE(skce.kernel)
+    blockskce_all = BlockUnbiasedSKCE(skce.kernel, nsamples)
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)
@@ -69,7 +72,18 @@ end
             predictions = [rand(dist) for _ in 1:20]
             targets = [rand(Categorical(p)) for p in predictions]
 
-            estimates[i] = calibrationerror(skce, predictions, targets)
+            estimates[i] = calibrationerror(blockskce, predictions, targets)
+
+            # consistency checks
+            @test estimates[i] ≈ mean(
+                calibrationerror(
+                    skce,
+                    predictions[(2 * i - 1):(2 * i)],
+                    targets[(2 * i - 1):(2 * i)],
+                ) for i in 1:(nsamples ÷ 2)
+            )
+            @test calibrationerror(skce, predictions, targets) ==
+                calibrationerror(blockskce_all, predictions, targets)
         end
 
         @test any(x -> x > zero(x), estimates)
