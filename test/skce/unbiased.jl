@@ -69,7 +69,7 @@ end
         dist = Dirichlet(nclasses, 1)
 
         for i in 1:length(estimates)
-            predictions = [rand(dist) for _ in 1:20]
+            predictions = [rand(dist) for _ in 1:nsamples]
             targets = [rand(Categorical(p)) for p in predictions]
 
             estimates[i] = calibrationerror(blockskce, predictions, targets)
