@@ -59,18 +59,9 @@ end
 function _calibrationerror(
     skce::UnbiasedSKCE,
     predictions::AbstractVector,
-    targets::AbstractVector
+    targets::AbstractVector,
 )
-    @unpack kernel = skce
-
-    # obtain number of samples
-    nsamples = length(predictions)
-    nsamples ≥ 2 || error("there must be at least two samples")
-
-    # compute the estimate
-    estimate = unsafe_unbiasedskce(kernel, predictions, targets, 1, nsamples)
-
-    return estimate
+    return unbiasedskce(skce.kernel, predictions, targets)
 end
 
 @doc raw"""
@@ -132,7 +123,7 @@ struct BlockUnbiasedSKCE{K<:Kernel} <: SKCE
 end
 
 """
-    BlockUnbiasedSKCE(k₁, k₂)
+    BlockUnbiasedSKCE(k₁, k₂[, blocksize = 2])
 
 Unbiased estimator of the squared kernel calibration error (SKCE) with a tensor product
 kernel ``k = k_1 \\otimes k_2`` that uses blocks with `blocksize` samples.
@@ -149,7 +140,7 @@ end
 function _calibrationerror(
     skce::BlockUnbiasedSKCE,
     predictions::AbstractVector,
-    targets::AbstractVector
+    targets::AbstractVector,
 )
     @unpack kernel, blocksize = skce
 
@@ -160,42 +151,39 @@ function _calibrationerror(
     # compute number of blocks
     nblocks = nsamples ÷ blocksize
 
-    # evaluate U-statistic of the first block
-    istart = 1
-    iend = blocksize
-    x = unsafe_unbiasedskce(kernel, predictions, targets, istart, iend)
+    # create iterator of partitions
+    blocks = Iterators.take(
+        zip(
+            Iterators.partition(predictions, blocksize),
+            Iterators.partition(targets, blocksize),
+        ),
+        nblocks,
+    )
 
-    # initialize the estimate
-    estimate = x / 1
-
-    # for all other blocks
-    for b in 2:nblocks
-        # evaluate U-statistic
-        istart += blocksize
-        iend += blocksize
-        x = unsafe_unbiasedskce(kernel, predictions, targets, istart, iend)
-
-        # update the estimate
-        estimate += (x - estimate) / b
-    end
+    # compute average u-statistic
+    estimate = mean(
+        unbiasedskce(kernel, _predictions, _targets) for (_predictions, _targets) in blocks
+    )
 
     return estimate
 end
 
-function unsafe_unbiasedskce(kernel, predictions, targets, istart, iend)
+# evaluate U-statistic
+function unbiasedskce(kernel, predictions, targets)
     # obtain number of samples
-    nsamples = iend - istart + 1
+    nsamples = length(predictions)
+    nsamples ≥ 2 || error("there must be at least two samples")
 
     @inbounds begin
         # evaluate the kernel function for the first pair of samples
-        hij = unsafe_skce_eval(kernel, predictions[istart], targets[istart], predictions[istart + 1], targets[istart + 1])
+        hij = unsafe_skce_eval(kernel, predictions[1], targets[1], predictions[2], targets[2])
 
         # initialize the estimate
         estimate = hij / 1
 
         # for all other pairs of samples
         n = 1
-        for j in (istart + 2):iend
+        for j in 3:nsamples
             predictionj = predictions[j]
             targetj = targets[j]
 
