@@ -33,5 +33,5 @@ Alternatively, it is possible to specify a tuple of predictions and targets or a
 tuples of predictions and targets.
 
 This package implements the estimator `ECE` of the ECE, the estimators
-`BiasedSKCE`, `UnbiasedSKCE`, and `BlockUnbiasedSKCE` for the SKCE, and `SUMCE` for the
-SUMCE.
+`BiasedSKCE`, `UnbiasedSKCE`, and `BlockUnbiasedSKCE` for the SKCE, and `UCME` for the
+UCME.
