@@ -19,15 +19,11 @@ struct UCME{K<:Kernel,TP,TT} <: CalibrationErrorEstimator
     end
 end
 
-function UCME(kernel1::Kernel, kernel2::Kernel, data...)
-    return UCME(TensorProduct(kernel1, kernel2), data...)
-end
+function UCME(kernel::Kernel, testdata...)
+    testpredictions, testtargets = predictions_targets(testdata...)
 
-function UCME(kernel::Kernel, data...)
-    predictions, targets = predictions_targets(data...)
-
-    return UCME{typeof(kernel),typeof(predictions),typeof(targets)}(
-        kernel, predictions, targets
+    return UCME{typeof(kernel),typeof(testpredictions),typeof(testtargets)}(
+        kernel, testpredictions, testtargets
     )
 end
 
@@ -112,13 +108,13 @@ function unsafe_ucme_eval(
     return a - b
 end
 
-function unsafe_ucme_eval(kernel::TensorProduct, p, y, testp, testy)
+function unsafe_ucme_eval(kernel::KernelTensorProduct, p, y, testp, testy)
     κpredictions, κtargets = kernel.kernels
     return unsafe_ucme_eval_targets(κtargets, p, y, testp, testy) * κpredictions(p, testp)
 end
 # resolve method ambiguity
 function unsafe_ucme_eval(
-    kernel::TensorProduct,
+    kernel::KernelTensorProduct,
     p::AbstractVector{<:Real},
     y::Integer,
     testp::AbstractVector{<:Real},

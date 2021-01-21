@@ -186,8 +186,8 @@ function kernel((predictions, targets))
     ## compute inverse lengthscale with median heuristic
     γ = inv(median(pairwise(TotalVariation(), predictions, dims=2)))
 
-    ## create kernel
-    TensorProduct(transform(TVExponentialKernel(), γ), WhiteKernel())
+    ## create tensor product kernel
+    transform(TVExponentialKernel(), γ) ⊗ WhiteKernel()
 end
 
 # ## Expected calibration error

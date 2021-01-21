@@ -36,4 +36,6 @@ include("skce/unbiased.jl")
 
 include("ucme.jl")
 
+include("deprecated.jl")
+
 end # module

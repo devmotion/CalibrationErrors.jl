@@ -44,18 +44,6 @@ struct UnbiasedSKCE{K<:Kernel} <: SKCE
     kernel::K
 end
 
-"""
-    UnbiasedSKCE(k₁, k₂)
-
-Unbiased estimator of the squared kernel calibration error (SKCE) with a tensor product
-kernel ``k = k_1 \\otimes k_2``.
-
-See also: [`UnbiasedSKCE`](@ref)
-"""
-function UnbiasedSKCE(kernel1::Kernel, kernel2::Kernel)
-    return UnbiasedSKCE(TensorProduct(kernel1, kernel2))
-end
-
 function _calibrationerror(
     skce::UnbiasedSKCE,
     predictions::AbstractVector,
@@ -122,17 +110,6 @@ struct BlockUnbiasedSKCE{K<:Kernel} <: SKCE
     end
 end
 
-"""
-    BlockUnbiasedSKCE(k₁, k₂[, blocksize = 2])
-
-Unbiased estimator of the squared kernel calibration error (SKCE) with a tensor product
-kernel ``k = k_1 \\otimes k_2`` that uses blocks with `blocksize` samples.
-
-See also: [`BlockUnbiasedSKCE`](@ref)
-"""
-function BlockUnbiasedSKCE(kernel1::Kernel, kernel2::Kernel, blocksize::Int = 2)
-    return BlockUnbiasedSKCE(TensorProduct(kernel1, kernel2), blocksize)
-end
 function BlockUnbiasedSKCE(kernel::Kernel, blocksize::Int = 2)
     return BlockUnbiasedSKCE{typeof(kernel)}(kernel, blocksize)
 end

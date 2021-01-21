@@ -9,8 +9,16 @@ Random.seed!(1234)
 
 @testset "UCME: Two-dimensional example" begin
     # three test locations
-    ucme = UCME(SqExponentialKernel(), WhiteKernel(),
+    ucme = UCME(SqExponentialKernel() ⊗ WhiteKernel(),
                 [[1.0, 0], [0.5, 0.5], [0.0, 1]], [1, 1, 2])
+
+    # Deprecations
+    ucme2 = @test_deprecated UCME(SqExponentialKernel(), WhiteKernel(),
+                 [[1.0, 0], [0.5, 0.5], [0.0, 1]], [1, 1, 2])
+    @test typeof(ucme2) === typeof(ucme)
+    @test ucme2.kernel == ucme.kernel
+    @test ucme2.testpredictions == ucme.testpredictions
+    @test ucme2.testtargets == ucme.testtargets
 
     # two predictions
     @test @inferred(calibrationerror(ucme, ([1 0; 0 1], [1, 2]))) ≈ 0
@@ -25,16 +33,19 @@ end
     estimates = Vector{Float64}(undef, 1_000)
 
     for ntest in (1, 5, 10), nclasses in (2, 10, 100)
-        dist = Dirichlet(nclasses, 1)
+        dist = Dirichlet(nclasses, 1.0)
 
         testpredictions = [rand(dist) for _ in 1:ntest]
         testtargets = rand(1:nclasses, ntest)
-        ucme = UCME(transform(ExponentialKernel(), 0.1), WhiteKernel(),
+        ucme = UCME(transform(ExponentialKernel(), 0.1) ⊗ WhiteKernel(),
                     testpredictions, testtargets)
 
+        predictions = [Vector{Float64}(undef, nclasses) for _ in 1:20]
+        targets = Vector{Int}(undef, 20)
+
         for i in 1:length(estimates)
-            predictions = [rand(dist) for _ in 1:20]
-            targets = [rand(Categorical(p)) for p in predictions]
+            rand!.(Ref(dist), predictions)
+            targets .= rand.(Categorical.(predictions))
 
             estimates[i] = calibrationerror(ucme, predictions, targets)
         end
@@ -42,4 +53,3 @@ end
         @test all(x > zero(x) for x in estimates)
     end
 end
-
