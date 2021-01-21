@@ -42,7 +42,7 @@ end
     kernel = SqExponentialKernel()
     kernel1 = kernel ⊗ WhiteKernel()
     kernel2 = kernel ⊗ WhiteKernel2()
-    kernel3 = kernel ⊗ WhiteKernel()
+    kernel3 = TensorProduct2(kernel, WhiteKernel())
 
     x1, x2 = rand(10), rand(1:10)
 
