@@ -10,7 +10,7 @@ Random.seed!(1234)
 @testset "Simple example ($nclasses classes)" for nclasses in (2, 10, 100)
     # sample predictions and targets
     nsamples = 1_000
-    dist = Dirichlet(nclasses, 1)
+    dist = Dirichlet(nclasses, 1.0)
     predictions = [rand(dist) for _ in 1:nsamples]
     targets = rand(1:nclasses, nsamples)
 

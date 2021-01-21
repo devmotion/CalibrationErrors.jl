@@ -33,16 +33,19 @@ end
     estimates = Vector{Float64}(undef, 1_000)
 
     for ntest in (1, 5, 10), nclasses in (2, 10, 100)
-        dist = Dirichlet(nclasses, 1)
+        dist = Dirichlet(nclasses, 1.0)
 
         testpredictions = [rand(dist) for _ in 1:ntest]
         testtargets = rand(1:nclasses, ntest)
         ucme = UCME(transform(ExponentialKernel(), 0.1) ⊗ WhiteKernel(),
                     testpredictions, testtargets)
 
+        predictions = [Vector{Float64}(undef, nclasses) for _ in 1:20]
+        targets = Vector{Int}(undef, 20)
+
         for i in 1:length(estimates)
-            predictions = [rand(dist) for _ in 1:20]
-            targets = [rand(Categorical(p)) for p in predictions]
+            rand!.(Ref(dist), predictions)
+            targets .= rand.(Categorical.(predictions))
 
             estimates[i] = calibrationerror(ucme, predictions, targets)
         end

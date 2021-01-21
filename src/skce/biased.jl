@@ -44,16 +44,6 @@ struct BiasedSKCE{K<:Kernel} <: SKCE
     kernel::K
 end
 
-"""
-    BiasedSKCE(k₁, k₂)
-
-Biased estimator of the squared kernel calibration error (SKCE) with a tensor product
-kernel ``k = k_1 \\otimes k_2``.
-
-See also: [`BiasedSKCE`](@ref)
-"""
-BiasedSKCE(kernel1::Kernel, kernel2::Kernel) = BiasedSKCE(TensorProduct(kernel1, kernel2))
-
 function _calibrationerror(skce::BiasedSKCE,
                            predictions::AbstractVector,
                            targets::AbstractVector)
