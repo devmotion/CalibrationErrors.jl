@@ -9,8 +9,16 @@ Random.seed!(1234)
 
 @testset "UCME: Two-dimensional example" begin
     # three test locations
-    ucme = UCME(SqExponentialKernel(), WhiteKernel(),
+    ucme = UCME(SqExponentialKernel() ⊗ WhiteKernel(),
                 [[1.0, 0], [0.5, 0.5], [0.0, 1]], [1, 1, 2])
+
+    # Deprecations
+    ucme2 = @test_deprecated UCME(SqExponentialKernel(), WhiteKernel(),
+                 [[1.0, 0], [0.5, 0.5], [0.0, 1]], [1, 1, 2])
+    @test typeof(ucme2) === typeof(ucme)
+    @test ucme2.kernel == ucme.kernel
+    @test ucme2.testpredictions == ucme.testpredictions
+    @test ucme2.testtargets == ucme.testtargets
 
     # two predictions
     @test @inferred(calibrationerror(ucme, ([1 0; 0 1], [1, 2]))) ≈ 0
@@ -29,7 +37,7 @@ end
 
         testpredictions = [rand(dist) for _ in 1:ntest]
         testtargets = rand(1:nclasses, ntest)
-        ucme = UCME(transform(ExponentialKernel(), 0.1), WhiteKernel(),
+        ucme = UCME(transform(ExponentialKernel(), 0.1) ⊗ WhiteKernel(),
                     testpredictions, testtargets)
 
         for i in 1:length(estimates)
@@ -42,4 +50,3 @@ end
         @test all(x > zero(x) for x in estimates)
     end
 end
-

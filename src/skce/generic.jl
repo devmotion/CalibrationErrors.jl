@@ -89,14 +89,14 @@ function unsafe_skce_eval(
 end
 
 # evaluation for tensor product kernels
-function unsafe_skce_eval(kernel::TensorProduct, p, y, p̃, ỹ)
+function unsafe_skce_eval(kernel::KernelTensorProduct, p, y, p̃, ỹ)
     κpredictions, κtargets = kernel.kernels
     return κpredictions(p, p̃) * unsafe_skce_eval_targets(κtargets, p, y, p̃, ỹ)
 end
 
 # resolve method ambiguity
 function unsafe_skce_eval(
-    kernel::TensorProduct,
+    kernel::KernelTensorProduct,
     p::AbstractVector{<:Real},
     y::Integer,
     p̃::AbstractVector{<:Real},

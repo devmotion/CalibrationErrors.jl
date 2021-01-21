@@ -8,7 +8,12 @@ using Test
 Random.seed!(1234)
 
 @testset "Unbiased: Two-dimensional example" begin
-    skce = UnbiasedSKCE(SqExponentialKernel(), WhiteKernel())
+    skce = UnbiasedSKCE(SqExponentialKernel() ⊗ WhiteKernel())
+
+    # Deprecation
+    skce2 = @test_deprecated UnbiasedSKCE(SqExponentialKernel(), WhiteKernel())
+    @test typeof(skce2) === typeof(skce)
+    @test skce2.kernel == skce.kernel
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
@@ -18,7 +23,7 @@ Random.seed!(1234)
 end
 
 @testset "Unbiased: Basic properties" begin
-    skce = UnbiasedSKCE(transform(ExponentialKernel(), 0.1), WhiteKernel())
+    skce = UnbiasedSKCE(transform(ExponentialKernel(), 0.1) ⊗ WhiteKernel())
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)
@@ -39,7 +44,17 @@ end
 
 @testset "Block: Two-dimensional example" begin
     # Blocks of two samples
-    skce = BlockUnbiasedSKCE(SqExponentialKernel(), WhiteKernel())
+    skce = BlockUnbiasedSKCE(SqExponentialKernel() ⊗ WhiteKernel())
+
+    # Deprecation
+    skce2 = @test_deprecated BlockUnbiasedSKCE(SqExponentialKernel(), WhiteKernel())
+    @test typeof(skce2) === typeof(skce)
+    @test skce2.kernel == skce.kernel
+    @test skce2.blocksize == skce.blocksize
+    skce3 = @test_deprecated BlockUnbiasedSKCE(SqExponentialKernel(), WhiteKernel(), 2)
+    @test typeof(skce3) === typeof(skce)
+    @test skce3.kernel == skce.kernel
+    @test skce3.blocksize == skce.blocksize
 
     # only two predictions, i.e., one term in the estimator
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [1, 2]))) ≈ 0
@@ -60,9 +75,10 @@ end
 
 @testset "Block: Basic properties" begin
     nsamples = 20
-    skce = UnbiasedSKCE(transform(ExponentialKernel(), 0.1), WhiteKernel())
-    blockskce = BlockUnbiasedSKCE(skce.kernel)
-    blockskce_all = BlockUnbiasedSKCE(skce.kernel, nsamples)
+    kernel = transform(ExponentialKernel(), 0.1) ⊗ WhiteKernel()
+    skce = UnbiasedSKCE(kernel)
+    blockskce = BlockUnbiasedSKCE(kernel)
+    blockskce_all = BlockUnbiasedSKCE(kernel, nsamples)
     estimates = Vector{Float64}(undef, 1_000)
 
     for nclasses in (2, 10, 100)
