@@ -10,7 +10,9 @@ on:
       # Build master branch.
       - master
   release:
-    types: [published]
+    types: [created]
+  pull_request:
+    types: [labeled]
 
 jobs:
   test:
@@ -70,6 +72,7 @@ jobs:
           path-to-lcov: lcov.info
   docs:
     name: Documentation
+    if: github.event.action != 'labeled' || github.event.label.name == 'preview_docs'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
