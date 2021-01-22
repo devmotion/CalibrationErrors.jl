@@ -8,21 +8,26 @@ mutable struct Bin{T<:Real}
     """Proportions of targets."""
     proportions_targets::Vector{T}
 
-    function Bin{T}(nsamples::Int, mean_predictions::Vector{T},
-                    proportions_targets::Vector{T}) where {T}
+    function Bin{T}(
+        nsamples::Int, mean_predictions::Vector{T}, proportions_targets::Vector{T}
+    ) where {T}
         nsamples ≥ 0 || throw(ArgumentError("the number of samples must be non-negative"))
         nclasses = length(mean_predictions)
         nclasses > 1 || throw(ArgumentError("the number of classes must be greater than 1"))
-        nclasses == length(proportions_targets) ||
-            throw(DimensionMismatch("the number of predicted classes has to be equal to the number of classes"))
+        nclasses == length(proportions_targets) || throw(
+            DimensionMismatch(
+                "the number of predicted classes has to be equal to the number of classes",
+            ),
+        )
 
-        new{T}(nsamples, mean_predictions, proportions_targets)
+        return new{T}(nsamples, mean_predictions, proportions_targets)
     end
 end
 
-function Bin(nsamples::Int, mean_predictions::Vector{T},
-             proportions_targets::Vector{T}) where {T<:Real}
-    Bin{T}(nsamples, mean_predictions, proportions_targets)
+function Bin(
+    nsamples::Int, mean_predictions::Vector{T}, proportions_targets::Vector{T}
+) where {T<:Real}
+    return Bin{T}(nsamples, mean_predictions, proportions_targets)
 end
 
 """
@@ -30,8 +35,10 @@ end
 
 Create bin of `predictions` and corresponding `targets`.
 """
-function Bin(predictions::AbstractVector{<:AbstractVector{<:Real}},
-             targets::AbstractVector{<:Integer})
+function Bin(
+    predictions::AbstractVector{<:AbstractVector{<:Real}},
+    targets::AbstractVector{<:Integer},
+)
     # compute mean of predictions
     mean_predictions = mean(predictions)
 
@@ -39,7 +46,7 @@ function Bin(predictions::AbstractVector{<:AbstractVector{<:Real}},
     nclasses = length(predictions[1])
     proportions_targets = proportions(targets, nclasses)
 
-    Bin(length(predictions), mean_predictions, proportions_targets)
+    return Bin(length(predictions), mean_predictions, proportions_targets)
 end
 
 """
@@ -57,7 +64,7 @@ function Bin(prediction::AbstractVector{<:Real}, target::Integer)
         proportions_targets[i] = i == target ? 1 : 0
     end
 
-    Bin(1, mean_predictions, proportions_targets)
+    return Bin(1, mean_predictions, proportions_targets)
 end
 
 """
@@ -79,5 +86,5 @@ function adddata!(bin::Bin, prediction::AbstractVector{<:Real}, target::Integer)
     nclasses = length(proportions_targets)
     @. proportions_targets += ((1:nclasses == target) - proportions_targets) / nsamples
 
-    nothing
+    return nothing
 end

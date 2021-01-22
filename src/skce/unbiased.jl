@@ -45,9 +45,7 @@ struct UnbiasedSKCE{K<:Kernel} <: SKCE
 end
 
 function _calibrationerror(
-    skce::UnbiasedSKCE,
-    predictions::AbstractVector,
-    targets::AbstractVector,
+    skce::UnbiasedSKCE, predictions::AbstractVector, targets::AbstractVector
 )
     return unbiasedskce(skce.kernel, predictions, targets)
 end
@@ -104,20 +102,18 @@ struct BlockUnbiasedSKCE{K<:Kernel} <: SKCE
     """Number of samples per block."""
     blocksize::Int
 
-    function BlockUnbiasedSKCE{K}(kernel::K, blocksize::Int) where K
+    function BlockUnbiasedSKCE{K}(kernel::K, blocksize::Int) where {K}
         blocksize ≥ 2 || error("there must be at least two samples per block")
-        new{K}(kernel, blocksize)
+        return new{K}(kernel, blocksize)
     end
 end
 
-function BlockUnbiasedSKCE(kernel::Kernel, blocksize::Int = 2)
+function BlockUnbiasedSKCE(kernel::Kernel, blocksize::Int=2)
     return BlockUnbiasedSKCE{typeof(kernel)}(kernel, blocksize)
 end
 
 function _calibrationerror(
-    skce::BlockUnbiasedSKCE,
-    predictions::AbstractVector,
-    targets::AbstractVector,
+    skce::BlockUnbiasedSKCE, predictions::AbstractVector, targets::AbstractVector
 )
     @unpack kernel, blocksize = skce
 
@@ -153,7 +149,9 @@ function unbiasedskce(kernel, predictions, targets)
 
     @inbounds begin
         # evaluate the kernel function for the first pair of samples
-        hij = unsafe_skce_eval(kernel, predictions[1], targets[1], predictions[2], targets[2])
+        hij = unsafe_skce_eval(
+            kernel, predictions[1], targets[1], predictions[2], targets[2]
+        )
 
         # initialize the estimate
         estimate = hij / 1

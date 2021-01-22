@@ -1,5 +1,5 @@
 using Documenter
-import JSON
+using JSON: JSON
 
 if haskey(ENV, "GITHUB_ACTIONS")
     # Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
@@ -38,30 +38,26 @@ CairoMakie.activate!()
 scatter(rand(10), rand(10))
 
 makedocs(;
-    modules = [CalibrationErrors],
-    authors = "David Widmann <david.widmann@it.uu.se>",
-    repo = "https://github.com/devmotion/CalibrationErrors.jl/blob/{commit}{path}#L{line}",
-    sitename = "CalibrationErrors.jl",
+    modules=[CalibrationErrors],
+    authors="David Widmann <david.widmann@it.uu.se>",
+    repo="https://github.com/devmotion/CalibrationErrors.jl/blob/{commit}{path}#L{line}",
+    sitename="CalibrationErrors.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://devmotion.github.io/CalibrationErrors.jl",
         assets=String[],
     ),
-    pages = [
+    pages=[
         "index.md",
         "introduction.md",
         "ece.md",
         "kce.md",
         "others.md",
-        "Examples" => joinpath.(
-            "examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT)),
-        ),
+        "Examples" =>
+            joinpath.("examples", filter(x -> endswith(x, ".md"), readdir(OUTPUT))),
     ],
     strict=true,
     checkdocs=:exports,
 )
 
-deploydocs(;
-    repo = "github.com/devmotion/CalibrationErrors.jl.git",
-    push_preview = true,
-)
+deploydocs(; repo="github.com/devmotion/CalibrationErrors.jl.git", push_preview=true)

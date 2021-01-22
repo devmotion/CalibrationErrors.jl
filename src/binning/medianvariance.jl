@@ -17,15 +17,17 @@ struct MedianVarianceBinning <: AbstractBinningAlgorithm
         minsize ≥ 1 || error("minimum number of samples must be positive")
         maxbins ≥ 1 || error("maximum number of bins must be positive")
 
-        new(minsize, maxbins)
+        return new(minsize, maxbins)
     end
 end
 
-MedianVarianceBinning(minsize::Int = 10) = MedianVarianceBinning(minsize, typemax(Int))
+MedianVarianceBinning(minsize::Int=10) = MedianVarianceBinning(minsize, typemax(Int))
 
-function perform(alg::MedianVarianceBinning,
-                 predictions::AbstractVector{<:AbstractVector{T}},
-                 targets::AbstractVector{<:Integer}) where {T<:Real}
+function perform(
+    alg::MedianVarianceBinning,
+    predictions::AbstractVector{<:AbstractVector{T}},
+    targets::AbstractVector{<:Integer},
+) where {T<:Real}
     @unpack minsize, maxbins = alg
 
     # check if binning is not possible
@@ -39,16 +41,18 @@ function perform(alg::MedianVarianceBinning,
     # find dimension with maximum variance
     idxs_predictions = collect(1:nsamples)
     GC.@preserve idxs_predictions begin
-        max_var_predictions, argmax_var_predictions =
-            max_argmax_var(predictions, idxs_predictions)
+        max_var_predictions, argmax_var_predictions = max_argmax_var(
+            predictions, idxs_predictions
+        )
 
         # create priority queue and empty set of bins
         queue = PriorityQueue(
             (idxs_predictions, argmax_var_predictions) => max_var_predictions,
-            Base.Order.Reverse)
+            Base.Order.Reverse,
+        )
         S = typeof(zero(T) / 1)
         bins = Vector{Bin{S}}(undef, 0)
-    
+
         nbins = 1
         while nbins < maxbins && !isempty(queue)
             # pick the set with the largest variance
@@ -70,7 +74,9 @@ function perform(alg::MedianVarianceBinning,
                     push!(bins, Bin(predictions[newidxs], targets[newidxs]))
                 else
                     # otherwise update the queue with the new subsets
-                    max_var_newidxs, argmax_var_newidxs = max_argmax_var(predictions, newidxs)
+                    max_var_newidxs, argmax_var_newidxs = max_argmax_var(
+                        predictions, newidxs
+                    )
                     enqueue!(queue, (newidxs, argmax_var_newidxs), max_var_newidxs)
                 end
             end
@@ -89,7 +95,7 @@ function perform(alg::MedianVarianceBinning,
         end
     end
 
-    bins
+    return bins
 end
 
 function max_argmax_var(x::AbstractVector{<:AbstractVector{<:Real}}, idxs)
@@ -108,14 +114,15 @@ function max_argmax_var(x::AbstractVector{<:AbstractVector{<:Real}}, idxs)
         end
     end
 
-    maxvar, maxdim
+    return maxvar, maxdim
 end
 
 # use Welford algorithm to compute the unbiased sample variance
 # taken from: https://github.com/JuliaLang/Statistics.jl/blob/da6057baf849cbc803b952ef7adf979ae3a9f9d2/src/Statistics.jl#L184-L199
 # this function is unsafe since it does not perform any bounds checking
-function unsafe_variance_welford(x::AbstractVector{<:AbstractVector{<:Real}},
-                                 idxs::Vector{Int}, dim::Int)
+function unsafe_variance_welford(
+    x::AbstractVector{<:AbstractVector{<:Real}}, idxs::Vector{Int}, dim::Int
+)
     n = length(idxs)
 
     @inbounds begin
@@ -135,8 +142,9 @@ end
 
 # this function is unsafe since it leads to undefined behaviour if the
 # outputs are accessed afer `idxs` has been garbage collected 
-function unsafe_median_split!(idxs::Vector{Int},
-                              x::AbstractVector{<:AbstractVector{<:Real}}, dim::Int)
+function unsafe_median_split!(
+    idxs::Vector{Int}, x::AbstractVector{<:AbstractVector{<:Real}}, dim::Int
+)
     n = length(idxs)
 
     if length(idxs) < 2
@@ -145,10 +153,10 @@ function unsafe_median_split!(idxs::Vector{Int},
         # partially sort the indices `idxs` according to the corresponding values in the
         # `d`th component of`x`
         m = div(n, 2) + 1
-        f = let x=x, dim=dim
+        f = let x = x, dim = dim
             idx -> x[idx][dim]
         end
-        partialsort!(idxs, 1:m; by = f)
+        partialsort!(idxs, 1:m; by=f)
 
         # figure out all values < median
         # the median is `x[idxs[m]][dim]`` for vectors of odd length
@@ -158,7 +166,7 @@ function unsafe_median_split!(idxs::Vector{Int},
         else
             # otherwise obtain the last value < median
             firstidxs = unsafe_wrap(Array, pointer(idxs, 1), m - 1)
-            cutoff = searchsortedfirst(firstidxs, idxs[m]; by = f) - 1
+            cutoff = searchsortedfirst(firstidxs, idxs[m]; by=f) - 1
         end
     end
 
@@ -166,5 +174,5 @@ function unsafe_median_split!(idxs::Vector{Int},
     idxsbelow = unsafe_wrap(Array, pointer(idxs, 1), cutoff)
     idxsabove = unsafe_wrap(Array, pointer(idxs, cutoff + 1), n - cutoff)
 
-    idxsbelow, idxsabove
+    return idxsbelow, idxsabove
 end

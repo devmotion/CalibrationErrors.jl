@@ -49,9 +49,9 @@ struct BiasedSKCE{K<:Kernel} <: SKCE
     kernel::K
 end
 
-function _calibrationerror(skce::BiasedSKCE,
-                           predictions::AbstractVector,
-                           targets::AbstractVector)
+function _calibrationerror(
+    skce::BiasedSKCE, predictions::AbstractVector, targets::AbstractVector
+)
     @unpack kernel = skce
 
     # obtain number of samples
@@ -94,5 +94,5 @@ function _calibrationerror(skce::BiasedSKCE,
         end
     end
 
-    estimate
+    return estimate
 end

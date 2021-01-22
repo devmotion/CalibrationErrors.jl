@@ -48,7 +48,9 @@ end
             idx = binindex(bin.mean_predictions, nbins, Val(nclasses))
 
             # compute indices of all predictions in the same bin
-            idxs = filter(i -> idx == binindex(predictions[i], nbins, Val(nclasses)), 1:nsamples)
+            idxs = filter(
+                i -> idx == binindex(predictions[i], nbins, Val(nclasses)), 1:nsamples
+            )
 
             @test bin.nsamples == length(idxs)
             @test bin.mean_predictions ≈ mean(predictions[idxs])
@@ -63,26 +65,29 @@ end
 
     bins = perform(UniformBinning(2), predictions, targets)
     @test length(bins) == 2
-    sort!(bins; by = x -> x.nsamples)
+    sort!(bins; by=x -> x.nsamples)
     @test all(bin -> sum(bin.mean_predictions) == 1, bins)
     @test all(bin -> sum(bin.proportions_targets) == 1, bins)
     for (i, idxs) in enumerate(([3], [1, 2]))
         @test bins[i].nsamples == length(idxs)
         @test bins[i].mean_predictions == mean(predictions[idxs])
-        @test bins[i].proportions_targets == vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims = 2))
+        @test bins[i].proportions_targets ==
+              vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims=2))
     end
 
     bins = perform(UniformBinning(1), predictions, targets)
     @test length(bins) == 1
     @test bins[1].nsamples == 3
     @test bins[1].mean_predictions ≈ mean(predictions)
-    @test bins[1].proportions_targets ≈ [1/3, 1/3, 1/3]
+    @test bins[1].proportions_targets ≈ [1 / 3, 1 / 3, 1 / 3]
 
-    predictions = [[0.4, 0.1, 0.5], [0.5, 0.3, 0.2], [0.3, 0.7, 0.0], [0.1, 0.0, 0.9], [0.8, 0.1, 0.1]]
+    predictions = [
+        [0.4, 0.1, 0.5], [0.5, 0.3, 0.2], [0.3, 0.7, 0.0], [0.1, 0.0, 0.9], [0.8, 0.1, 0.1]
+    ]
     targets = [1, 2, 3, 1, 2]
 
     bins = perform(UniformBinning(3), predictions, targets)
-    sort!(bins; by = x -> x.mean_predictions[1])
+    sort!(bins; by=x -> x.mean_predictions[1])
     @test length(bins) == 5
     @test all(bin -> bin.nsamples == 1, bins)
     for (i, idx) in enumerate((4, 3, 1, 2, 5))
@@ -91,14 +96,15 @@ end
     end
 
     bins = perform(UniformBinning(2), predictions, targets)
-    sort!(bins; by = x -> x.mean_predictions[1])
+    sort!(bins; by=x -> x.mean_predictions[1])
     @test length(bins) == 4
     @test all(bin -> sum(bin.mean_predictions) == 1, bins)
     @test all(bin -> sum(bin.proportions_targets) == 1, bins)
     for (i, idxs) in enumerate(([4], [3], [1, 2], [5]))
         @test bins[i].nsamples == length(idxs)
         @test bins[i].mean_predictions == mean(predictions[idxs])
-        @test bins[i].proportions_targets == vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims = 2))
+        @test bins[i].proportions_targets ==
+              vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims=2))
     end
 
     bins = perform(UniformBinning(1), predictions, targets)

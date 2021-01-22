@@ -1,20 +1,23 @@
 abstract type CalibrationErrorEstimator end
 
 # extract predictions and targets from tuple
-predictions_targets((predictions, targets)::Tuple{<:Any,<:Any}) =
-    predictions_targets(predictions, targets)
+function predictions_targets((predictions, targets)::Tuple{<:Any,<:Any})
+    return predictions_targets(predictions, targets)
+end
 
 # extract predictions and targets from a vector of tuples
-predictions_targets(data::AbstractVector{<:Tuple{<:Any,<:Any}}) =
-    predictions_targets(first.(data), last.(data))
+function predictions_targets(data::AbstractVector{<:Tuple{<:Any,<:Any}})
+    return predictions_targets(first.(data), last.(data))
+end
 
 # extract predictions from a matrix
-predictions_targets(predictions::AbstractMatrix{<:Real}, targets::AbstractVector) =
-    predictions_targets([predictions[:, i] for i in axes(predictions, 2)], targets)
+function predictions_targets(predictions::AbstractMatrix{<:Real}, targets::AbstractVector)
+    return predictions_targets([predictions[:, i] for i in axes(predictions, 2)], targets)
+end
 
 # do not transform vectors
 function predictions_targets(predictions::AbstractVector, targets::AbstractVector)
-    predictions, targets
+    return predictions, targets
 end
 
 """
@@ -32,5 +35,5 @@ function calibrationerror(estimator::CalibrationErrorEstimator, data...)
     length(predictions) == length(targets) ||
         throw(DimensionMismatch("number of predictions and targets must be equal"))
 
-    _calibrationerror(estimator, predictions, targets)
+    return _calibrationerror(estimator, predictions, targets)
 end

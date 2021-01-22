@@ -30,7 +30,8 @@ end
 
         @test sum(bin -> bin.nsamples, bins) == nsamples
         @test sum(bin -> bin.nsamples .* bin.mean_predictions, bins) ≈ sum(predictions)
-        @test sum(bin -> bin.nsamples .* bin.proportions_targets, bins) ≈ counts(targets, nclasses)
+        @test sum(bin -> bin.nsamples .* bin.proportions_targets, bins) ≈
+              counts(targets, nclasses)
     end
 
     # set maximum number of bins
@@ -45,7 +46,8 @@ end
 
         @test sum(bin -> bin.nsamples, bins) == nsamples
         @test sum(bin -> bin.nsamples .* bin.mean_predictions, bins) ≈ sum(predictions)
-        @test sum(bin -> bin.nsamples .* bin.proportions_targets, bins) ≈ counts(targets, nclasses)
+        @test sum(bin -> bin.nsamples .* bin.proportions_targets, bins) ≈
+              counts(targets, nclasses)
     end
 end
 
@@ -68,9 +70,11 @@ end
     @test length(bins) == 1
     @test bins[1].nsamples == 3
     @test bins[1].mean_predictions == mean(predictions)
-    @test bins[1].proportions_targets == [1/3, 1/3, 1/3]
+    @test bins[1].proportions_targets == [1 / 3, 1 / 3, 1 / 3]
 
-    predictions = [[0.4, 0.1, 0.5], [0.5, 0.3, 0.2], [0.3, 0.7, 0.0], [0.1, 0.0, 0.9], [0.8, 0.1, 0.1]]
+    predictions = [
+        [0.4, 0.1, 0.5], [0.5, 0.3, 0.2], [0.3, 0.7, 0.0], [0.1, 0.0, 0.9], [0.8, 0.1, 0.1]
+    ]
     targets = [1, 2, 3, 1, 2]
     # maximum possible steps in the order they might occur:
     # first step: [3, 5], [1, 2, 4]
@@ -93,7 +97,8 @@ end
     for (i, idxs) in enumerate(([3, 5], [1, 2, 4]))
         @test bins[i].nsamples == length(idxs)
         @test bins[i].mean_predictions ≈ mean(predictions[idxs])
-        @test bins[i].proportions_targets == vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims = 2))
+        @test bins[i].proportions_targets ==
+              vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims=2))
     end
 
     bins = perform(MedianVarianceBinning(3), predictions, targets)
