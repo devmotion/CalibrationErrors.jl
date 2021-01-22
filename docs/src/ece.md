@@ -24,7 +24,7 @@ arbitrarily complex in general.
 
 [^GPSW17]: Guo, C., et al. (2017). [On calibration of modern neural networks](http://proceedings.mlr.press/v70/guo17a.html). In *Proceedings of the 34th International Conference on Machine Learning* (pp. 1321-1330).
 
-[^VWALRS]: Vaicenavicius, J., et al. (2019). [Evaluating model calibration in classification](http://proceedings.mlr.press/v89/vaicenavicius19a.html). In *Proceedings of Machine Learning Research (AISTATS 2019)* (pp. 3459-3467).
+[^VWALRS19]: Vaicenavicius, J., et al. (2019). [Evaluating model calibration in classification](http://proceedings.mlr.press/v89/vaicenavicius19a.html). In *Proceedings of Machine Learning Research (AISTATS 2019)* (pp. 3459-3467).
 
 [^WLZ21]: Widmann, D., Lindsten, F., & Zachariah, D. (2021). [Calibration tests beyond classification](https://openreview.net/forum?id=-bxf89v3Nx). To be presented at *ICLR 2021*.
 
