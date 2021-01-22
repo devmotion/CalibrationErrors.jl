@@ -9,8 +9,9 @@ on:
       - trying
       # Build master branch.
       - master
-  release:
-    types: [created]
+    tags:
+      # When a new release is available
+      - 'v*'
   pull_request:
     types: [labeled]
 
