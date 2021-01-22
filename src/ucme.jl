@@ -49,7 +49,7 @@ struct UCME{K<:Kernel,TP,TT} <: CalibrationErrorEstimator
         length(testtargets) == ntest ||
             throw(DimensionMismatch("number of test predictions and targets must be equal"))
 
-        new{K,TP,TT}(kernel, testpredictions, testtargets)
+        return new{K,TP,TT}(kernel, testpredictions, testtargets)
     end
 end
 
@@ -62,9 +62,7 @@ function UCME(kernel::Kernel, testdata...)
 end
 
 function _calibrationerror(
-    estimator::UCME,
-    predictions::AbstractVector,
-    targets::AbstractVector
+    estimator::UCME, predictions::AbstractVector, targets::AbstractVector
 )
     @unpack kernel, testpredictions, testtargets = estimator
 
@@ -85,7 +83,7 @@ function unsafe_ucme_eval_testlocation(
     predictions::AbstractVector,
     targets::AbstractVector,
     testprediction,
-    testtarget
+    testtarget,
 )
     # compute average over predictions and targets for the given test location
     estimate = mean(zip(predictions, targets)) do (p, y)
@@ -100,7 +98,7 @@ function unsafe_ucme_eval(
     p::AbstractVector{<:Real},
     y::Integer,
     testp::AbstractVector{<:Real},
-    testy::Integer
+    testy::Integer,
 )
     a = kernel((p, y), (testp, testy))
     b = sum(p[z] * kernel((p, z), (testp, testy)) for z in 1:length(p))
@@ -118,7 +116,7 @@ function unsafe_ucme_eval(
     p::AbstractVector{<:Real},
     y::Integer,
     testp::AbstractVector{<:Real},
-    testy::Integer
+    testy::Integer,
 )
     κpredictions, κtargets = kernel.kernels
     return unsafe_ucme_eval_targets(κtargets, p, y, testp, testy) * κpredictions(p, testp)
@@ -129,7 +127,7 @@ function unsafe_ucme_eval_targets(
     p::AbstractVector{<:Real},
     y::Integer,
     testp::AbstractVector{<:Real},
-    testy::Integer
+    testy::Integer,
 )
     @inbounds res = (y == testy) - p[testy]
     return res

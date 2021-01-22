@@ -88,7 +88,7 @@ function estimates(estimator, π::Real, m::Int)
         estimates[i] = calibrationerror(estimator(data), data)
     end
 
-    estimates
+    return estimates
 end
 
 # We use a helper function to run the experiment for all desired parameter settings.
@@ -105,7 +105,7 @@ function estimates(estimator)
     πvec = [0.0, 0.5, 1.0]
     estimatesmat = estimates.(Ref(estimator), πvec', mvec)
 
-    EstimatesSet(mvec, πvec, estimatesmat)
+    return EstimatesSet(mvec, πvec, estimatesmat)
 end
 
 # As mentioned above, we can calculate the analytic expected calibration error. For the squared
@@ -118,7 +118,7 @@ end
 
 function plot(set::EstimatesSet; ece=false)
     ## create figure
-    f = Figure(resolution = (1080, 960))
+    f = Figure(; resolution=(1080, 960))
 
     ## add subplots
     nrows, ncols = size(set.estimates)
@@ -127,50 +127,40 @@ function plot(set::EstimatesSet; ece=false)
         estimates = set.estimates[i, j]
 
         ## create new axis
-        ax = f[i, j] = Axis(f; ticks = LinearTicks(4))
-        i < nrows && hidexdecorations!(current_axis(); grid = false)
-        j > 1 && hideydecorations!(current_axis(); grid = false)
+        ax = f[i, j] = Axis(f; ticks=LinearTicks(4))
+        i < nrows && hidexdecorations!(current_axis(); grid=false)
+        j > 1 && hideydecorations!(current_axis(); grid=false)
 
         ## plot histogram of estimates
         h = fit(Histogram, estimates)
-        plot!(
-            h;
-            color = (ColorSchemes.Dark2_8[1], 0.5),
-            strokecolor = :black,
-            strokewidth = 0.5,
-        )
+        plot!(h; color=(ColorSchemes.Dark2_8[1], 0.5), strokecolor=:black, strokewidth=0.5)
 
         ## indicate analytic calibration error for ECE
         if ece
-            vlines!(
-                ax, [π * (m - 1) / m];
-                color = ColorSchemes.Dark2_8[2], linewidth = 2,
-            )
+            vlines!(ax, [π * (m - 1) / m]; color=ColorSchemes.Dark2_8[2], linewidth=2)
         end
 
         ## indicate mean of estimates
-        vlines!(ax, [mean(estimates)]; color = ColorSchemes.Dark2_8[3], linewidth = 2)
+        vlines!(ax, [mean(estimates)]; color=ColorSchemes.Dark2_8[3], linewidth=2)
     end
 
     ## add labels and link axes
     for (j, π) in enumerate(set.π)
-        f[1, j, Top()] = Box(f; color = :gray90)
-        f[1, j, Top()] = Label(f, "π = $π"; padding = (0, 0, 5, 5))
+        f[1, j, Top()] = Box(f; color=:gray90)
+        f[1, j, Top()] = Label(f, "π = $π"; padding=(0, 0, 5, 5))
         linkxaxes!(contents(f[:, j])...)
     end
     for (i, m) in enumerate(set.m)
-        f[i, ncols, Right()] = Box(f; color = :gray90)
-        f[i, ncols, Right()] = Label(
-            f, "$m classes"; rotation = -π/2, padding = (5, 5, 0, 0),
-        )
+        f[i, ncols, Right()] = Box(f; color=:gray90)
+        f[i, ncols, Right()] = Label(f, "$m classes"; rotation=-π / 2, padding=(5, 5, 0, 0))
         linkyaxes!(contents(f[i, :])...)
     end
     f[nrows, 1:ncols, Bottom()] = Label(
-        f, "calibration error estimate"; padding = (0, 0, 0, 75),
+        f, "calibration error estimate"; padding=(0, 0, 0, 75)
     )
-    f[1:nrows, 1, Left()] = Label(f, "# runs"; rotation = π/2, padding = (0, 75, 0, 0))
+    f[1:nrows, 1, Left()] = Label(f, "# runs"; rotation=π / 2, padding=(0, 75, 0, 0))
 
-    f
+    return f
 end
 
 # ## Kernel choice
@@ -184,10 +174,10 @@ end
 
 function kernel((predictions, targets))
     ## compute inverse lengthscale with median heuristic
-    γ = inv(median(pairwise(TotalVariation(), predictions, dims=2)))
+    γ = inv(median(pairwise(TotalVariation(), predictions; dims=2)))
 
     ## create tensor product kernel
-    transform(TVExponentialKernel(), γ) ⊗ WhiteKernel()
+    return transform(TVExponentialKernel(), γ) ⊗ WhiteKernel()
 end
 
 # ## Expected calibration error

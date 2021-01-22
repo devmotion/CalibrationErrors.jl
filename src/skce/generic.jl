@@ -21,7 +21,7 @@ function unsafe_skce_eval(
     p::AbstractVector{<:Real},
     y::Integer,
     p̃::AbstractVector{<:Real},
-    ỹ::Integer
+    ỹ::Integer,
 )
     # precomputations
     n = length(p)
@@ -85,7 +85,7 @@ function unsafe_skce_eval(
         end
     end
 
-    result
+    return result
 end
 
 # evaluation for tensor product kernels
@@ -100,7 +100,7 @@ function unsafe_skce_eval(
     p::AbstractVector{<:Real},
     y::Integer,
     p̃::AbstractVector{<:Real},
-    ỹ::Integer
+    ỹ::Integer,
 )
     κpredictions, κtargets = kernel.kernels
     return κpredictions(p, p̃) * unsafe_skce_eval_targets(κtargets, p, y, p̃, ỹ)
@@ -111,7 +111,7 @@ function unsafe_skce_eval_targets(
     p::AbstractVector{<:Real},
     y::Integer,
     p̃::AbstractVector{<:Real},
-    ỹ::Integer
+    ỹ::Integer,
 )
     # ensure that y ≤ ỹ (simplifies the implementation)
     y > ỹ && return unsafe_skce_eval_targets(κtargets, p̃, ỹ, p, y)
@@ -253,7 +253,7 @@ function unsafe_skce_eval_targets(
     p::AbstractVector{<:Real},
     y::Integer,
     p̃::AbstractVector{<:Real},
-    ỹ::Integer
+    ỹ::Integer,
 )
     @inbounds res = (y == ỹ) - p[ỹ] - p̃[y] + dot(p, p̃)
     return res

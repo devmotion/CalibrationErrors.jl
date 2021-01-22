@@ -31,8 +31,11 @@ In particular, distance measures of the package
 ECE(binning::AbstractBinningAlgorithm) = ECE(binning, TotalVariation())
 
 # estimate ECE
-function _calibrationerror(ece::ECE, predictions::AbstractVector{<:AbstractVector{<:Real}},
-                           targets::AbstractVector{<:Integer})
+function _calibrationerror(
+    ece::ECE,
+    predictions::AbstractVector{<:AbstractVector{<:Real}},
+    targets::AbstractVector{<:Integer},
+)
     @unpack binning, distance = ece
 
     # check number of samples
@@ -69,5 +72,5 @@ function _calibrationerror(ece::ECE, predictions::AbstractVector{<:AbstractVecto
         end
     end
 
-    estimate
+    return estimate
 end

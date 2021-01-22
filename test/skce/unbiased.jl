@@ -41,7 +41,7 @@ end
 
         @test any(x -> x > zero(x), estimates)
         @test any(x -> x < zero(x), estimates)
-        @test mean(estimates) ≈ 0 atol=1e-3
+        @test mean(estimates) ≈ 0 atol = 1e-3
     end
 end
 
@@ -66,14 +66,17 @@ end
     @test @inferred(calibrationerror(skce, ([1 0; 0 1], [2, 2]))) ≈ 0
 
     # two predictions, ten times replicated
-    @test @inferred(calibrationerror(skce, (repeat([1 0; 0 1], 1, 10),
-                                            repeat([1, 2], 10)))) ≈ 0
-    @test @inferred(calibrationerror(skce, repeat([1 0; 0 1], 1, 10),
-                                     repeat([1, 1], 10))) ≈ 0
-    @test @inferred(calibrationerror(skce, (repeat([[1, 0], [0, 1]], 10),
-                                            repeat([2, 1], 10)))) ≈ -2 * exp(-1)
-    @test @inferred(calibrationerror(skce, (repeat([1 0; 0 1], 1, 10),
-                                            repeat([2, 2], 10)))) ≈ 0
+    @test @inferred(
+        calibrationerror(skce, (repeat([1 0; 0 1], 1, 10), repeat([1, 2], 10)))
+    ) ≈ 0
+    @test @inferred(calibrationerror(skce, repeat([1 0; 0 1], 1, 10), repeat([1, 1], 10))) ≈
+          0
+    @test @inferred(
+        calibrationerror(skce, (repeat([[1, 0], [0, 1]], 10), repeat([2, 1], 10)))
+    ) ≈ -2 * exp(-1)
+    @test @inferred(
+        calibrationerror(skce, (repeat([1 0; 0 1], 1, 10), repeat([2, 2], 10)))
+    ) ≈ 0
 end
 
 @testset "Block: Basic properties" begin
@@ -99,17 +102,15 @@ end
             # consistency checks
             @test estimates[i] ≈ mean(
                 calibrationerror(
-                    skce,
-                    predictions[(2 * i - 1):(2 * i)],
-                    targets[(2 * i - 1):(2 * i)],
+                    skce, predictions[(2 * i - 1):(2 * i)], targets[(2 * i - 1):(2 * i)]
                 ) for i in 1:(nsamples ÷ 2)
             )
             @test calibrationerror(skce, predictions, targets) ==
-                calibrationerror(blockskce_all, predictions, targets)
+                  calibrationerror(blockskce_all, predictions, targets)
         end
 
         @test any(x -> x > zero(x), estimates)
         @test any(x -> x < zero(x), estimates)
-        @test mean(estimates) ≈ 0 atol=5e-3
+        @test mean(estimates) ≈ 0 atol = 5e-3
     end
 end

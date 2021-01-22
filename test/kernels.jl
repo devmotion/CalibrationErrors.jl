@@ -31,11 +31,10 @@ end
     @test kernel(x, y) == exp(-totalvariation(x, y))
 
     # transformations
-    @test transform(kernel, 0.1)(x, y) == exp(- 0.1 * totalvariation(x, y))
-    @test transform(kernel, ScaleTransform(0.1))(x, y) ==
-        exp(- 0.1 * totalvariation(x, y))
+    @test transform(kernel, 0.1)(x, y) == exp(-0.1 * totalvariation(x, y))
+    @test transform(kernel, ScaleTransform(0.1))(x, y) == exp(-0.1 * totalvariation(x, y))
     ard = rand(10)
-    @test transform(kernel, ard)(x, y) == exp(- totalvariation(ard .* x, ard .* y))
+    @test transform(kernel, ard)(x, y) == exp(-totalvariation(ard .* x, ard .* y))
 end
 
 @testset "unsafe_skce_eval" begin
@@ -46,11 +45,15 @@ end
 
     x1, x2 = rand(10), rand(1:10)
 
-    @test unsafe_skce_eval(kernel1, x1, x2, x1, x2) ≈ unsafe_skce_eval(kernel2, x1, x2, x1, x2)
-    @test unsafe_skce_eval(kernel1, x1, x2, x1, x2) ≈ unsafe_skce_eval(kernel3, x1, x2, x1, x2)
+    @test unsafe_skce_eval(kernel1, x1, x2, x1, x2) ≈
+          unsafe_skce_eval(kernel2, x1, x2, x1, x2)
+    @test unsafe_skce_eval(kernel1, x1, x2, x1, x2) ≈
+          unsafe_skce_eval(kernel3, x1, x2, x1, x2)
 
     y1, y2 = rand(10), rand(1:10)
 
-    @test unsafe_skce_eval(kernel1, x1, x2, y1, y2) ≈ unsafe_skce_eval(kernel2, x1, x2, y1, y2)
-    @test unsafe_skce_eval(kernel1, x1, x2, y1, y2) ≈ unsafe_skce_eval(kernel3, x1, x2, y1, y2)
+    @test unsafe_skce_eval(kernel1, x1, x2, y1, y2) ≈
+          unsafe_skce_eval(kernel2, x1, x2, y1, y2)
+    @test unsafe_skce_eval(kernel1, x1, x2, y1, y2) ≈
+          unsafe_skce_eval(kernel3, x1, x2, y1, y2)
 end
