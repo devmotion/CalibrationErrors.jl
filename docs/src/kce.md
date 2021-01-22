@@ -70,17 +70,14 @@ is an estimator with linear sample complexity.
 
 ```@docs
 BiasedSKCE
-BiasedSKCE(::Kernel, ::Kernel)
 ```
 
 ### Unbiased estimators
 
 ```@docs
 UnbiasedSKCE
-UnbiasedSKCE(::Kernel, ::Kernel)
 ```
 
 ```@docs
 BlockUnbiasedSKCE
-BlockUnbiasedSKCE(::Kernel, ::Kernel)
 ```
