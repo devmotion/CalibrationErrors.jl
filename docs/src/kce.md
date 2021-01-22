@@ -68,11 +68,11 @@ or the squared Euclidean distance can be formulated in this way.[^WLZ19]
 The maximum mean calibration error (MMCE)[^KSJ] can be viewed as a special case of the KCE, in
 which only the most-confident predictions are considered.[^WLZ19]
 
+[^KSJ]: Kumar, A., Sarawagi, S., & Jain, U. (2018). [Trainable calibration measures for neural networks from kernel mean embeddings](http://proceedings.mlr.press/v80/kumar18a.html). In *Proceedings of the 35th International Conference on Machine Learning* (pp. 2805-2814).
+
 [^WLZ19]: Widmann, D., Lindsten, F., & Zachariah, D. (2019). [Calibration tests in multi-class classification: A unifying framework](https://proceedings.neurips.cc/paper/2019/hash/1c336b8080f82bcc2cd2499b4c57261d-Abstract.html). In *Advances in Neural Information Processing Systems 32 (NeurIPS 2019)* (pp. 12257–12267).
 
 [^WLZ21]: Widmann, D., Lindsten, F., & Zachariah, D. (2021). [Calibration tests beyond classification](https://openreview.net/forum?id=-bxf89v3Nx). To be presented at *ICLR 2021*.
-
-[^KSJ]: Kumar, A., Sarawagi, S., & Jain, U. (2018). [Trainable calibration measures for neural networks from kernel mean embeddings](http://proceedings.mlr.press/v80/kumar18a.html). In *Proceedings of the 35th International Conference on Machine Learning* (pp. 2805-2814).
 
 ## Estimators
 
