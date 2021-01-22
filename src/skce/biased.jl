@@ -28,6 +28,11 @@ h_k\big((μ, y), (μ', y')\big) ={}&   k\big((μ, y), (μ', y')\big)
 \end{aligned}
 ```
 
+The bias of the estimator is
+```math
+\frac{1}{n} \Big(\mathbb{E}_{P_X,Y} h_k\big((P_X, Y), (P_X, Y)\big) - \mathrm{SKCE}_k\Big).
+```
+
 # References
 
 Widmann, D., Lindsten, F., & Zachariah, D. (2019). [Calibration tests in multi-class
