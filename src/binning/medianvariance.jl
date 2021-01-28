@@ -141,7 +141,7 @@ function unsafe_variance_welford(
 end
 
 # this function is unsafe since it leads to undefined behaviour if the
-# outputs are accessed afer `idxs` has been garbage collected 
+# outputs are accessed afer `idxs` has been garbage collected
 function unsafe_median_split!(
     idxs::Vector{Int}, x::AbstractVector{<:AbstractVector{<:Real}}, dim::Int
 )

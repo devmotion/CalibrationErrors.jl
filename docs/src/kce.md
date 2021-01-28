@@ -27,7 +27,7 @@ KCE based on matrix-valued kernel
 $\tilde{k} \colon \mathcal{P} \times \mathcal{P} \to \mathbb{R}^{m \times m}$ on
 the space $\mathcal{P}$ of predictions.[^WLZ19] The definition above can be rewritten as
 ```math
-\mathrm{KCE}_{\tilde{k}} := \sup_{f \in \mathcal{B}_{\tilde{k}}} \bigg| \mathbb{E}_{P_X} \big(\mathcal{L}(Y \,|\, P_X) - P_X\big)^\mathsf{T} f(P_X) \bigg|,
+\mathrm{KCE}_{\tilde{k}} := \sup_{f \in \mathcal{B}_{\tilde{k}}} \bigg| \mathbb{E}_{P_X} \big(\mathrm{law}(Y \,|\, P_X) - P_X\big)^\mathsf{T} f(P_X) \bigg|,
 ```
 where the matrix-valued kernel $\tilde{k}$ is given by
 ```math
@@ -43,7 +43,7 @@ calibrated.[^WLZ21] Moreover, the squared KCE (SKCE) can be formulated in
 terms of the kernel $k$ as
 ```math
 \begin{aligned}
-\mathrm{SKCE}_{k} := \mathrm{KCE}_k^2 &= \int k(u, v) \, \big(\mathcal{L}(P_X, Y) - \mathcal{L}(P_X, Z_X)\big)(u) \big(\mathcal{L}(P_X, Y) - \mathcal{L}(P_X, Z_X)\big)(v) \\
+\mathrm{SKCE}_{k} := \mathrm{KCE}_k^2 &= \int k(u, v) \, \big(\mathrm{law}(P_X, Y) - \mathrm{law}(P_X, Z_X)\big)(u) \big(\mathrm{law}(P_X, Y) - \mathrm{law}(P_X, Z_X)\big)(v) \\
 &= \mathbb{E} h_k\big((P_X, Y), (P_{X'}, Y')\big),
 \end{aligned}
 ```
