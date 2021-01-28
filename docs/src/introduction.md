@@ -12,29 +12,9 @@ of observations of features and corresponding targets are available).[^1]
 
 The following plot shows measurements of the bill length and the flipper length
 for three different penguin species in the
-[Palmer penguin dataset](https://github.com/allisonhorst/palmerpenguins).
+[Palmer penguins dataset](https://github.com/allisonhorst/palmerpenguins).
 
-```@setup palmerpenguins
-using CairoMakie
-using DataFrames
-using PalmerPenguins
-using AbstractPlotting.ColorSchemes
-
-penguins = dropmissing(DataFrame(PalmerPenguins.load()))
-
-f = Figure()
-f[1,1] = Axis(f; xlabel = "bill length [mm]", ylabel = "flipper length [mm]")
-scs = map(enumerate(groupby(penguins, :species))) do (i, df)
-    scatter!(
-        df[!, :bill_length_mm], df[!, :flipper_length_mm];
-        color = (ColorSchemes.Dark2_8[i], 0.8),
-    )
-end
-f[1,2] = Legend(f, scs, string.(levels(penguins.species)), "species")
-AbstractPlotting.save("penguins.svg", f)
-```
-
-![](penguins.svg)
+![](./examples/figures/penguins.svg)
 
 There exist many different probabilistic predictive models for predicting the
 probability of the penguin species (*target*) given the bill and flipper length
@@ -42,7 +22,7 @@ probability of the penguin species (*target*) given the bill and flipper length
 $P_X$ be the prediction of a specific model $P$ for a feature $X$. Ideally, we would
 like that
 ```math
-P_X = \mathcal{L}(Y \,|\, X) \qquad \text{almost surely},
+P_X = \mathrm{law}(Y \,|\, X) \qquad \text{almost surely},
 ```
 i.e., the model should predict the law of target $Y$ given features $X$.[^2] Of course,
 usually it is not possible to achieve this in practice.
@@ -66,7 +46,7 @@ and whose target is the predicted confidence score.
 
 [^1]: It does not matter how the model is obtained. In particular, both Bayesian and frequentist approaches can be used.
 
-[^2]: In classification problems, the law $\mathcal{L}(Y \,|\, X)$ can be identified with a vector in the probability simplex. Therefore often we just consider this equivalent formulation, both for the predictions $P_X$ and the law $\mathcal{L}(Y \,|\, X)$.
+[^2]: In classification problems, the law $\mathrm{law}(Y \,|\, X)$ can be identified with a vector in the probability simplex. Therefore often we just consider this equivalent formulation, both for the predictions $P_X$ and the law $\mathrm{law}(Y \,|\, X)$.
 
 ## Calibration
 
@@ -83,7 +63,7 @@ days it rains.
 
 More generally, mathematically we would like
 ```math
-P_X = \mathcal{L}(Y \,|\, P_X) \quad \text{almost surely},
+P_X = \mathrm{law}(Y \,|\, P_X) \quad \text{almost surely},
 ```
 i.e., the predicted distribution of targets should be equal to the distribution of targets
 conditioned on the predicted distribution.[^3]
@@ -91,12 +71,12 @@ conditioned on the predicted distribution.[^3]
 This statistical property is called *calibration*. If it is satisfied, a model is
 *calibrated*.
 
-Obviously, the ideal model $P_X = \mathcal{L}(Y \,|\, X)$ is calibrated. However,
-also the naive model $P_X = \mathcal{L}(Y)$ that always predicts the marginal
+Obviously, the ideal model $P_X = \mathrm{law}(Y \,|\, X)$ is calibrated. However,
+also the naive model $P_X = \mathrm{law}(Y)$ that always predicts the marginal
 distribution of $Y$ independent of the features is calibrated.[^4] In fact, any model of
 the form
 ```math
-P_X = \mathcal{L}(Y \,|\, \phi(X)) \quad \text{almost surely},
+P_X = \mathrm{law}(Y \,|\, \phi(X)) \quad \text{almost surely},
 ```
 where $\phi$ is some measurable function, is calibrated.
 
@@ -111,7 +91,7 @@ Calibration errors such as the [expected calibration error](@ref ece) and the
 degree of miscalibration, of probabilistic predictive models. They allow a more
 fine-tuned analysis of calibration and enable comparisons of calibration of
 different models. Intuitively, calibration measures quantify the deviation of
-$P_X$ and $\mathcal{L}(Y \,|\, P_X)$, i.e., the left and right hand side in
+$P_X$ and $\mathrm{law}(Y \,|\, P_X)$, i.e., the left and right hand side in
 the calibration definition.
 
 ### Estimation

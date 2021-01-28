@@ -1,5 +1,6 @@
-using Documenter
-using JSON: JSON
+using CalibrationErrors
+using Literate: Literate
+using Pkg: Pkg
 
 if haskey(ENV, "GITHUB_ACTIONS")
     # Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
@@ -8,12 +9,11 @@ if haskey(ENV, "GITHUB_ACTIONS")
     ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
 end
 
-using Literate, CalibrationErrors
-
 EXAMPLES = joinpath(@__DIR__, "..", "examples")
 OUTPUT = joinpath(@__DIR__, "src", "examples")
 
 ispath(OUTPUT) && rm(OUTPUT; recursive=true)
+mkpath(joinpath(OUTPUT, "figures"))
 
 # Add links to binder and nbviewer below the first heading of level 1
 function preprocess(content)
@@ -26,16 +26,20 @@ function preprocess(content)
     return replace(content, r"^# # [^\n]*"m => sub; count=1)
 end
 
+# Save current project directory
+PROJECT_PATH = Pkg.project().path
+
 for file in readdir(EXAMPLES; join=true)
     endswith(file, ".jl") || continue
     Literate.markdown(file, OUTPUT; documenter=true, preprocess=preprocess)
     Literate.notebook(file, OUTPUT)
 end
 
-# Avoid font caching warning in docs
-using CairoMakie
-CairoMakie.activate!()
-scatter(rand(10), rand(10))
+# Reset project directory
+Pkg.activate(PROJECT_PATH)
+
+using Documenter
+using JSON: JSON
 
 makedocs(;
     modules=[CalibrationErrors],

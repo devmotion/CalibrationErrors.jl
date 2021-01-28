@@ -1,5 +1,36 @@
 # # Distribution of calibration error estimates
 #
+# ## Packages
+
+using Pkg: Pkg
+
+Pkg.activate(mktempdir())
+Pkg.add(
+    Pkg.Types.Context(; io=devnull),
+    [
+        Pkg.PackageSpec(; name="CairoMakie", version="0.3.12"),
+        Pkg.PackageSpec(; name="CalibrationErrors", version="0.5.13"),
+        Pkg.PackageSpec(; name="Distances", version="0.10.1"),
+        Pkg.PackageSpec(; name="Distributions", version="0.24.12"),
+        Pkg.PackageSpec(; name="StatsBase", version="0.33.2"),
+    ],
+)
+Pkg.status()
+
+#-
+
+using CairoMakie
+using CalibrationErrors
+using Distances
+using Distributions
+using StatsBase
+
+using LinearAlgebra
+using Random
+using Statistics
+
+using CairoMakie.AbstractPlotting.ColorSchemes: Dark2_8
+
 # ## Introduction
 #
 # This example is taken from the publication
@@ -41,26 +72,13 @@
 # ```math
 # \mathrm{ECE}_{\mathrm{TV}} = \frac{\pi(m-1)}{m}.
 # ```
-
-# ## Setup
-
-using CairoMakie
-using CalibrationErrors
-using Distances
-using Distributions
-using StatsBase
-using AbstractPlotting.ColorSchemes
-
-using LinearAlgebra
-using Random
-
-# ## Estimates
 #
+# ## Estimates
 #
 
 function estimates(estimator, π::Real, m::Int)
     ## cache array for predictions, modified predictions, and labels
-    predictions = Matrix{Float64}(undef, m, 250)
+    predictions = [Vector{Float64}(undef, m) for _ in 1:250]
     targets = Vector{Int}(undef, 250)
     data = (predictions, targets)
 
@@ -73,14 +91,14 @@ function estimates(estimator, π::Real, m::Int)
     ## for each run
     @inbounds for i in eachindex(estimates)
         ## sample predictions
-        rand!(sampler_predictions, predictions)
+        rand!.((sampler_predictions,), predictions)
 
         ## sample targets
-        @inbounds for j in eachindex(targets)
+        for (j, p) in enumerate(predictions)
             if rand() < π
                 targets[j] = 1
             else
-                targets[j] = sample(Weights(view(predictions, :, j), 1))
+                targets[j] = rand(Categorical(p))
             end
         end
 
@@ -90,6 +108,7 @@ function estimates(estimator, π::Real, m::Int)
 
     return estimates
 end
+#md nothing #hide
 
 # We use a helper function to run the experiment for all desired parameter settings.
 
@@ -103,10 +122,11 @@ function estimates(estimator)
     ## for all combinations of m and π
     mvec = [2, 10, 100]
     πvec = [0.0, 0.5, 1.0]
-    estimatesmat = estimates.(Ref(estimator), πvec', mvec)
+    estimatesmat = estimates.((estimator,), πvec', mvec)
 
     return EstimatesSet(mvec, πvec, estimatesmat)
 end
+#md nothing #hide
 
 # As mentioned above, we can calculate the analytic expected calibration error. For the squared
 # kernel calibration error, we take the mean of the estimates of the unbiased quadratic
@@ -127,41 +147,40 @@ function plot(set::EstimatesSet; ece=false)
         estimates = set.estimates[i, j]
 
         ## create new axis
-        ax = f[i, j] = Axis(f; ticks=LinearTicks(4))
+        ax = Axis(f[i, j]; ticks=LinearTicks(4))
         i < nrows && hidexdecorations!(current_axis(); grid=false)
         j > 1 && hideydecorations!(current_axis(); grid=false)
 
         ## plot histogram of estimates
         h = fit(Histogram, estimates)
-        plot!(h; color=(ColorSchemes.Dark2_8[1], 0.5), strokecolor=:black, strokewidth=0.5)
+        plot!(h; color=(Dark2_8[1], 0.5), strokecolor=:black, strokewidth=0.5)
 
         ## indicate analytic calibration error for ECE
         if ece
-            vlines!(ax, [π * (m - 1) / m]; color=ColorSchemes.Dark2_8[2], linewidth=2)
+            vlines!(ax, [π * (m - 1) / m]; color=Dark2_8[2], linewidth=2)
         end
 
         ## indicate mean of estimates
-        vlines!(ax, [mean(estimates)]; color=ColorSchemes.Dark2_8[3], linewidth=2)
+        vlines!(ax, [mean(estimates)]; color=Dark2_8[3], linewidth=2)
     end
 
     ## add labels and link axes
     for (j, π) in enumerate(set.π)
-        f[1, j, Top()] = Box(f; color=:gray90)
-        f[1, j, Top()] = Label(f, "π = $π"; padding=(0, 0, 5, 5))
+        Box(f[1, j, Top()]; color=:gray90)
+        Label(f[1, j, Top()], "π = $π"; padding=(0, 0, 5, 5))
         linkxaxes!(contents(f[:, j])...)
     end
     for (i, m) in enumerate(set.m)
-        f[i, ncols, Right()] = Box(f; color=:gray90)
-        f[i, ncols, Right()] = Label(f, "$m classes"; rotation=-π / 2, padding=(5, 5, 0, 0))
+        Box(f[i, ncols, Right()]; color=:gray90)
+        Label(f[i, ncols, Right()], "$m classes"; rotation=-π / 2, padding=(5, 5, 0, 0))
         linkyaxes!(contents(f[i, :])...)
     end
-    f[nrows, 1:ncols, Bottom()] = Label(
-        f, "calibration error estimate"; padding=(0, 0, 0, 75)
-    )
-    f[1:nrows, 1, Left()] = Label(f, "# runs"; rotation=π / 2, padding=(0, 75, 0, 0))
+    Label(f[nrows, 1:ncols, Bottom()], "calibration error estimate"; padding=(0, 0, 0, 75))
+    Label(f[1:nrows, 1, Left()], "# runs"; rotation=π / 2, padding=(0, 75, 0, 0))
 
     return f
 end
+#md nothing #hide
 
 # ## Kernel choice
 
@@ -172,13 +191,33 @@ end
 # predictions, and the inverse lengthscale $\gamma$ is set according to the median
 # heuristic.
 
-function kernel((predictions, targets))
+struct MedianHeuristicKernel
+    distances::Matrix{Float64}
+    cache::Vector{Float64}
+end
+
+function MedianHeuristicKernel(n::Int)
+    return MedianHeuristicKernel(
+        Matrix{Float64}(undef, n, n), Vector{Float64}(undef, (n * (n - 1)) ÷ 2)
+    )
+end
+
+function (f::MedianHeuristicKernel)((predictions, targets))
+    distances = f.distances
+    cache = f.cache
+
     ## compute inverse lengthscale with median heuristic
-    γ = inv(median(pairwise(TotalVariation(), predictions; dims=2)))
+    pairwise!(distances, TotalVariation(), predictions)
+    k = 0
+    @inbounds for j in axes(distances, 2), i in 1:(j - 1)
+        cache[k += 1] = distances[i, j]
+    end
+    γ = inv(median!(cache))
 
     ## create tensor product kernel
     return transform(TVExponentialKernel(), γ) ⊗ WhiteKernel()
 end
+#md nothing #hide
 
 # ## Expected calibration error
 #
@@ -188,11 +227,11 @@ end
 # For our estimation we use 10 bins of uniform width in each dimension.
 
 Random.seed!(1234)
-data = estimates(x -> ECE(UniformBinning(10), TotalVariation()))
+data = estimates(_ -> ECE(UniformBinning(10), TotalVariation()))
 plot(data; ece=true)
-#md AbstractPlotting.save("ece_uniform.svg", ans); nothing #hide
+#md AbstractPlotting.save("./figures/ece_uniform.svg", ans); nothing #hide
 
-#md # ![](ece_uniform.svg)
+#md # ![](./figures/ece_uniform.svg)
 
 # ### Non-uniform binning
 #
@@ -205,38 +244,36 @@ plot(data; ece=true)
 # than 10.
 
 Random.seed!(1234)
-data = estimates(x -> ECE(MedianVarianceBinning(10), TotalVariation()))
+data = estimates(_ -> ECE(MedianVarianceBinning(10), TotalVariation()))
 plot(data; ece=true)
-#md AbstractPlotting.save("ece_medianvariance.svg", ans); nothing #hide
+#md AbstractPlotting.save("./figures/ece_medianvariance.svg", ans); nothing #hide
 
-#md # ![](ece_medianvariance.svg)
+#md # ![](./figures/ece_medianvariance.svg)
 
 # ## Biased estimator of the squared kernel calibration error
 #
 
 Random.seed!(1234)
-data = estimates(BiasedSKCE ∘ kernel)
+data = estimates(BiasedSKCE ∘ MedianHeuristicKernel(250))
 plot(data)
-#md AbstractPlotting.save("skce_biased.svg", ans); nothing #hide
+#md AbstractPlotting.save("./figures/skce_biased.svg", ans); nothing #hide
 
-#md # ![](skce_biased.svg)
+#md # ![](./figures/skce_biased.svg)
 
-# ## Unbiased estimator of the squared kernel calibration error
+# ## Unbiased estimators of the squared kernel calibration error
 #
 
 Random.seed!(1234)
-data = estimates(UnbiasedSKCE ∘ kernel)
+data = estimates(UnbiasedSKCE ∘ MedianHeuristicKernel(250))
 plot(data)
-#md AbstractPlotting.save("skce_unbiased.svg", ans); nothing #hide
+#md AbstractPlotting.save("./figures/skce_unbiased.svg", ans); nothing #hide
 
-#md # ![](skce_unbiased.svg)
-
-# ## Unbiased estimator of the squared kernel calibration error (blocks of 2 samples)
-#
+#md # ![](./figures/skce_unbiased.svg)
+#nb #-
 
 Random.seed!(1234)
-data = estimates(BlockUnbiasedSKCE ∘ kernel)
+data = estimates(BlockUnbiasedSKCE ∘ MedianHeuristicKernel(250))
 plot(data)
-#md AbstractPlotting.save("skce_blockunbiased.svg", ans); nothing #hide
+#md AbstractPlotting.save("./figures/skce_blockunbiased.svg", ans); nothing #hide
 
-#md # ![](skce_blockunbiased.svg)
+#md # ![](./figures/skce_blockunbiased.svg)
