@@ -20,7 +20,6 @@ function preprocess(content)
     sub = s"""
         \0
         #
-        # [![](https://mybinder.org/badge_logo.svg)](@__BINDER_ROOT_URL__/examples/@__NAME__.ipynb)
         # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/examples/@__NAME__.ipynb)
     """
     return replace(content, r"^# # [^\n]*"m => sub; count=1)
