@@ -17,7 +17,6 @@ export WassersteinExponentialKernel, MixtureWassersteinExponentialKernel
 include("distances/types.jl")
 include("distances/bures.jl")
 include("distances/wasserstein.jl")
-include("distances/pairwise.jl")
 
 include("kernels.jl")
 

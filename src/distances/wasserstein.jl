@@ -1,5 +1,10 @@
 struct SqWasserstein <: DistributionsSemiMetric end
 
+# result type (e.g., for pairwise computations)
+function Distances.result_type(::SqWasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+    return promote_type(T1, T2)
+end
+
 # evaluations for normal distributions
 function (::SqWasserstein)(a::Normal, b::Normal)
     μa, σa = params(a)
@@ -36,6 +41,11 @@ end
 # Wasserstein 2 distance
 struct Wasserstein <: DistributionsMetric end
 
+# result type (e.g., for pairwise computations)
+function Distances.result_type(::Wasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+    return float(promote_type(T1, T2))
+end
+
 function (::Wasserstein)(a::Distribution, b::Distribution)
     return sqrt(sqwasserstein(a, b))
 end
@@ -47,6 +57,14 @@ end
 # Mixture Wasserstein distances
 struct SqMixtureWasserstein <: DistributionsSemiMetric end
 struct MixtureWasserstein <: DistributionsMetric end
+
+# result type (e.g., for pairwise computations)
+function Distances.result_type(::SqMixtureWasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+    return promote_type(T1, T2)
+end
+function Distances.result_type(::MixtureWasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+    return float(promote_type(T1, T2))
+end
 
 function (::SqMixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
     probsa = probs(a)

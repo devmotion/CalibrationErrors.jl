@@ -1,8 +1,10 @@
 using CalibrationErrorsDistributions
-using CalibrationErrorsDistributions: sqwasserstein, sqmixturewasserstein, wasserstein,
-    mixturewasserstein
+using Distances
 
 using Test
+
+using CalibrationErrorsDistributions: sqwasserstein, sqmixturewasserstein, wasserstein,
+    mixturewasserstein, Wasserstein, SqWasserstein
 
 @testset "wasserstein.jl" begin
     @testset "SqWasserstein" begin
@@ -30,6 +32,23 @@ using Test
         @test iszero(sqwasserstein(laplace1, laplace1))
         @test iszero(sqwasserstein(laplace2, laplace2))
         @test sqwasserstein(laplace1, laplace2) == (μ1 - μ2)^2 + 2 * (σ1 - σ2)^2
+
+        # pairwise computations
+        for (m, n) in ((1, 10), (10, 1), (10, 10))
+            dists1 = [Normal(randn(), rand()) for _ in 1:m]
+            dists2 = [Normal(randn(), rand()) for _ in 1:n]
+
+            # compute distance matrix
+            distmat = [sqwasserstein(x, y) for x in dists1, y in dists2]
+
+            # out-of-place
+            @test pairwise(SqWasserstein(), dists1, dists2) ≈ distmat
+
+            # in-place
+            z = similar(distmat)
+            pairwise!(z, SqWasserstein(), dists1, dists2)
+            @test z ≈ distmat
+        end
     end
 
     @testset "Wasserstein" begin
@@ -60,6 +79,23 @@ using Test
         @test iszero(wasserstein(laplace1, laplace1))
         @test iszero(wasserstein(laplace2, laplace2))
         @test wasserstein(laplace1, laplace2) == sqrt(sqwasserstein(laplace1, laplace2))
+
+        # pairwise computations
+        for (m, n) in ((1, 10), (10, 1), (10, 10))
+            dists1 = [Normal(randn(), rand()) for _ in 1:m]
+            dists2 = [Normal(randn(), rand()) for _ in 1:n]
+
+            # compute distance matrix
+            distmat = [wasserstein(x, y) for x in dists1, y in dists2]
+
+            # out-of-place
+            @test pairwise(Wasserstein(), dists1, dists2) ≈ distmat
+
+            # in-place
+            z = similar(distmat)
+            pairwise!(z, Wasserstein(), dists1, dists2)
+            @test z ≈ distmat
+        end
     end
 
     @testset "SqMixtureWasserstein" begin
