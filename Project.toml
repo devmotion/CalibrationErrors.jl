@@ -1,7 +1,7 @@
 name = "CalibrationErrorsDistributions"
 uuid = "20087e1a-bb94-462b-b900-33d17a750383"
 authors = ["David Widmann <david.widmann@it.uu.se>"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 CalibrationErrors = "33913031-fe46-5864-950f-100836f47845"
