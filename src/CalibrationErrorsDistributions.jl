@@ -6,11 +6,11 @@ using Reexport
 @reexport using Distributions
 @reexport using KernelFunctions
 
-import Distances
-import OptimalTransport
-import PDMats
+using Distances: Distances
+using OptimalTransport: OptimalTransport
+using PDMats: PDMats
 
-import LinearAlgebra
+using LinearAlgebra: LinearAlgebra
 
 export WassersteinExponentialKernel, MixtureWassersteinExponentialKernel
 

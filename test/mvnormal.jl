@@ -36,9 +36,8 @@ using Test
             WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), rand()),
             WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), [rand()]),
         )
-            for estimator in (
-                BiasedSKCE(kernel), UnbiasedSKCE(kernel), BlockUnbiasedSKCE(kernel, 5)
-            )
+            for estimator in
+                (BiasedSKCE(kernel), UnbiasedSKCE(kernel), BlockUnbiasedSKCE(kernel, 5))
                 skce_mvnormal = calibrationerror(
                     estimator, predictions_mvnormal, targets_mvnormal
                 )
@@ -50,11 +49,13 @@ using Test
 
             ucme_mvnormal = calibrationerror(
                 UCME(kernel, testpredictions_mvnormal, testtargets_mvnormal),
-                predictions_mvnormal, targets_mvnormal
+                predictions_mvnormal,
+                targets_mvnormal,
             )
             ucme_normal = calibrationerror(
                 UCME(kernel, testpredictions_normal, testtargets_normal),
-                predictions_normal, targets_normal
+                predictions_normal,
+                targets_normal,
             )
             @test ucme_mvnormal ≈ ucme_normal
         end
@@ -74,9 +75,14 @@ using Test
             testtargets = [randn(dim) for _ in 1:ntestsamples]
 
             for γ in (1.0, rand())
-                kernel1 = WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), γ)
-                kernel2 = WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), fill(γ, dim))
-                kernel3 = WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), LinearTransform(diagm(fill(γ, dim))))
+                kernel1 =
+                    WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), γ)
+                kernel2 =
+                    WassersteinExponentialKernel() ⊗
+                    transform(SqExponentialKernel(), fill(γ, dim))
+                kernel3 =
+                    WassersteinExponentialKernel() ⊗
+                    transform(SqExponentialKernel(), LinearTransform(diagm(fill(γ, dim))))
 
                 # check evaluation of the first two observations
                 p1 = predictions[1]
@@ -84,7 +90,8 @@ using Test
                 t1 = targets[1]
                 t2 = targets[2]
                 for f in (
-                    CalibrationErrors.unsafe_skce_eval_targets, CalibrationErrors.unsafe_ucme_eval_targets
+                    CalibrationErrors.unsafe_skce_eval_targets,
+                    CalibrationErrors.unsafe_ucme_eval_targets,
                 )
                     out1 = f(kernel1.kernels[2], p1, t1, p2, t2)
                     out2 = f(kernel2.kernels[2], p1, t1, p2, t2)
@@ -97,18 +104,20 @@ using Test
                 end
 
                 # check estimates
-                for estimator in (
-                    UnbiasedSKCE, x -> UCME(x, testpredictions, testtargets)
-                )
+                for estimator in (UnbiasedSKCE, x -> UCME(x, testpredictions, testtargets))
                     estimate1 = calibrationerror(estimator(kernel1), predictions, targets)
                     estimate2 = calibrationerror(estimator(kernel2), predictions, targets)
                     estimate3 = calibrationerror(estimator(kernel3), predictions, targets)
                     @test estimate2 ≈ estimate1
                     @test estimate3 ≈ estimate1
                     if isone(γ)
-                        @test calibrationerror(estimator(
-                            WassersteinExponentialKernel() ⊗ SqExponentialKernel()
-                        ), predictions, targets) ≈ estimate1
+                        @test calibrationerror(
+                            estimator(
+                                WassersteinExponentialKernel() ⊗ SqExponentialKernel()
+                            ),
+                            predictions,
+                            targets,
+                        ) ≈ estimate1
                     end
                 end
             end
@@ -121,7 +130,7 @@ using Test
         A = randn(dim, dim)
 
         for d in (
-            MvNormal(μ, rand()), MvNormal(μ, rand(dim)), MvNormal(μ, Symmetric(I + A'*A))
+            MvNormal(μ, rand()), MvNormal(μ, rand(dim)), MvNormal(μ, Symmetric(I + A' * A))
         )
             # unscaled transformation
             for t in (
@@ -129,7 +138,6 @@ using Test
                 ARDTransform(ones(dim)),
                 LinearTransform(Diagonal(ones(dim))),
             )
-
                 out = CalibrationErrorsDistributions.apply(t, d)
                 @test mean(out) ≈ mean(d)
                 @test cov(out) ≈ cov(d)
@@ -141,9 +149,8 @@ using Test
             for t in (
                 ScaleTransform(scale),
                 ARDTransform(fill(scale, dim)),
-                LinearTransform(Diagonal(fill(scale, dim)))
+                LinearTransform(Diagonal(fill(scale, dim))),
             )
-
                 out = CalibrationErrorsDistributions.apply(t, d)
                 @test mean(out) ≈ mean(d_scaled)
                 @test cov(out) ≈ cov(d_scaled)
@@ -155,13 +162,13 @@ using Test
         dim = 10
         v = rand(dim)
         γ = rand()
-        X = diagm(γ .* v.^2)
+        X = diagm(γ .* v .^ 2)
 
         for A in (ScalMat(dim, γ), PDiagMat(fill(γ, dim)), PDMat(diagm(fill(γ, dim))))
             Y = CalibrationErrorsDistributions.scale_cov(A, v)
             @test Matrix(Y) ≈ X
         end
-    end    
+    end
 
     @testset "invquad_diff" begin
         dim = 10

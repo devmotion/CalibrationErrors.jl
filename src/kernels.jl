@@ -13,8 +13,7 @@ KernelFunctions.metric(::MixtureWassersteinExponentialKernel) = MixtureWasserste
 for T in (WassersteinExponentialKernel, MixtureWassersteinExponentialKernel)
     @eval begin
         function (k::TransformedKernel{$T,<:ScaleTransform})(
-            x::Distribution,
-            y::Distribution,
+            x::Distribution, y::Distribution
         )
             d = Distances.evaluate(KernelFunctions.metric(k.kernel), x, y)
             return KernelFunctions.kappa(k.kernel, first(k.transform.s) * d)

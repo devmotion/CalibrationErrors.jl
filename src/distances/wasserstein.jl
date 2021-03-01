@@ -1,7 +1,9 @@
 struct SqWasserstein <: DistributionsSemiMetric end
 
 # result type (e.g., for pairwise computations)
-function Distances.result_type(::SqWasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+function Distances.result_type(
+    ::SqWasserstein, ::Type{T1}, ::Type{T2}
+) where {T1<:Real,T2<:Real}
     return promote_type(T1, T2)
 end
 
@@ -42,7 +44,9 @@ end
 struct Wasserstein <: DistributionsMetric end
 
 # result type (e.g., for pairwise computations)
-function Distances.result_type(::Wasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+function Distances.result_type(
+    ::Wasserstein, ::Type{T1}, ::Type{T2}
+) where {T1<:Real,T2<:Real}
     return float(promote_type(T1, T2))
 end
 
@@ -59,10 +63,14 @@ struct SqMixtureWasserstein <: DistributionsSemiMetric end
 struct MixtureWasserstein <: DistributionsMetric end
 
 # result type (e.g., for pairwise computations)
-function Distances.result_type(::SqMixtureWasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+function Distances.result_type(
+    ::SqMixtureWasserstein, ::Type{T1}, ::Type{T2}
+) where {T1<:Real,T2<:Real}
     return promote_type(T1, T2)
 end
-function Distances.result_type(::MixtureWasserstein, ::Type{T1}, ::Type{T2}) where {T1<:Real,T2<:Real}
+function Distances.result_type(
+    ::MixtureWasserstein, ::Type{T1}, ::Type{T2}
+) where {T1<:Real,T2<:Real}
     return float(promote_type(T1, T2))
 end
 

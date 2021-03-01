@@ -18,14 +18,15 @@ function CalibrationErrors.unsafe_skce_eval_targets(
     invB = LinearAlgebra.I + Σ̃
     invC = invA + Σ̃
 
-    res = kernel(y, ỹ) - mvnormal_gaussian_kernel(invA, μ, ỹ) -
+    res =
+        kernel(y, ỹ) - mvnormal_gaussian_kernel(invA, μ, ỹ) -
         mvnormal_gaussian_kernel(invB, μ̃, y) + mvnormal_gaussian_kernel(invC, μ, μ̃)
 
     return res
 end
 
 function mvnormal_gaussian_kernel(invA, y, ỹ)
-    return exp(- (LinearAlgebra.logdet(invA) + invquad_diff(invA, y, ỹ)) / 2)
+    return exp(-(LinearAlgebra.logdet(invA) + invquad_diff(invA, y, ỹ)) / 2)
 end
 
 # UCME
@@ -36,7 +37,7 @@ function CalibrationErrors.unsafe_ucme_eval_targets(
     p::MvNormal,
     y::AbstractVector{<:Real},
     testp::MvNormal,
-    testy::AbstractVector{<:Real}
+    testy::AbstractVector{<:Real},
 )
     # compute inverse scaling matrix
     invA = LinearAlgebra.I + p.Σ
@@ -48,7 +49,9 @@ end
 # TODO: scale upfront?
 
 function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::TransformedKernel{SqExponentialKernel,<:Union{ScaleTransform,ARDTransform,LinearTransform}},
+    kernel::TransformedKernel{
+        SqExponentialKernel,<:Union{ScaleTransform,ARDTransform,LinearTransform}
+    },
     p::MvNormal,
     y::AbstractVector{<:Real},
     p̃::MvNormal,
@@ -63,7 +66,9 @@ function CalibrationErrors.unsafe_skce_eval_targets(
 end
 
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    kernel::TransformedKernel{SqExponentialKernel,<:Union{ScaleTransform,ARDTransform,LinearTransform}},
+    kernel::TransformedKernel{
+        SqExponentialKernel,<:Union{ScaleTransform,ARDTransform,LinearTransform}
+    },
     p::MvNormal,
     y::AbstractVector{<:Real},
     testp::MvNormal,
@@ -93,8 +98,8 @@ apply(t::LinearTransform, d::MvNormal) = Matrix(t.A) * d
 
 # scale covariance matrix
 # TODO: improve efficiency
-scale_cov(Σ::PDMats.ScalMat, v) = PDMats.PDiagMat(v.^2 .* Σ.value)
-scale_cov(Σ::PDMats.PDiagMat, v) = PDMats.PDiagMat(v.^2 .* Σ.diag)
+scale_cov(Σ::PDMats.ScalMat, v) = PDMats.PDiagMat(v .^ 2 .* Σ.value)
+scale_cov(Σ::PDMats.PDiagMat, v) = PDMats.PDiagMat(v .^ 2 .* Σ.diag)
 scale_cov(Σ::PDMats.AbstractPDMat, v) = PDMats.X_A_Xt(Σ, LinearAlgebra.diagm(v))
 
 invquad_diff(A::PDMats.ScalMat, x, y) = A.inv_value * Distances.sqeuclidean(x, y)

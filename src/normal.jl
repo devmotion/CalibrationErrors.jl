@@ -2,11 +2,7 @@
 
 # predicted normal distributions with squared exponential kernel for the targets
 function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::SqExponentialKernel,
-    p::Normal,
-    y::Real,
-    p̃::Normal,
-    ỹ::Real
+    kernel::SqExponentialKernel, p::Normal, y::Real, p̃::Normal, ỹ::Real
 )
     # extract parameters
     μ = p.μ
@@ -22,17 +18,14 @@ function CalibrationErrors.unsafe_skce_eval_targets(
     β = inv(sqrt(1 + sqσ̃))
     γ = inv(sqrt(1 + sqσ + sqσ̃))
 
-    return kernel(y, ỹ) - α * kernel(α * μ, α * ỹ) - β * kernel(β * y, β * μ̃) + γ * kernel(γ * μ, γ * μ̃)
+    return kernel(y, ỹ) - α * kernel(α * μ, α * ỹ) - β * kernel(β * y, β * μ̃) +
+           γ * kernel(γ * μ, γ * μ̃)
 end
 
 # UCME
 
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    kernel::SqExponentialKernel,
-    p::Normal,
-    y::Real,
-    ::Normal,
-    testy::Real
+    kernel::SqExponentialKernel, p::Normal, y::Real, ::Normal, testy::Real
 )
     # compute scaling factor
     # TODO: use `hypot`?
@@ -49,13 +42,13 @@ function CalibrationErrors.unsafe_skce_eval_targets(
     p::Normal,
     y::Real,
     p̃::Normal,
-    ỹ::Real
+    ỹ::Real,
 )
     # obtain the transform
     t = kernel.transform
 
     return CalibrationErrors.unsafe_skce_eval_targets(
-        SqExponentialKernel(), apply(t, p), t(y), apply(t, p̃), t(ỹ),
+        SqExponentialKernel(), apply(t, p), t(y), apply(t, p̃), t(ỹ)
     )
 end
 
@@ -64,14 +57,14 @@ function CalibrationErrors.unsafe_ucme_eval_targets(
     p::Normal,
     y::Real,
     testp::Normal,
-    testy::Real
+    testy::Real,
 )
     # obtain the transform
     t = kernel.transform
 
     # `testp` is irrelevant for the evaluation and therefore not transformed
     return CalibrationErrors.unsafe_ucme_eval_targets(
-        SqExponentialKernel(), apply(t, p), t(y), testp, t(testy),
+        SqExponentialKernel(), apply(t, p), t(y), testp, t(testy)
     )
 end
 
