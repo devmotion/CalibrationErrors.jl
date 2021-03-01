@@ -1,35 +1,20 @@
+# SKCE
+
 # predicted Laplace distributions with exponential kernel for the targets
 function CalibrationErrors.unsafe_skce_eval_targets(
-    ::ExponentialKernel,
+    kernel::ExponentialKernel,
     p::Laplace,
     y::Real,
     p̃::Laplace,
     ỹ::Real
 )
-    return unsafe_skce_eval_targets_laplace_laplacian(params(p), y, params(p̃), ỹ)
-end
+    # extract the parameters
+    μ = p.μ
+    β = p.θ
+    μ̃ = p̃.μ
+    β̃ = p̃.θ
 
-function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::TransformedKernel{<:ExponentialKernel,<:ScaleTransform},
-    p::Laplace,
-    y::Real,
-    p̃::Laplace,
-    ỹ::Real
-)
-    # obtain the parameters of the predicted Laplace distributions
-    μ, β = params(p)
-    μ̃, β̃ = params(p̃)
-
-    # obtain inverse length scale
-    invν = first(kernel.transform.s)
-
-    return unsafe_skce_eval_targets_laplace_laplacian(
-        (invν * μ, invν * β), invν * y, (invν * μ̃, invν * β̃), invν * ỹ
-    )
-end
-
-function unsafe_skce_eval_targets_laplace_laplacian((μ, β), y, (μ̃, β̃), ỹ)
-    res = exp(- (y - ỹ)^2) - laplace_laplacian_kernel(β, abs(μ - ỹ)) -
+    res = kernel(y, ỹ) - laplace_laplacian_kernel(β, abs(μ - ỹ)) -
         laplace_laplacian_kernel(β̃, abs(μ̃ - y)) + laplace_laplacian_kernel(β, β̃, abs(μ - μ̃))
 
     return res
@@ -72,3 +57,53 @@ function laplace_laplacian_kernel(β, β̃, z)
             exp(-z) / (c1 * c2)
     end
 end
+
+# UCME
+
+function CalibrationErrors.unsafe_ucme_eval_targets(
+    kernel::ExponentialKernel,
+    p::Laplace,
+    y::Real,
+    ::Laplace,
+    testy::Real
+)
+    return kernel(y, testy) - laplace_laplacian_kernel(p.θ, abs(p.μ - testy))
+end
+
+# kernels with input transformations
+# TODO: scale upfront?
+function CalibrationErrors.unsafe_skce_eval_targets(
+    kernel::TransformedKernel{ExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
+    p::Laplace,
+    y::Real,
+    p̃::Laplace,
+    ỹ::Real
+)
+    # obtain the transform
+    t = kernel.transform
+
+    return CalibrationErrors.unsafe_skce_eval_targets(
+        ExponentialKernel(), apply(t, p), t(y), apply(t, p̃), t(ỹ),
+    )
+end
+
+function CalibrationErrors.unsafe_ucme_eval_targets(
+    kernel::TransformedKernel{ExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
+    p::Laplace,
+    y::Real,
+    testp::Laplace,
+    testy::Real
+)
+    # obtain the transform
+    t = kernel.transform
+
+    # `testp` is irrelevant for the evaluation and therefore not transformed
+    return CalibrationErrors.unsafe_ucme_eval_targets(
+        ExponentialKernel(), apply(t, p), t(y), testp, t(testy)
+    )
+end
+
+# utilities
+
+# internal `apply` avoids type piracy of transforms
+apply(t::Union{ScaleTransform,ARDTransform}, d::Laplace) = Laplace(t(d.μ), t(d.θ))

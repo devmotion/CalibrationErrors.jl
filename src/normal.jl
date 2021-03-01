@@ -1,61 +1,81 @@
+# SKCE
+
 # predicted normal distributions with squared exponential kernel for the targets
 function CalibrationErrors.unsafe_skce_eval_targets(
-    ::SqExponentialKernel,
+    kernel::SqExponentialKernel,
     p::Normal,
     y::Real,
     p̃::Normal,
     ỹ::Real
 )
-    return unsafe_skce_eval_targets_normal_gaussian(params(p), y, params(p̃), ỹ)
+    # extract parameters
+    μ = p.μ
+    σ = p.σ
+    μ̃ = p̃.μ
+    σ̃ = p̃.σ
+
+    # compute scaling factors
+    # TODO: use `hypot`?
+    sqσ = σ^2
+    sqσ̃ = σ̃^2
+    α = inv(sqrt(1 + sqσ))
+    β = inv(sqrt(1 + sqσ̃))
+    γ = inv(sqrt(1 + sqσ + sqσ̃))
+
+    return kernel(y, ỹ) - α * kernel(α * μ, α * ỹ) - β * kernel(β * y, β * μ̃) + γ * kernel(γ * μ, γ * μ̃)
 end
 
+# UCME
+
+function CalibrationErrors.unsafe_ucme_eval_targets(
+    kernel::SqExponentialKernel,
+    p::Normal,
+    y::Real,
+    ::Normal,
+    testy::Real
+)
+    # compute scaling factor
+    # TODO: use `hypot`?
+    α = inv(sqrt(1 + p.σ^2))
+
+    return kernel(y, testy) - α * kernel(α * p.μ, α * testy)
+end
+
+# kernels with input transformations
+# TODO: scale upfront?
+
 function CalibrationErrors.unsafe_skce_eval_targets(
-    κtargets::TransformedKernel{<:SqExponentialKernel,<:ScaleTransform},
+    kernel::TransformedKernel{SqExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
     p::Normal,
     y::Real,
     p̃::Normal,
     ỹ::Real
 )
-    # obtain the parameters of the predicted Laplace distributions
-    μ, σ = params(p)
-    μ̃, σ̃ = params(p̃)
+    # obtain the transform
+    t = kernel.transform
 
-    # obtain scale parameter
-    invν = first(κtargets.transform.s)
-
-    return unsafe_skce_eval_targets_normal_gaussian(
-        (invν * μ, invν * σ), invν * y, (invν * μ̃, invν * σ̃), invν * ỹ
+    return CalibrationErrors.unsafe_skce_eval_targets(
+        SqExponentialKernel(), apply(t, p), t(y), apply(t, p̃), t(ỹ),
     )
 end
 
-function unsafe_skce_eval_targets_normal_gaussian((μ, σ), y, (μ̃, σ̃), ỹ)
-    # compute variances
-    σ2 = σ^2
-    σ̃2 = σ̃^2
-
-    # compute scaling factors
-    α = inv(1 + σ2)
-    β = inv(1 + σ̃2)
-    γ = inv(1 + σ2 + σ̃2)
-
-    ky = exp(- (y - ỹ)^2 / 2) - sqrt(α) * exp(- α * (μ - ỹ)^2 / 2) -
-        sqrt(β) * exp(- β * (y - μ̃)^2 / 2) + sqrt(γ) * exp(- γ * (μ - μ̃)^2 / 2)
-
-    return ky
-end
-
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    κtargets::SqExponentialKernel,
+    kernel::TransformedKernel{SqExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
     p::Normal,
     y::Real,
     testp::Normal,
     testy::Real
 )
-    # extract parameters
-    μ, σ = params(p)
+    # obtain the transform
+    t = kernel.transform
 
-    # compute scaling factor
-    α = inv(1 + σ^2)
-
-    return exp(- (y - testy)^2 / 2) - sqrt(α) * exp(- α * (μ - testy)^2 / 2)
+    # `testp` is irrelevant for the evaluation and therefore not transformed
+    return CalibrationErrors.unsafe_ucme_eval_targets(
+        SqExponentialKernel(), apply(t, p), t(y), testp, t(testy),
+    )
 end
+
+# utilities
+
+# internal `apply` avoids type piracy of transforms
+apply(t::Union{ScaleTransform,ARDTransform}, d::Normal) = Normal(t(d.μ), t(d.σ))
