@@ -39,7 +39,7 @@ function preprocess(content)
 #md # Pkg.instantiate()
 #md # ```
 #
-        """
+        """,
     )
     return replace(content, r"^# # [^\n]*"m => sub; count=1)
 end
@@ -74,7 +74,7 @@ makedocs(;
         "ece.md",
         "kce.md",
         "others.md",
-        "Examples" => [joinpath("examples", "$(name).md") for name in EXAMPLES]
+        "Examples" => [joinpath("examples", "$(name).md") for name in EXAMPLES],
     ],
     strict=true,
     checkdocs=:exports,
