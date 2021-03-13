@@ -2,25 +2,6 @@
 #
 # ## Packages
 
-using Pkg: Pkg
-
-Pkg.activate(mktempdir())
-Pkg.add(
-    Pkg.Types.Context(; io=devnull),
-    [
-        Pkg.PackageSpec(; name="CairoMakie", version="0.3.12"),
-        Pkg.PackageSpec(; name="CalibrationErrors", version="0.5.13"),
-        Pkg.PackageSpec(; name="DataFrames", version="0.22.3"),
-        Pkg.PackageSpec(; name="Distances", version="0.10.1"),
-        Pkg.PackageSpec(; name="Distributions", version="0.24.12"),
-        Pkg.PackageSpec(; name="PalmerPenguins", version="0.1.1"),
-        Pkg.PackageSpec(; name="Query", version="1.0.0"),
-    ],
-)
-Pkg.status()
-
-#-
-
 using CairoMakie
 using CalibrationErrors
 using DataFrames
