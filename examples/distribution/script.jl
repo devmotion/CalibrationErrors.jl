@@ -90,8 +90,7 @@ function estimates(estimator, π::Real, m::Int)
     end
 
     return estimates
-end
-#md nothing #hide
+end;
 
 # We use a helper function to run the experiment for all desired parameter settings.
 
@@ -108,8 +107,7 @@ function estimates(estimator)
     estimatesmat = estimates.((estimator,), πvec', mvec)
 
     return EstimatesSet(mvec, πvec, estimatesmat)
-end
-#md nothing #hide
+end;
 
 # As mentioned above, we can calculate the analytic expected calibration error. For the squared
 # kernel calibration error, we take the mean of the estimates of the unbiased quadratic
@@ -162,8 +160,7 @@ function plot(set::EstimatesSet; ece=false)
     Label(f[1:nrows, 1, Left()], "# runs"; rotation=π / 2, padding=(0, 75, 0, 0))
 
     return f
-end
-#md nothing #hide
+end;
 
 # ## Kernel choice
 
@@ -212,9 +209,9 @@ end
 Random.seed!(1234)
 data = estimates(_ -> ECE(UniformBinning(10), TotalVariation()))
 plot(data; ece=true)
-#md AbstractPlotting.save("./figures/ece_uniform.svg", ans); nothing #hide
+#!jl save("./figures/ece_uniform.svg", current_figure());
 
-#md # ![](./figures/ece_uniform.svg)
+#!jl # ![](./figures/ece_uniform.svg)
 
 # ### Non-uniform binning
 #
@@ -229,9 +226,9 @@ plot(data; ece=true)
 Random.seed!(1234)
 data = estimates(_ -> ECE(MedianVarianceBinning(10), TotalVariation()))
 plot(data; ece=true)
-#md AbstractPlotting.save("./figures/ece_medianvariance.svg", ans); nothing #hide
+#!jl save("./figures/ece_medianvariance.svg", current_figure());
 
-#md # ![](./figures/ece_medianvariance.svg)
+#!jl # ![](./figures/ece_medianvariance.svg)
 
 # ## Biased estimator of the squared kernel calibration error
 #
@@ -239,9 +236,9 @@ plot(data; ece=true)
 Random.seed!(1234)
 data = estimates(BiasedSKCE ∘ MedianHeuristicKernel(250))
 plot(data)
-#md AbstractPlotting.save("./figures/skce_biased.svg", ans); nothing #hide
+#!jl save("./figures/skce_biased.svg", current_figure());
 
-#md # ![](./figures/skce_biased.svg)
+#!jl # ![](./figures/skce_biased.svg)
 
 # ## Unbiased estimators of the squared kernel calibration error
 #
@@ -249,14 +246,13 @@ plot(data)
 Random.seed!(1234)
 data = estimates(UnbiasedSKCE ∘ MedianHeuristicKernel(250))
 plot(data)
-#md AbstractPlotting.save("./figures/skce_unbiased.svg", ans); nothing #hide
+#!jl save("./figures/skce_unbiased.svg", current_figure());
 
-#md # ![](./figures/skce_unbiased.svg)
-#nb #-
+#!jl # ![](./figures/skce_unbiased.svg)
 
 Random.seed!(1234)
 data = estimates(BlockUnbiasedSKCE ∘ MedianHeuristicKernel(250))
 plot(data)
-#md AbstractPlotting.save("./figures/skce_blockunbiased.svg", ans); nothing #hide
+#!jl save("./figures/skce_blockunbiased.svg", current_figure());
 
-#md # ![](./figures/skce_blockunbiased.svg)
+#!jl # ![](./figures/skce_blockunbiased.svg)

@@ -32,10 +32,9 @@ for (i, (key, df)) in enumerate(pairs(groupby(penguins, :species)))
     )
 end
 Legend(f[1, 2], ax, "species")
-#md AbstractPlotting.save("./figures/penguins.svg", f); nothing #hide
-#nb f
+#!jl save("./figures/penguins.svg", f);
 
-#md # ![](./figures/penguins.svg)
+#!jl # ![](./figures/penguins.svg)
 
 # We split the data randomly into a training and validation dataset. The training dataset
 # contains around 60% of the samples.
@@ -47,9 +46,8 @@ train_idxs = @view idxs[1:k]
 val_idxs = @view idxs[(k + 1):end]
 
 train_penguins = penguins[train_idxs, :]
-val_penguins = penguins[val_idxs, :]
+val_penguins = penguins[val_idxs, :];
 
-#md nothing #hide
 #-
 
 f = Figure()
@@ -75,10 +73,9 @@ Legend(
     [["training", "validation"], string.(levels(penguins.species))],
     ["dataset", "species"],
 )
-#md AbstractPlotting.save("./figures/penguins_datasets.svg", f); nothing #hide
-#nb f
+#!jl save("./figures/penguins_datasets.svg", f);
 
-#md # ![](./figures/penguins_datasets.svg)
+#!jl # ![](./figures/penguins_datasets.svg)
 
 # ## Fitting normal distributions
 #
@@ -119,15 +116,14 @@ function plot_normal_fit(dists, species, xlabel)
 end
 
 plot_normal_fit(penguins_fit.bill, penguins_fit.species, "bill length [mm]")
-#md AbstractPlotting.save("./figures/normal_fit_bill.svg", ans); nothing #hide
+#!jl save("./figures/normal_fit_bill.svg", current_figure());
 
-#md # ![](./figures/normal_fit_bill.svg)
-#nb #-
+#!jl # ![](./figures/normal_fit_bill.svg)
 
 plot_normal_fit(penguins_fit.flipper, penguins_fit.species, "flipper length [mm]")
-#md AbstractPlotting.save("./figures/normal_fit_flipper.svg", ans); nothing #hide
+#!jl save("./figures/normal_fit_flipper.svg", current_figure());
 
-#md # ![](./figures/normal_fit_flipper.svg)
+#!jl # ![](./figures/normal_fit_flipper.svg)
 
 # ## Naive Bayes classifier
 #
@@ -165,8 +161,7 @@ function predict_naive_bayes_classifier(fit, data)
 end
 
 train_predict = predict_naive_bayes_classifier(penguins_fit, train_penguins)
-val_predict = predict_naive_bayes_classifier(penguins_fit, val_penguins)
-#md nothing #hide
+val_predict = predict_naive_bayes_classifier(penguins_fit, val_penguins);
 
 # ## Evaluation
 #
@@ -178,8 +173,7 @@ train_species = convert(Vector{Int}, indexin(train_penguins.species, names(train
 train_probs = collect(Vector{Float64}, eachrow(train_predict))
 
 val_species = convert(Vector{Int}, indexin(val_penguins.species, names(val_predict)))
-val_probs = collect(Vector{Float64}, eachrow(val_predict))
-#md nothing #hide
+val_probs = collect(Vector{Float64}, eachrow(val_predict));
 
 # ### Log-likelihood
 #
@@ -304,8 +298,7 @@ calibrationerror(ece, val_probs, val_species)
 
 distances = pairwise(SqEuclidean(), train_probs)
 λ = sqrt(median(distances[i] for i in CartesianIndices(distances) if i[1] < i[2]))
-kernel = KernelFunctions.transform(GaussianKernel(), inv(λ)) ⊗ WhiteKernel()
-#md nothing #hide
+kernel = KernelFunctions.transform(GaussianKernel(), inv(λ)) ⊗ WhiteKernel();
 
 # We obtain the following biased estimates of the squared KCE (SKCE):
 
