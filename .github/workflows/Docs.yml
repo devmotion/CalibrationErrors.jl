@@ -8,7 +8,7 @@ on:
       # This is where pull requests from "bors try" are built.
       - trying
       # Build master branch.
-      - master
+      - main
     tags:
       # When a new release is available
       - 'v*'
