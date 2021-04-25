@@ -4,10 +4,10 @@ Estimation of calibration errors.
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://devmotion.github.io/CalibrationErrors.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://devmotion.github.io/CalibrationErrors.jl/dev)
-[![Build Status](https://github.com/devmotion/CalibrationErrors.jl/workflows/CI/badge.svg)](https://github.com/devmotion/CalibrationErrors.jl/actions?query=workflow%3ACI+branch%3Amaster)
+[![Build Status](https://github.com/devmotion/CalibrationErrors.jl/workflows/CI/badge.svg?branch=main)](https://github.com/devmotion/CalibrationErrors.jl/actions?query=workflow%3ACI+branch%3Amain)
 [![DOI](https://zenodo.org/badge/188981243.svg)](https://zenodo.org/badge/latestdoi/188981243)
-[![Codecov](https://codecov.io/gh/devmotion/CalibrationErrors.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/devmotion/CalibrationErrors.jl)
-[![Coveralls](https://coveralls.io/repos/github/devmotion/CalibrationErrors.jl/badge.svg?branch=master)](https://coveralls.io/github/devmotion/CalibrationErrors.jl?branch=master)
+[![Codecov](https://codecov.io/gh/devmotion/CalibrationErrors.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/devmotion/CalibrationErrors.jl)
+[![Coveralls](https://coveralls.io/repos/github/devmotion/CalibrationErrors.jl/badge.svg?branch=main)](https://coveralls.io/github/devmotion/CalibrationErrors.jl?branch=main)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 [![Bors enabled](https://bors.tech/images/badge_small.svg)](https://app.bors.tech/repositories/24611)
 
