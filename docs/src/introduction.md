@@ -102,8 +102,8 @@ estimated from a validation data set.
 
 Various estimators of different calibration errors such as the
 [expected calibration error](@ref ece) and the [kernel calibration error](@ref kce)
-can be evaluated with [`calibrationerror`](@ref).
+are implemented in CalibrationErrors.
 
 ```@docs
-calibrationerror
+(::CalibrationErrors.CalibrationErrorEstimator)(predictions, targets)
 ```

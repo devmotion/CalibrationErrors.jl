@@ -41,34 +41,22 @@ struct UCME{K<:Kernel,TP,TT} <: CalibrationErrorEstimator
     testtargets::TT
 
     function UCME{K,TP,TT}(kernel::K, testpredictions::TP, testtargets::TT) where {K,TP,TT}
-        # obtain number of test locations
-        ntest = length(testpredictions)
-        ntest ≥ 1 || error("there must be at least one test location")
-
-        # check number of predictions and targets
-        length(testtargets) == ntest ||
-            throw(DimensionMismatch("number of test predictions and targets must be equal"))
-
+        check_nsamples(testpredictions, testtargets)
         return new{K,TP,TT}(kernel, testpredictions, testtargets)
     end
 end
 
-function UCME(kernel::Kernel, testdata...)
-    testpredictions, testtargets = predictions_targets(testdata...)
-
+function UCME(kernel::Kernel, testpredictions, testtargets)
     return UCME{typeof(kernel),typeof(testpredictions),typeof(testtargets)}(
         kernel, testpredictions, testtargets
     )
 end
 
-function _calibrationerror(
-    estimator::UCME, predictions::AbstractVector, targets::AbstractVector
-)
+function (estimator::UCME)(predictions::AbstractVector, targets::AbstractVector)
     @unpack kernel, testpredictions, testtargets = estimator
 
     # obtain number of samples
-    nsamples = length(predictions)
-    nsamples ≥ 1 || error("there must be at least one sample")
+    nsamples = check_nsamples(predictions, targets)
 
     # compute average over test locations
     estimate = mean(zip(testpredictions, testtargets)) do (tp, ty)

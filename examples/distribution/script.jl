@@ -86,7 +86,7 @@ function estimates(estimator, π::Real, m::Int)
         end
 
         ## evaluate estimator
-        estimates[i] = calibrationerror(estimator(data), data)
+        estimates[i] = estimator(data)(predictions, targets)
     end
 
     return estimates

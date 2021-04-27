@@ -19,19 +19,13 @@ unnormalized calibration mean embedding (UCME) in the Julia language.
 
 ## Example
 
-Calibration errors can be estimated from a data set of predicted probabilities
-and and a set of targets by executing
+Calibration errors can be estimated from a data set of predicted probability distributions
+and a set of corresponding observed targets by executing
 ```julia
-calibrationerror(estimator, predictions, targets)
+estimator(predictions, targets)
 ```
 
-The predictions can be provided as a vector of `n` vectors of predicted probabilities
-of length `m` or as a matrix of size `(m, n)`, in which each of the `n` columns corresponds
-to predicted probabilities of the targets `1,…,m`. The corresponding targets have to be
-provided as a vector of length `n`, in which every element is from the set `1,…,m`.
-
-Alternatively, it is possible to specify a tuple of predictions and targets or a vector of
-tuples of predictions and targets.
+The sets of predictions and targets have to be provided as vectors.
 
 This package implements the estimator `ECE` of the ECE, the estimators
 `BiasedSKCE`, `UnbiasedSKCE`, and `BlockUnbiasedSKCE` for the SKCE, and `UCME` for the
