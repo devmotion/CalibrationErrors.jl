@@ -81,5 +81,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/devmotion/CalibrationErrors.jl.git", push_preview=true, devbranch="main"
+    repo="github.com/devmotion/CalibrationErrors.jl.git",
+    push_preview=true,
+    devbranch="main",
 )

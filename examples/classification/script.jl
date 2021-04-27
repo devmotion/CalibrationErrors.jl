@@ -247,20 +247,20 @@ brier_score(val_species, val_probs)
 # One approach is to use bins of uniform size.
 
 ece = ECE(UniformBinning(10), (μ, y) -> kl_divergence(y, μ))
-calibrationerror(ece, train_probs, train_species)
+ece(train_probs, train_species)
 
 #-
 
-calibrationerror(ece, val_probs, val_species)
+ece(val_probs, val_species)
 
 # For the squared Euclidean distance we obtain:
 
 ece = ECE(UniformBinning(10), SqEuclidean())
-calibrationerror(ece, train_probs, train_species)
+ece(train_probs, train_species)
 
 #-
 
-calibrationerror(ece, val_probs, val_species)
+ece(val_probs, val_species)
 
 # Alternatively, one can use a data-dependent binning scheme that tries to split the
 # predictions in a way that minimizes the variance in each bin.
@@ -268,20 +268,20 @@ calibrationerror(ece, val_probs, val_species)
 # With the KL divergence we get:
 
 ece = ECE(MedianVarianceBinning(5), (μ, y) -> kl_divergence(y, μ))
-calibrationerror(ece, train_probs, train_species)
+ece(train_probs, train_species)
 
 #-
 
-calibrationerror(ece, val_probs, val_species)
+ece(val_probs, val_species)
 
 # For the squared Euclidean distance we obtain:
 
 ece = ECE(MedianVarianceBinning(5), SqEuclidean())
-calibrationerror(ece, train_probs, train_species)
+ece(train_probs, train_species)
 
 #-
 
-calibrationerror(ece, val_probs, val_species)
+ece(val_probs, val_species)
 
 # We see that the estimates (of the same theoretical quantity!) are highly dependent on the
 # chosen binning scheme.
@@ -298,27 +298,27 @@ calibrationerror(ece, val_probs, val_species)
 
 distances = pairwise(SqEuclidean(), train_probs)
 λ = sqrt(median(distances[i] for i in CartesianIndices(distances) if i[1] < i[2]))
-kernel = KernelFunctions.transform(GaussianKernel(), inv(λ)) ⊗ WhiteKernel();
+kernel = (GaussianKernel() ∘ ScaleTransform(inv(λ))) ⊗ WhiteKernel();
 
 # We obtain the following biased estimates of the squared KCE (SKCE):
 
 skce = BiasedSKCE(kernel)
-calibrationerror(skce, train_probs, train_species)
+skce(train_probs, train_species)
 
 #-
 
-calibrationerror(skce, val_probs, val_species)
+skce(val_probs, val_species)
 
 # Similar to the biased estimates of the ECE, the biased estimates of the SKCE are always
 # non-negative. The unbiased estimates can be negative as well, in particular if the model
 # is (close to being) calibrated:
 
 skce = UnbiasedSKCE(kernel)
-calibrationerror(skce, train_probs, train_species)
+skce(train_probs, train_species)
 
 #-
 
-calibrationerror(skce, val_probs, val_species)
+skce(val_probs, val_species)
 
 # When the datasets are large, the quadratic sample complexity of the standard biased and
 # unbiased estimators of the SKCE can become prohibitive. In these cases, one can resort to
@@ -329,8 +329,8 @@ calibrationerror(skce, val_probs, val_species)
 # with linear sample complexity:
 
 skce = BlockUnbiasedSKCE(kernel, 2)
-calibrationerror(skce, train_probs, train_species)
+skce(train_probs, train_species)
 
 #-
 
-calibrationerror(skce, val_probs, val_species)
+skce(val_probs, val_species)
