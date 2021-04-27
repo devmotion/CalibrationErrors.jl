@@ -105,5 +105,5 @@ Various estimators of different calibration errors such as the
 are implemented in CalibrationErrors.
 
 ```@docs
-(::CalibrationErrors.CalibrationErrorEstimator)(predictions, targets)
+CalibrationErrors.CalibrationErrorEstimator
 ```
