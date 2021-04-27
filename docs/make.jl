@@ -80,4 +80,6 @@ makedocs(;
     checkdocs=:exports,
 )
 
-deploydocs(; repo="github.com/devmotion/CalibrationErrors.jl.git", push_preview=true)
+deploydocs(;
+    repo="github.com/devmotion/CalibrationErrors.jl.git", push_preview=true, devbranch="main"
+)
