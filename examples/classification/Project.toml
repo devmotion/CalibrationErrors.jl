@@ -10,7 +10,7 @@ Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 [compat]
 CairoMakie = "0.3.18"
 CalibrationErrors = "0.5.13"
-DataFrames = "0.22.5"
+DataFrames = "0.22.5, 1.0"
 Distances = "0.10.2"
 Distributions = "0.24.15"
 PalmerPenguins = "0.1.2"
