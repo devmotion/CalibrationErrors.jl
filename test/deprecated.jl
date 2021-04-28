@@ -131,7 +131,7 @@
         ) == data
     end
 
-    @testset "unbiased_skce" begin
+    @testset "unbiasedskce" begin
         kernel = SqExponentialKernel() ⊗ WhiteKernel()
         predictions = map(1:10) do _
             x = rand(5)
@@ -140,7 +140,7 @@
         end
         targets = rand(1:5, 10)
         @test @test_deprecated(
-            CalibrationErrors.unbiased_skce(kernel, predictions, targets)
+            CalibrationErrors.unbiasedskce(kernel, predictions, targets)
         ) == UnbiasedSKCE(kernel)(predictions, targets)
     end
 end

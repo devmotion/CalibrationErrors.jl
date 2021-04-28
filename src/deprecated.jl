@@ -33,6 +33,6 @@
     predictions, targets
 ) false
 
-@deprecate unbiased_skce(kernel, predictions, targets) UnbiasedSKCE(kernel)(
+@deprecate unbiasedskce(kernel, predictions, targets) UnbiasedSKCE(kernel)(
     predictions, targets
 ) false
