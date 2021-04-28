@@ -1,7 +1,3 @@
-using CalibrationErrorsDistributions
-
-using Test
-
 @testset "normal.jl" begin
     @testset "SKCE: basic example" begin
         skce = UnbiasedSKCE(WassersteinExponentialKernel() ⊗ SqExponentialKernel())
@@ -9,12 +5,11 @@ using Test
         # only two predictions, i.e., one term in the estimator
         normal1 = Normal(0, 1)
         normal2 = Normal(1, 2)
-        @test @inferred(calibrationerror(skce, ([normal1, normal1], [0, 0]))) ≈
-              1 - sqrt(2) + 1 / sqrt(3)
-        @test @inferred(calibrationerror(skce, ([normal1, normal2], [1, 0]))) ≈
+        @test @inferred(skce([normal1, normal1], [0, 0])) ≈ 1 - sqrt(2) + 1 / sqrt(3)
+        @test @inferred(skce([normal1, normal2], [1, 0])) ≈
               exp(-sqrt(2)) *
               (exp(-1 / 2) - 1 / sqrt(2) - 1 / sqrt(5) + exp(-1 / 12) / sqrt(6))
-        @test @inferred(calibrationerror(skce, ([normal1, normal2], [0, 1]))) ≈
+        @test @inferred(skce([normal1, normal2], [0, 1])) ≈
               exp(-sqrt(2)) * (
             exp(-1 / 2) - exp(-1 / 4) / sqrt(2) - exp(-1 / 10) / sqrt(5) +
             exp(-1 / 12) / sqrt(6)
@@ -23,18 +18,18 @@ using Test
 
     @testset "SKCE: basic example (transformed)" begin
         skce = UnbiasedSKCE(
-            WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), 0.5)
+            WassersteinExponentialKernel() ⊗ (SqExponentialKernel() ∘ ScaleTransform(0.5))
         )
 
         # only two predictions, i.e., one term in the estimator
         normal1 = Normal(0, 1)
         normal2 = Normal(1, 2)
-        @test @inferred(calibrationerror(skce, ([normal1, normal1], [0, 0]))) ≈
+        @test @inferred(skce([normal1, normal1], [0, 0])) ≈
               1 - 2 / sqrt(1.25) + 1 / sqrt(1.5)
-        @test @inferred(calibrationerror(skce, ([normal1, normal2], [1, 0]))) ≈
+        @test @inferred(skce([normal1, normal2], [1, 0])) ≈
               exp(-sqrt(2)) *
               (exp(-1 / 8) - 1 / sqrt(1.25) - 1 / sqrt(2) + exp(-1 / 18) / sqrt(2.25))
-        @test @inferred(calibrationerror(skce, ([normal1, normal2], [0, 1]))) ≈
+        @test @inferred(skce([normal1, normal2], [0, 1])) ≈
               exp(-sqrt(2)) * (
             exp(-1 / 8) - exp(-1 / 10) / sqrt(1.25) - exp(-1 / 16) / sqrt(2) +
             exp(-1 / 18) / sqrt(2.25)
@@ -44,11 +39,10 @@ using Test
     @testset "SKCE: basic properties" begin
         skce = UnbiasedSKCE(WassersteinExponentialKernel() ⊗ SqExponentialKernel())
 
-        estimates = Vector{Float64}(undef, 10_000)
-        for i in 1:length(estimates)
+        estimates = map(1:10_000) do _
             predictions = map(Normal, randn(20), rand(20))
             targets = map(rand, predictions)
-            estimates[i] = calibrationerror(skce, predictions, targets)
+            return skce(predictions, targets)
         end
 
         @test any(x -> x > zero(x), estimates)
@@ -65,7 +59,7 @@ using Test
         # two predictions
         normal1 = Normal(0, 1)
         normal2 = Normal(1, 2)
-        @test @inferred(calibrationerror(ucme, ([normal1, normal2], [0, 0.5]))) ≈
+        @test @inferred(ucme([normal1, normal2], [0, 0.5])) ≈
               (
             exp(-1 / sqrt(2)) * (exp(-1 / 2) - exp(-1 / 4) / sqrt(2)) +
             exp(-sqrt(5 / 2)) * (exp(-1 / 8) - 1 / sqrt(5))
@@ -77,7 +71,7 @@ using Test
             [Normal(0.5, 0.5), Normal(-1, 1.5)],
             [1, -0.5],
         )
-        @test @inferred(calibrationerror(ucme, ([normal1, normal2], [0, 0.5]))) ≈
+        @test @inferred(ucme([normal1, normal2], [0, 0.5])) ≈
               (
             (
                 exp(-1 / sqrt(2)) * (exp(-1 / 2) - exp(-1 / 4) / sqrt(2)) +
@@ -103,8 +97,10 @@ using Test
         testtargets = randn(ntestsamples)
 
         for γ in (1.0, rand())
-            kernel1 = WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), γ)
-            kernel2 = WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), [γ])
+            kernel1 =
+                WassersteinExponentialKernel() ⊗ (SqExponentialKernel() ∘ ScaleTransform(γ))
+            kernel2 =
+                WassersteinExponentialKernel() ⊗ (SqExponentialKernel() ∘ ARDTransform([γ]))
 
             # check evaluation of the first two observations
             p1 = predictions[1]
@@ -125,14 +121,12 @@ using Test
 
             # check estimates
             for estimator in (UnbiasedSKCE, x -> UCME(x, testpredictions, testtargets))
-                estimate1 = calibrationerror(estimator(kernel1), predictions, targets)
-                estimate2 = calibrationerror(estimator(kernel2), predictions, targets)
+                estimate1 = estimator(kernel1)(predictions, targets)
+                estimate2 = estimator(kernel2)(predictions, targets)
                 @test estimate2 ≈ estimate1
                 if isone(γ)
-                    @test calibrationerror(
-                        estimator(WassersteinExponentialKernel() ⊗ SqExponentialKernel()),
-                        predictions,
-                        targets,
+                    @test estimator(WassersteinExponentialKernel() ⊗ SqExponentialKernel())(
+                        predictions, targets
                     ) ≈ estimate1
                 end
             end

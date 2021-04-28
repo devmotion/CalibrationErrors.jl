@@ -1,9 +1,3 @@
-using CalibrationErrorsDistributions
-using PDMats
-
-using LinearAlgebra
-using Test
-
 @testset "mvnormal.jl" begin
     @testset "consistency with Normal" begin
         nsamples = 1_000
@@ -33,29 +27,23 @@ using Test
 
         for kernel in (
             WassersteinExponentialKernel() ⊗ SqExponentialKernel(),
-            WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), rand()),
-            WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), [rand()]),
+            WassersteinExponentialKernel() ⊗
+            (SqExponentialKernel() ∘ ScaleTransform(rand())),
+            WassersteinExponentialKernel() ⊗
+            (SqExponentialKernel() ∘ ARDTransform([rand()])),
         )
             for estimator in
                 (BiasedSKCE(kernel), UnbiasedSKCE(kernel), BlockUnbiasedSKCE(kernel, 5))
-                skce_mvnormal = calibrationerror(
-                    estimator, predictions_mvnormal, targets_mvnormal
-                )
-                skce_normal = calibrationerror(
-                    estimator, predictions_normal, targets_normal
-                )
+                skce_mvnormal = estimator(predictions_mvnormal, targets_mvnormal)
+                skce_normal = estimator(predictions_normal, targets_normal)
                 @test skce_mvnormal ≈ skce_normal
             end
 
-            ucme_mvnormal = calibrationerror(
-                UCME(kernel, testpredictions_mvnormal, testtargets_mvnormal),
-                predictions_mvnormal,
-                targets_mvnormal,
+            ucme_mvnormal = UCME(kernel, testpredictions_mvnormal, testtargets_mvnormal)(
+                predictions_mvnormal, targets_mvnormal
             )
-            ucme_normal = calibrationerror(
-                UCME(kernel, testpredictions_normal, testtargets_normal),
-                predictions_normal,
-                targets_normal,
+            ucme_normal = UCME(kernel, testpredictions_normal, testtargets_normal)(
+                predictions_normal, targets_normal
             )
             @test ucme_mvnormal ≈ ucme_normal
         end
@@ -76,13 +64,14 @@ using Test
 
             for γ in (1.0, rand())
                 kernel1 =
-                    WassersteinExponentialKernel() ⊗ transform(SqExponentialKernel(), γ)
+                    WassersteinExponentialKernel() ⊗
+                    (SqExponentialKernel() ∘ ScaleTransform(γ))
                 kernel2 =
                     WassersteinExponentialKernel() ⊗
-                    transform(SqExponentialKernel(), fill(γ, dim))
+                    (SqExponentialKernel() ∘ ARDTransform(fill(γ, dim)))
                 kernel3 =
                     WassersteinExponentialKernel() ⊗
-                    transform(SqExponentialKernel(), LinearTransform(diagm(fill(γ, dim))))
+                    (SqExponentialKernel() ∘ LinearTransform(diagm(fill(γ, dim))))
 
                 # check evaluation of the first two observations
                 p1 = predictions[1]
@@ -105,18 +94,16 @@ using Test
 
                 # check estimates
                 for estimator in (UnbiasedSKCE, x -> UCME(x, testpredictions, testtargets))
-                    estimate1 = calibrationerror(estimator(kernel1), predictions, targets)
-                    estimate2 = calibrationerror(estimator(kernel2), predictions, targets)
-                    estimate3 = calibrationerror(estimator(kernel3), predictions, targets)
+                    estimate1 = estimator(kernel1)(predictions, targets)
+                    estimate2 = estimator(kernel2)(predictions, targets)
+                    estimate3 = estimator(kernel3)(predictions, targets)
                     @test estimate2 ≈ estimate1
                     @test estimate3 ≈ estimate1
                     if isone(γ)
-                        @test calibrationerror(
-                            estimator(
-                                WassersteinExponentialKernel() ⊗ SqExponentialKernel()
-                            ),
-                            predictions,
-                            targets,
+                        @test estimator(
+                            WassersteinExponentialKernel() ⊗ SqExponentialKernel()
+                        )(
+                            predictions, targets
                         ) ≈ estimate1
                     end
                 end

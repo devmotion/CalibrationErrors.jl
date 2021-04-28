@@ -9,6 +9,7 @@ using Reexport
 using Distances: Distances
 using OptimalTransport: OptimalTransport
 using PDMats: PDMats
+using Tulip: Tulip
 
 using LinearAlgebra: LinearAlgebra
 

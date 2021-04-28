@@ -1,9 +1,3 @@
-using CalibrationErrorsDistributions
-using PDMats
-
-using LinearAlgebra
-using Test
-
 @testset "bures.jl" begin
     function _sqbures(A, B)
         sqrt_A = sqrt(A)

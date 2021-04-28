@@ -35,11 +35,6 @@ function (::SqWasserstein)(a::Laplace, b::Laplace)
     return abs2(μa - μb) + 2 * abs2(βa - βb)
 end
 
-# syntactic sugar
-function sqwasserstein(a::Distribution, b::Distribution)
-    return (SqWasserstein())(a, b)
-end
-
 # Wasserstein 2 distance
 struct Wasserstein <: DistributionsMetric end
 
@@ -51,16 +46,18 @@ function Distances.result_type(
 end
 
 function (::Wasserstein)(a::Distribution, b::Distribution)
-    return sqrt(sqwasserstein(a, b))
-end
-
-function wasserstein(a::Distribution, b::Distribution)
-    return (Wasserstein())(a, b)
+    return sqrt(SqWasserstein()(a, b))
 end
 
 # Mixture Wasserstein distances
-struct SqMixtureWasserstein <: DistributionsSemiMetric end
-struct MixtureWasserstein <: DistributionsMetric end
+struct SqMixtureWasserstein{S} <: DistributionsSemiMetric
+    lpsolver::S
+end
+struct MixtureWasserstein{S} <: DistributionsMetric
+    lpsolver::S
+end
+SqMixtureWasserstein() = SqMixtureWasserstein(Tulip.Optimizer())
+MixtureWasserstein() = MixtureWasserstein(Tulip.Optimizer())
 
 # result type (e.g., for pairwise computations)
 function Distances.result_type(
@@ -74,24 +71,11 @@ function Distances.result_type(
     return float(promote_type(T1, T2))
 end
 
-function (::SqMixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
-    probsa = probs(a)
-    componentsa = components(a)
-    probsb = probs(b)
-    componentsb = components(b)
-
-    C = Distances.pairwise(SqWasserstein(), componentsa, componentsb)
-    return OptimalTransport.emd2(probsa, probsb, C)
+function (s::SqMixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
+    C = Distances.pairwise(SqWasserstein(), components(a), components(b))
+    return OptimalTransport.emd2(probs(a), probs(b), C, s.lpsolver)
 end
 
-function sqmixturewasserstein(a::AbstractMixtureModel, b::AbstractMixtureModel)
-    return (SqMixtureWasserstein())(a, b)
-end
-
-function (::MixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
-    return sqrt(sqmixturewasserstein(a, b))
-end
-
-function mixturewasserstein(a::AbstractMixtureModel, b::AbstractMixtureModel)
-    return (MixtureWasserstein())(a, b)
+function (m::MixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
+    return sqrt(SqMixtureWasserstein(m.lpsolver)(a, b))
 end
