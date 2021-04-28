@@ -8,6 +8,8 @@ using Random
 using Statistics
 using Test
 
+using CalibrationErrors: unsafe_skce_eval
+
 Random.seed!(1234)
 
 @testset "CalibrationErrors" begin
@@ -32,6 +34,9 @@ Random.seed!(1234)
     end
 
     @testset "SKCE" begin
+        @testset "generic" begin
+            include("skce/generic.jl")
+        end
         @testset "biased" begin
             include("skce/biased.jl")
         end
