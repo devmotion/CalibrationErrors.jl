@@ -88,6 +88,20 @@ function unsafe_skce_eval(
     return result
 end
 
+# for binary classification with probabilities (corresponding to parameters of Bernoulli
+# distributions) and boolean targets the expression simplifies to
+# ```math
+# k((p, y), (p̃, ỹ)) = (y(1-p) + (1-y)p)(ỹ(1-p̃) + (1-ỹ)p̃)(k((p, y), (p̃, ỹ)) - k((p, 1-y), (p̃, ỹ)) - k((p, y), (p̃, 1-ỹ)) + k((p, 1-y), (p̃, 1-ỹ)))
+# ```
+function unsafe_skce_eval(kernel::Kernel, p::Real, y::Bool, p̃::Real, ỹ::Bool)
+    noty = !y
+    notỹ = !ỹ
+    z =
+        kernel((p, y), (p̃, ỹ)) - kernel((p, noty), (p̃, ỹ)) -
+        kernel((p, y), (p̃, notỹ)) + kernel((p, noty), (p̃, notỹ))
+    return (y ? 1 - p : p) * (ỹ ? 1 - p̃ : p̃) * z
+end
+
 # evaluation for tensor product kernels
 function unsafe_skce_eval(kernel::KernelTensorProduct, p, y, p̃, ỹ)
     κpredictions, κtargets = kernel.kernels
@@ -102,6 +116,10 @@ function unsafe_skce_eval(
     p̃::AbstractVector{<:Real},
     ỹ::Integer,
 )
+    κpredictions, κtargets = kernel.kernels
+    return κpredictions(p, p̃) * unsafe_skce_eval_targets(κtargets, p, y, p̃, ỹ)
+end
+function unsafe_skce_eval(kernel::KernelTensorProduct, p::Real, y::Bool, p̃::Real, ỹ::Bool)
     κpredictions, κtargets = kernel.kernels
     return κpredictions(p, p̃) * unsafe_skce_eval_targets(κtargets, p, y, p̃, ỹ)
 end
@@ -257,4 +275,14 @@ function unsafe_skce_eval_targets(
 )
     @inbounds res = (y == ỹ) - p[ỹ] - p̃[y] + dot(p, p̃)
     return res
+end
+
+function unsafe_skce_eval_targets(κtargets::Kernel, p::Real, y::Bool, p̃::Real, ỹ::Bool)
+    noty = !y
+    notỹ = !ỹ
+    z = κtargets(y, ỹ) - κtargets(noty, ỹ) - κtargets(y, notỹ) + κtargets(noty, notỹ)
+    return (y ? 1 - p : p) * (ỹ ? 1 - p̃ : p̃) * z
+end
+function unsafe_skce_eval_targets(::WhiteKernel, p::Real, y::Bool, p̃::Real, ỹ::Bool)
+    return 2 * (y - p) * (ỹ - p̃)
 end
