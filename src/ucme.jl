@@ -88,10 +88,13 @@ function unsafe_ucme_eval(
     testp::AbstractVector{<:Real},
     testy::Integer,
 )
-    a = kernel((p, y), (testp, testy))
-    b = sum(p[z] * kernel((p, z), (testp, testy)) for z in 1:length(p))
-
-    return a - b
+    res = sum(((z == y) - pz) * kernel((p, z), (testp, testy)) for (z, pz) in enumerate(p))
+    return res
+end
+function unsafe_ucme_eval(kernel::Kernel, p::Real, y::Bool, testp::Real, testy::Bool)
+    noty = !y
+    return (y - p) * kernel((p, y), (testp, testy)) +
+           (noty - p) * kernel((p, noty), (testp, testy))
 end
 
 function unsafe_ucme_eval(kernel::KernelTensorProduct, p, y, testp, testy)
@@ -109,6 +112,30 @@ function unsafe_ucme_eval(
     κpredictions, κtargets = kernel.kernels
     return unsafe_ucme_eval_targets(κtargets, p, y, testp, testy) * κpredictions(p, testp)
 end
+function unsafe_ucme_eval(
+    kernel::KernelTensorProduct, p::Real, y::Bool, testp::Real, testy::Bool
+)
+    κpredictions, κtargets = kernel.kernels
+    return unsafe_ucme_eval_targets(κtargets, p, y, testp, testy) * κpredictions(p, testp)
+end
+
+function unsafe_ucme_eval_targets(
+    kernel::Kernel,
+    p::AbstractVector{<:Real},
+    y::Integer,
+    testp::AbstractVector{<:Real},
+    testy::Integer,
+)
+    res = sum(((z == y) - pz) * kernel(z, testy) for (z, pz) in enumerate(p))
+    return res
+end
+function unsafe_ucme_eval_targets(
+    kernel::Kernel, p::Real, y::Bool, testp::Real, testy::Bool
+)
+    noty = !y
+    res = (y - p) * kernel(y, testy) + (noty - p) * kernel(noty, testy)
+    return res
+end
 
 function unsafe_ucme_eval_targets(
     κtargets::WhiteKernel,
@@ -119,4 +146,9 @@ function unsafe_ucme_eval_targets(
 )
     @inbounds res = (y == testy) - p[testy]
     return res
+end
+function unsafe_ucme_eval_targets(
+    kernel::WhiteKernel, p::Real, y::Bool, testp::Real, testy::Bool
+)
+    return (2 * testy - 1) * (y - p)
 end

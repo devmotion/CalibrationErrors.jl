@@ -25,9 +25,9 @@
 
         # corresponding values and kernel for full categorical distribution
         pfull = [p, 1 - p]
-        yint = y ? 1 : 2
+        yint = 2 - y
         p̃full = [p̃, 1 - p̃]
-        ỹint = ỹ ? 1 : 2
+        ỹint = 2 - ỹ
         kernelfull = SqExponentialKernel() ∘ ScaleTransform(scale / sqrt(2))
 
         @test unsafe_skce_eval(kernelfull ⊗ WhiteKernel(), pfull, yint, p̃full, ỹint) ≈ val

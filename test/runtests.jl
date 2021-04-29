@@ -8,7 +8,7 @@ using Random
 using Statistics
 using Test
 
-using CalibrationErrors: unsafe_skce_eval
+using CalibrationErrors: unsafe_skce_eval, unsafe_ucme_eval
 
 Random.seed!(1234)
 
