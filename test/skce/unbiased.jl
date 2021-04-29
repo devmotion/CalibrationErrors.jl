@@ -2,10 +2,12 @@
     @testset "Unbiased: Two-dimensional example" begin
         # categorical distributions
         skce = UnbiasedSKCE(SqExponentialKernel() ⊗ WhiteKernel())
-        @test iszero(@inferred(skce([[1, 0], [0, 1]], [1, 2])))
-        @test iszero(@inferred(skce([[1, 0], [0, 1]], [1, 1])))
-        @test @inferred(skce([[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-1)
-        @test iszero(@inferred(skce([[1, 0], [0, 1]], [2, 2])))
+        for predictions in ([[1, 0], [0, 1]], ColVecs([1 0; 0 1]), RowVecs([1 0; 0 1]))
+            @test iszero(@inferred(skce(predictions, [1, 2])))
+            @test iszero(@inferred(skce(predictions, [1, 1])))
+            @test @inferred(skce(predictions, [2, 1])) ≈ -2 * exp(-1)
+            @test iszero(@inferred(skce(predictions, [2, 2])))
+        end
 
         # probabilities
         skce = UnbiasedSKCE(
@@ -59,17 +61,24 @@
     @testset "Block: Two-dimensional example" begin
         # categorical distributions
         skce = BlockUnbiasedSKCE(SqExponentialKernel() ⊗ WhiteKernel())
-        @test iszero(@inferred(skce([[1, 0], [0, 1]], [1, 2])))
-        @test iszero(@inferred(skce([[1, 0], [0, 1]], [1, 1])))
-        @test @inferred(skce([[1, 0], [0, 1]], [2, 1])) ≈ -2 * exp(-1)
-        @test iszero(@inferred(skce([[1, 0], [0, 1]], [2, 2])))
+        for predictions in ([[1, 0], [0, 1]], ColVecs([1 0; 0 1]), RowVecs([1 0; 0 1]))
+            @test iszero(@inferred(skce(predictions, [1, 2])))
+            @test iszero(@inferred(skce(predictions, [1, 1])))
+            @test @inferred(skce(predictions, [2, 1])) ≈ -2 * exp(-1)
+            @test iszero(@inferred(skce(predictions, [2, 2])))
+        end
 
         # two predictions, ten times replicated
-        @test iszero(@inferred(skce(repeat([[1, 0], [0, 1]], 10), repeat([1, 2], 10))))
-        @test iszero(@inferred(skce(repeat([[1, 0], [0, 1]], 10), repeat([1, 1], 10))))
-        @test @inferred(skce(repeat([[1, 0], [0, 1]], 10), repeat([2, 1], 10))) ≈
-              -2 * exp(-1)
-        @test iszero(@inferred(skce(repeat([[1, 0], [0, 1]], 10), repeat([2, 2], 10))))
+        for predictions in (
+            repeat([[1, 0], [0, 1]], 10),
+            ColVecs(repeat([1 0; 0 1], 1, 10)),
+            RowVecs(repeat([1 0; 0 1], 10, 1)),
+        )
+            @test iszero(@inferred(skce(predictions, repeat([1, 2], 10))))
+            @test iszero(@inferred(skce(predictions, repeat([1, 1], 10))))
+            @test @inferred(skce(predictions, repeat([2, 1], 10))) ≈ -2 * exp(-1)
+            @test iszero(@inferred(skce(predictions, repeat([2, 2], 10))))
+        end
 
         # probabilities
         skce = BlockUnbiasedSKCE(
