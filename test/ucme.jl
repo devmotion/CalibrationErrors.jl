@@ -6,10 +6,12 @@
             [[1.0, 0], [0.5, 0.5], [0.0, 1]],
             [1, 1, 2],
         )
-        @test iszero(@inferred(ucme([[1, 0], [0, 1]], [1, 2])))
-        @test @inferred(ucme([[1, 0], [0, 1]], [1, 1])) ≈ (exp(-2) + exp(-0.5) + 1) / 12
-        @test @inferred(ucme([[1, 0], [0, 1]], [2, 1])) ≈ (1 - exp(-1))^2 / 6
-        @test @inferred(ucme([[1, 0], [0, 1]], [2, 2])) ≈ (exp(-2) + exp(-0.5) + 1) / 12
+        for predictions in ([[1, 0], [0, 1]], ColVecs([1 0; 0 1]), RowVecs([1 0; 0 1]))
+            @test iszero(@inferred(ucme(predictions, [1, 2])))
+            @test @inferred(ucme(predictions, [1, 1])) ≈ (exp(-2) + exp(-0.5) + 1) / 12
+            @test @inferred(ucme(predictions, [2, 1])) ≈ (1 - exp(-1))^2 / 6
+            @test @inferred(ucme(predictions, [2, 2])) ≈ (exp(-2) + exp(-0.5) + 1) / 12
+        end
 
         # probabilities
         ucme = UCME(

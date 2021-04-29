@@ -2,10 +2,12 @@
     @testset "Two-dimensional example" begin
         # categorical distributions
         skce = BiasedSKCE(SqExponentialKernel() ⊗ WhiteKernel())
-        @test iszero(@inferred(skce([[1, 0], [0, 1]], [1, 2])))
-        @test @inferred(skce([[1, 0], [0, 1]], [1, 1])) ≈ 0.5
-        @test @inferred(skce([[1, 0], [0, 1]], [2, 1])) ≈ 1 - exp(-1)
-        @test @inferred(skce([[1, 0], [0, 1]], [2, 2])) ≈ 0.5
+        for predictions in ([[1, 0], [0, 1]], ColVecs([1 0; 0 1]), RowVecs([1 0; 0 1]))
+            @test iszero(@inferred(skce(predictions, [1, 2])))
+            @test @inferred(skce(predictions, [1, 1])) ≈ 0.5
+            @test @inferred(skce(predictions, [2, 1])) ≈ 1 - exp(-1)
+            @test @inferred(skce(predictions, [2, 2])) ≈ 0.5
+        end
 
         # probabilities
         skce = BiasedSKCE((SqExponentialKernel() ∘ ScaleTransform(sqrt(2))) ⊗ WhiteKernel())
