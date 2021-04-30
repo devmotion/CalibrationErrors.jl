@@ -7,13 +7,17 @@ using Reexport
 @reexport using KernelFunctions
 
 using Distances: Distances
-using OptimalTransport: OptimalTransport
+using MathOptInterface: MathOptInterface
 using PDMats: PDMats
 using Tulip: Tulip
 
 using LinearAlgebra: LinearAlgebra
 
 export WassersteinExponentialKernel, MixtureWassersteinExponentialKernel
+
+const MOI = MathOptInterface
+
+include("optimaltransport.jl")
 
 include("distances/types.jl")
 include("distances/bures.jl")
