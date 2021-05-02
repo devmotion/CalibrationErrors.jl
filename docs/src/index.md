@@ -13,6 +13,8 @@ predictive models that output arbitrary probability distributions.
 [CalibrationTests.jl](https://github.com/devmotion/CalibrationTests.jl) implements
 statistical hypothesis tests of calibration.
 
+[pycalibration](https://github.com/devmotion/pycalibration) is a Python interface for CalibrationErrors.jl, CalibrationErrorsDistributions.jl, and CalibrationTests.jl.
+
 ## Citing
 
 If you use CalibrationsErrors.jl as part of your research, teaching, or other activities,
