@@ -1,7 +1,7 @@
 name = "CalibrationErrorsDistributions"
 uuid = "20087e1a-bb94-462b-b900-33d17a750383"
 authors = ["David Widmann <david.widmann@it.uu.se>"]
-version = "0.2.1"
+version = "0.2.2"
 
 [deps]
 CalibrationErrors = "33913031-fe46-5864-950f-100836f47845"
@@ -17,7 +17,7 @@ Tulip = "6dd1b50a-3aae-11e9-10b5-ef983d2400fa"
 [compat]
 CalibrationErrors = "0.5"
 Distances = "0.10.1"
-Distributions = "0.23, 0.24"
+Distributions = "0.23, 0.24, 0.25"
 KernelFunctions = "0.8, 0.9"
 MathOptInterface = "0.9"
 PDMats = "0.10, 0.11"
