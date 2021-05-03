@@ -19,8 +19,11 @@ using Tulip: Tulip
 # Julia 1.3 is only supported by OptimalTransport 0.1 which requires Python
 @static if VERSION >= v"1.4"
     using Pkg: Pkg
+    using UUIDs: UUIDs
     Pkg.add(;
-        name="OptimalTransport", uuid="7e02d93a-ae51-4f58-b602-d97af76e3b33", version="0.2"
+        name="OptimalTransport",
+        uuid=UUIDs.UUID("7e02d93a-ae51-4f58-b602-d97af76e3b33"),
+        version="0.2",
     )
     using OptimalTransport
 end

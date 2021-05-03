@@ -1,6 +1,5 @@
 [deps]
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 PDMats = "90014a1f-27ba-587c-ab20-58faa44d9150"
@@ -8,10 +7,10 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Tulip = "6dd1b50a-3aae-11e9-10b5-ef983d2400fa"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
 Distances = "0.10.1"
-JuliaFormatter = "0.13"
 MathOptInterface = "0.9"
 PDMats = "0.10, 0.11"
 Tulip = "0.7"
