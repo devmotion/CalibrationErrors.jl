@@ -29,7 +29,7 @@ usually it is not possible to achieve this in practice.
 
 A very simple class of models are models that yield the same prediction for all features,
 i.e., they return the same probabilities for the penguin species regardless of the bill and
-flipper length. Clearly, more complicated take into account also the features and might output
+flipper length. Clearly, more complicated models take into account also the features and might output
 different predictions for different features.
 
 In contrast to probabilistic predictive models, non-probabilistic predictive models
@@ -56,7 +56,7 @@ making. A [classic example are weather forecasts](https://www.jstor.org/stable/2
 that also report the "probability of rain" instead of only if it will rain or not.
 
 Therefore it is not sufficient if the model predicts an arbitrary distribution.
-Instead the predictions should actualy express the involved uncertainties "correctly".
+Instead the predictions should actually express the involved uncertainties "correctly".
 One desired property is that the predictions are consistent: if the forecasts predict
 an 80% probability of rain for an infinite sequence of days, then ideally on 80% of the
 days it rains.
@@ -82,7 +82,7 @@ where $\phi$ is some measurable function, is calibrated.
 
 [^3]: The general formulation applies not only to classification but to any prediction task with arbitrary target spaces, including regression.
 
-[^4]: In meterology, this model is called the *climatology*.
+[^4]: In meteorology, this model is called the *climatology*.
 
 ## Calibration error
 
