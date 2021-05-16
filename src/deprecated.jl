@@ -36,3 +36,5 @@
 @deprecate unbiasedskce(kernel, predictions, targets) UnbiasedSKCE(kernel)(
     predictions, targets
 ) false
+
+@deprecate TVExponentialKernel() ExponentialKernel(; metric=TotalVariation())

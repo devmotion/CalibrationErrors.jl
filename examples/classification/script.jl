@@ -170,10 +170,10 @@ val_predict = predict_naive_bayes_classifier(penguins_fit, val_penguins);
 # corresponding vector of predictions.
 
 train_species = convert(Vector{Int}, indexin(train_penguins.species, names(train_predict)))
-train_probs = collect(Vector{Float64}, eachrow(train_predict))
+train_probs = RowVecs(Matrix{Float64}(train_predict))
 
 val_species = convert(Vector{Int}, indexin(val_penguins.species, names(val_predict)))
-val_probs = collect(Vector{Float64}, eachrow(val_predict));
+val_probs = RowVecs(Matrix{Float64}(val_predict));
 
 # ### Log-likelihood
 #

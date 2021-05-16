@@ -29,10 +29,6 @@ Random.seed!(1234)
         include("ece.jl")
     end
 
-    @testset "Kernels" begin
-        include("kernels.jl")
-    end
-
     @testset "SKCE" begin
         @testset "generic" begin
             include("skce/generic.jl")

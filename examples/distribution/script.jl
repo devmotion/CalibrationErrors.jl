@@ -195,7 +195,10 @@ function (f::MedianHeuristicKernel)((predictions, targets))
     γ = inv(median!(cache))
 
     ## create tensor product kernel
-    return transform(TVExponentialKernel(), γ) ⊗ WhiteKernel()
+    kernel_predictions = ExponentialKernel(; metric=TotalVariation()) ∘ ScaleTransform(γ)
+    kernel_targets = WhiteKernel()
+
+    return kernel_predictions ⊗ kernel_targets
 end
 #md nothing #hide
 
