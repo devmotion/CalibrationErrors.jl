@@ -143,4 +143,9 @@
             CalibrationErrors.unbiasedskce(kernel, predictions, targets)
         ) == UnbiasedSKCE(kernel)(predictions, targets)
     end
+
+    @testset "TVExponentialKernel" begin
+        kernel = @test_deprecated(TVExponentialKernel())
+        @test kernel isa ExponentialKernel{TotalVariation}
+    end
 end
