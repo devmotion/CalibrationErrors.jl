@@ -1,6 +1,8 @@
 @testset "normal.jl" begin
     @testset "SKCE: basic example" begin
-        skce = UnbiasedSKCE(WassersteinExponentialKernel() ⊗ SqExponentialKernel())
+        skce = UnbiasedSKCE(
+            ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel()
+        )
 
         # only two predictions, i.e., one term in the estimator
         normal1 = Normal(0, 1)
@@ -18,7 +20,8 @@
 
     @testset "SKCE: basic example (transformed)" begin
         skce = UnbiasedSKCE(
-            WassersteinExponentialKernel() ⊗ (SqExponentialKernel() ∘ ScaleTransform(0.5))
+            ExponentialKernel(; metric=Wasserstein()) ⊗
+            (SqExponentialKernel() ∘ ScaleTransform(0.5)),
         )
 
         # only two predictions, i.e., one term in the estimator
@@ -37,7 +40,9 @@
     end
 
     @testset "SKCE: basic properties" begin
-        skce = UnbiasedSKCE(WassersteinExponentialKernel() ⊗ SqExponentialKernel())
+        skce = UnbiasedSKCE(
+            ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel()
+        )
 
         estimates = map(1:10_000) do _
             predictions = map(Normal, randn(20), rand(20))
@@ -53,7 +58,9 @@
     @testset "UCME: basic example" begin
         # one test location
         ucme = UCME(
-            WassersteinExponentialKernel() ⊗ SqExponentialKernel(), [Normal(0.5, 0.5)], [1]
+            ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel(),
+            [Normal(0.5, 0.5)],
+            [1],
         )
 
         # two predictions
@@ -67,7 +74,7 @@
 
         # two test locations
         ucme = UCME(
-            WassersteinExponentialKernel() ⊗ SqExponentialKernel(),
+            ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel(),
             [Normal(0.5, 0.5), Normal(-1, 1.5)],
             [1, -0.5],
         )
@@ -98,9 +105,11 @@
 
         for γ in (1.0, rand())
             kernel1 =
-                WassersteinExponentialKernel() ⊗ (SqExponentialKernel() ∘ ScaleTransform(γ))
+                ExponentialKernel(; metric=Wasserstein()) ⊗
+                (SqExponentialKernel() ∘ ScaleTransform(γ))
             kernel2 =
-                WassersteinExponentialKernel() ⊗ (SqExponentialKernel() ∘ ARDTransform([γ]))
+                ExponentialKernel(; metric=Wasserstein()) ⊗
+                (SqExponentialKernel() ∘ ARDTransform([γ]))
 
             # check evaluation of the first two observations
             p1 = predictions[1]
@@ -125,7 +134,9 @@
                 estimate2 = estimator(kernel2)(predictions, targets)
                 @test estimate2 ≈ estimate1
                 if isone(γ)
-                    @test estimator(WassersteinExponentialKernel() ⊗ SqExponentialKernel())(
+                    @test estimator(
+                        ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel()
+                    )(
                         predictions, targets
                     ) ≈ estimate1
                 end

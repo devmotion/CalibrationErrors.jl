@@ -2,7 +2,7 @@
 
 # predicted Laplace distributions with exponential kernel for the targets
 function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::ExponentialKernel, p::Laplace, y::Real, p̃::Laplace, ỹ::Real
+    kernel::ExponentialKernel{Euclidean}, p::Laplace, y::Real, p̃::Laplace, ỹ::Real
 )
     # extract the parameters
     μ = p.μ
@@ -59,7 +59,7 @@ end
 # UCME
 
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    kernel::ExponentialKernel, p::Laplace, y::Real, ::Laplace, testy::Real
+    kernel::ExponentialKernel{Euclidean}, p::Laplace, y::Real, ::Laplace, testy::Real
 )
     return kernel(y, testy) - laplace_laplacian_kernel(p.θ, abs(p.μ - testy))
 end
@@ -67,7 +67,9 @@ end
 # kernels with input transformations
 # TODO: scale upfront?
 function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::TransformedKernel{ExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
+    kernel::TransformedKernel{
+        ExponentialKernel{Euclidean},<:Union{ScaleTransform,ARDTransform}
+    },
     p::Laplace,
     y::Real,
     p̃::Laplace,
@@ -82,7 +84,9 @@ function CalibrationErrors.unsafe_skce_eval_targets(
 end
 
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    kernel::TransformedKernel{ExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
+    kernel::TransformedKernel{
+        ExponentialKernel{Euclidean},<:Union{ScaleTransform,ARDTransform}
+    },
     p::Laplace,
     y::Real,
     testp::Laplace,

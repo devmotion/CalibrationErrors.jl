@@ -2,7 +2,7 @@
 
 # predicted normal distributions with squared exponential kernel for the targets
 function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::SqExponentialKernel, p::Normal, y::Real, p̃::Normal, ỹ::Real
+    kernel::SqExponentialKernel{Euclidean}, p::Normal, y::Real, p̃::Normal, ỹ::Real
 )
     # extract parameters
     μ = p.μ
@@ -25,7 +25,7 @@ end
 # UCME
 
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    kernel::SqExponentialKernel, p::Normal, y::Real, ::Normal, testy::Real
+    kernel::SqExponentialKernel{Euclidean}, p::Normal, y::Real, ::Normal, testy::Real
 )
     # compute scaling factor
     # TODO: use `hypot`?
@@ -38,7 +38,9 @@ end
 # TODO: scale upfront?
 
 function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::TransformedKernel{SqExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
+    kernel::TransformedKernel{
+        SqExponentialKernel{Euclidean},<:Union{ScaleTransform,ARDTransform}
+    },
     p::Normal,
     y::Real,
     p̃::Normal,
@@ -53,7 +55,9 @@ function CalibrationErrors.unsafe_skce_eval_targets(
 end
 
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    kernel::TransformedKernel{SqExponentialKernel,<:Union{ScaleTransform,ARDTransform}},
+    kernel::TransformedKernel{
+        SqExponentialKernel{Euclidean},<:Union{ScaleTransform,ARDTransform}
+    },
     p::Normal,
     y::Real,
     testp::Normal,

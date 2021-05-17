@@ -1,7 +1,7 @@
 # SKCE
 
 function CalibrationErrors.unsafe_skce_eval_targets(
-    kernel::SqExponentialKernel,
+    kernel::SqExponentialKernel{Euclidean},
     p::MvNormal,
     y::AbstractVector{<:Real},
     p̃::MvNormal,
@@ -33,7 +33,7 @@ end
 
 # predicted normal distributions with squared exponential kernel for the targets
 function CalibrationErrors.unsafe_ucme_eval_targets(
-    kernel::SqExponentialKernel,
+    kernel::SqExponentialKernel{Euclidean},
     p::MvNormal,
     y::AbstractVector{<:Real},
     testp::MvNormal,
@@ -50,7 +50,7 @@ end
 
 function CalibrationErrors.unsafe_skce_eval_targets(
     kernel::TransformedKernel{
-        SqExponentialKernel,<:Union{ScaleTransform,ARDTransform,LinearTransform}
+        SqExponentialKernel{Euclidean},<:Union{ScaleTransform,ARDTransform,LinearTransform}
     },
     p::MvNormal,
     y::AbstractVector{<:Real},
@@ -67,7 +67,7 @@ end
 
 function CalibrationErrors.unsafe_ucme_eval_targets(
     kernel::TransformedKernel{
-        SqExponentialKernel,<:Union{ScaleTransform,ARDTransform,LinearTransform}
+        SqExponentialKernel{Euclidean},<:Union{ScaleTransform,ARDTransform,LinearTransform}
     },
     p::MvNormal,
     y::AbstractVector{<:Real},

@@ -26,10 +26,10 @@
         testtargets_mvnormal = map(vcat, testtargets_normal)
 
         for kernel in (
-            WassersteinExponentialKernel() ⊗ SqExponentialKernel(),
-            WassersteinExponentialKernel() ⊗
+            ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel(),
+            ExponentialKernel(; metric=Wasserstein()) ⊗
             (SqExponentialKernel() ∘ ScaleTransform(rand())),
-            WassersteinExponentialKernel() ⊗
+            ExponentialKernel(; metric=Wasserstein()) ⊗
             (SqExponentialKernel() ∘ ARDTransform([rand()])),
         )
             for estimator in
@@ -64,13 +64,13 @@
 
             for γ in (1.0, rand())
                 kernel1 =
-                    WassersteinExponentialKernel() ⊗
+                    ExponentialKernel(; metric=Wasserstein()) ⊗
                     (SqExponentialKernel() ∘ ScaleTransform(γ))
                 kernel2 =
-                    WassersteinExponentialKernel() ⊗
+                    ExponentialKernel(; metric=Wasserstein()) ⊗
                     (SqExponentialKernel() ∘ ARDTransform(fill(γ, dim)))
                 kernel3 =
-                    WassersteinExponentialKernel() ⊗
+                    ExponentialKernel(; metric=Wasserstein()) ⊗
                     (SqExponentialKernel() ∘ LinearTransform(diagm(fill(γ, dim))))
 
                 # check evaluation of the first two observations
@@ -101,7 +101,8 @@
                     @test estimate3 ≈ estimate1
                     if isone(γ)
                         @test estimator(
-                            WassersteinExponentialKernel() ⊗ SqExponentialKernel()
+                            ExponentialKernel(; metric=Wasserstein()) ⊗
+                            SqExponentialKernel(),
                         )(
                             predictions, targets
                         ) ≈ estimate1

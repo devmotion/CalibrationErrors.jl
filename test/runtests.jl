@@ -46,14 +46,14 @@ const MOI = MathOptInterface
         end
     end
 
-    @testset "kernels" begin
-        include("kernels.jl")
-    end
-
     @testset "Normal" begin
         include("normal.jl")
     end
     @testset "MvNormal" begin
         include("mvnormal.jl")
+    end
+
+    @testset "deprecations" begin
+        include("deprecated.jl")
     end
 end
