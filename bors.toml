@@ -9,7 +9,7 @@ status = [
   "Julia 1 - windows-latest - x64",
   "Julia 1.% - windows-latest - x86",
   "Julia 1.% - windows-latest - x64",
-  "format-check",
+  "format",
   "Documentation"
 ]
 delete_merged_branches = true
