@@ -115,7 +115,7 @@ end;
 # estimates is indicated by a solid black vertical line and the analytic
 # calibration error is visualized as a dashed red line.
 
-function plot(set::EstimatesSet; ece=false)
+function plot_estimates(set::EstimatesSet; ece=false)
     ## create figure
     f = Figure(; resolution=(1080, 960))
 
@@ -127,20 +127,20 @@ function plot(set::EstimatesSet; ece=false)
 
         ## create new axis
         ax = Axis(f[i, j]; ticks=LinearTicks(4))
-        i < nrows && hidexdecorations!(current_axis(); grid=false)
-        j > 1 && hideydecorations!(current_axis(); grid=false)
+        i < nrows && hidexdecorations!(ax; grid=false)
+        j > 1 && hideydecorations!(ax; grid=false)
 
         ## plot histogram of estimates
         h = fit(Histogram, estimates)
-        plot!(h; strokecolor=:black, strokewidth=0.5)
+        barplot!(ax, h; strokecolor=:black, strokewidth=0.5)
+
+        ## indicate mean of estimates
+        vlines!(ax, [mean(estimates)]; linewidth=2)
 
         ## indicate analytic calibration error for ECE
         if ece
             vlines!(ax, [π * (m - 1) / m]; linewidth=2)
         end
-
-        ## indicate mean of estimates
-        vlines!(ax, [mean(estimates)]; linewidth=2)
     end
 
     ## add labels and link axes
@@ -209,7 +209,7 @@ end
 
 Random.seed!(1234)
 data = estimates(_ -> ECE(UniformBinning(10), TotalVariation()))
-plot(data; ece=true)
+plot_estimates(data; ece=true)
 #!jl save("./figures/ece_uniform.svg", current_figure());
 
 #!jl # ![](./figures/ece_uniform.svg)
@@ -226,7 +226,7 @@ plot(data; ece=true)
 
 Random.seed!(1234)
 data = estimates(_ -> ECE(MedianVarianceBinning(10), TotalVariation()))
-plot(data; ece=true)
+plot_estimates(data; ece=true)
 #!jl save("./figures/ece_medianvariance.svg", current_figure());
 
 #!jl # ![](./figures/ece_medianvariance.svg)
@@ -236,7 +236,7 @@ plot(data; ece=true)
 
 Random.seed!(1234)
 data = estimates(BiasedSKCE ∘ MedianHeuristicKernel(250))
-plot(data)
+plot_estimates(data)
 #!jl save("./figures/skce_biased.svg", current_figure());
 
 #!jl # ![](./figures/skce_biased.svg)
@@ -246,14 +246,14 @@ plot(data)
 
 Random.seed!(1234)
 data = estimates(UnbiasedSKCE ∘ MedianHeuristicKernel(250))
-plot(data)
+plot_estimates(data)
 #!jl save("./figures/skce_unbiased.svg", current_figure());
 
 #!jl # ![](./figures/skce_unbiased.svg)
 
 Random.seed!(1234)
 data = estimates(BlockUnbiasedSKCE ∘ MedianHeuristicKernel(250))
-plot(data)
+plot_estimates(data)
 #!jl save("./figures/skce_blockunbiased.svg", current_figure());
 
 #!jl # ![](./figures/skce_blockunbiased.svg)
