@@ -12,8 +12,6 @@ using LinearAlgebra
 using Random
 using Statistics
 
-using CairoMakie.AbstractPlotting.ColorSchemes: Dark2_8
-
 # ## Introduction
 #
 # This example is taken from the publication
@@ -134,15 +132,15 @@ function plot(set::EstimatesSet; ece=false)
 
         ## plot histogram of estimates
         h = fit(Histogram, estimates)
-        plot!(h; color=(Dark2_8[1], 0.5), strokecolor=:black, strokewidth=0.5)
+        plot!(h; strokecolor=:black, strokewidth=0.5)
 
         ## indicate analytic calibration error for ECE
         if ece
-            vlines!(ax, [π * (m - 1) / m]; color=Dark2_8[2], linewidth=2)
+            vlines!(ax, [π * (m - 1) / m]; linewidth=2)
         end
 
         ## indicate mean of estimates
-        vlines!(ax, [mean(estimates)]; color=Dark2_8[3], linewidth=2)
+        vlines!(ax, [mean(estimates)]; linewidth=2)
     end
 
     ## add labels and link axes

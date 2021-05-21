@@ -12,7 +12,8 @@ using Query
 
 using Random
 
-using CairoMakie.AbstractPlotting.ColorSchemes: Dark2_8
+## Set color cycle globally
+set_theme!(; palette=(color=Makie.wong_colors(0.8)[1:3],))
 
 # ## Data
 #
@@ -27,9 +28,7 @@ penguins = dropmissing(DataFrame(PalmerPenguins.load()))
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="bill length [mm]", ylabel="flipper length [mm]")
 for (i, (key, df)) in enumerate(pairs(groupby(penguins, :species)))
-    scatter!(
-        df.bill_length_mm, df.flipper_length_mm; color=(Dark2_8[i], 0.8), label=key.species
-    )
+    scatter!(df.bill_length_mm, df.flipper_length_mm; label=key.species)
 end
 Legend(f[1, 2], ax, "species")
 #!jl save("./figures/penguins.svg", f);
@@ -52,21 +51,16 @@ val_penguins = penguins[val_idxs, :];
 
 f = Figure()
 ax = Axis(f[1, 1]; xlabel="bill length [mm]", ylabel="flipper length [mm]")
-for (i, df) in enumerate((train_penguins, val_penguins))
-    for (j, (key, subdf)) in enumerate(pairs(groupby(df, :species)))
-        scatter!(
-            subdf.bill_length_mm,
-            subdf.flipper_length_mm;
-            color=(Dark2_8[j], 0.8),
-            marker=i == 1 ? :circle : :diamond,
-        )
-    end
+for df in (train_penguins, val_penguins), subdf in groupby(df, :species)
+    scatter!(subdf.bill_length_mm, subdf.flipper_length_mm; cycle=[:color, :marker])
 end
 group_marker = [
-    MarkerElement(; marker=m, color=:black, strokecolor=:transparent, markersize=20) for
-    m in (:circle, :diamond)
+    MarkerElement(; marker=m, color=:black, strokecolor=:transparent) for
+    m in theme(ax.scene, :palette).marker[1:2]
 ]
-group_color = [PolyElement(; color=Dark2_8[i], strokecolor=:transparent) for i in 1:3]
+group_color = [
+    PolyElement(; color=c, strokecolor=:black) for c in theme(ax.scene, :palette).color
+]
 Legend(
     f[1, 2],
     [group_marker, group_color],
