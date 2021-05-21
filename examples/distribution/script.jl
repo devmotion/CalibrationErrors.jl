@@ -112,8 +112,8 @@ end;
 # estimator as approximation of the true value.
 
 # We provide simple histogram plots of our results. The mean value of the
-# estimates is indicated by a solid black vertical line and the analytic
-# calibration error is visualized as a dashed red line.
+# estimates is indicated by a solid vertical line and the analytic calibration error for the ECE
+# is visualized as a dashed line.
 
 function plot_estimates(set::EstimatesSet; ece=false)
     ## create figure
@@ -139,7 +139,7 @@ function plot_estimates(set::EstimatesSet; ece=false)
 
         ## indicate analytic calibration error for ECE
         if ece
-            vlines!(ax, [π * (m - 1) / m]; linewidth=2)
+            vlines!(ax, [π * (m - 1) / m]; linewidth=2, linestyle=:dash)
         end
     end
 
