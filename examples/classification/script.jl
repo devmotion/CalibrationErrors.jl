@@ -99,10 +99,10 @@ function plot_normal_fit(dists, species, xlabel)
     f = Figure()
     Axis(f[1, 1]; xlabel=xlabel, ylabel="density")
     xs = xrange(dists)
-    plots = map(enumerate(dists)) do (i, dist)
+    plots = map(dists) do dist
         ys = pdf.(dist, xs)
-        l = lines!(xs, ys; color=Dark2_8[i])
-        b = band!(xs, 0, ys; color=(Dark2_8[i], 0.2))
+        l = lines!(xs, ys)
+        b = band!(xs, 0, ys)
         return [l, b]
     end
     Legend(f[1, 2], plots, species, "species")
