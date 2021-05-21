@@ -56,10 +56,10 @@ for df in (train_penguins, val_penguins), subdf in groupby(df, :species)
 end
 group_marker = [
     MarkerElement(; marker=m, color=:black, strokecolor=:transparent) for
-    m in theme(ax.scene, :palette).marker[1:2]
+    m in theme(ax.scene, :palette).marker[][1:2]
 ]
 group_color = [
-    PolyElement(; color=c, strokecolor=:black) for c in theme(ax.scene, :palette).color
+    PolyElement(; color=c, strokecolor=:black) for c in theme(ax.scene, :palette).color[]
 ]
 Legend(
     f[1, 2],
