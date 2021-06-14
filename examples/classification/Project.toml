@@ -8,7 +8,7 @@ PalmerPenguins = "8b842266-38fa-440a-9b57-31493939ab85"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 
 [compat]
-CairoMakie = "0.5"
+CairoMakie = "0.6"
 CalibrationErrors = "0.5.13"
 DataFrames = "0.22.5, 1.0"
 Distances = "0.10.2"
