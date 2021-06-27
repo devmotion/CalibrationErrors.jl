@@ -7,15 +7,11 @@ using Reexport
 @reexport using KernelFunctions
 
 using Distances: Distances, Euclidean, SqEuclidean
-using MathOptInterface: MathOptInterface
+using OptimalTransport: OptimalTransport
 using PDMats: PDMats
 using Tulip: Tulip
 
 using LinearAlgebra: LinearAlgebra
-
-const MOI = MathOptInterface
-
-include("optimaltransport.jl")
 
 include("distances/types.jl")
 include("distances/bures.jl")

@@ -73,7 +73,7 @@ end
 
 function (s::SqMixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
     C = Distances.pairwise(SqWasserstein(), components(a), components(b))
-    return sqwasserstein(probs(a), probs(b), C, deepcopy(s.lpsolver))
+    return OptimalTransport.emd2(probs(a), probs(b), C, deepcopy(s.lpsolver))
 end
 
 function (m::MixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
