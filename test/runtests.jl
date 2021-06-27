@@ -1,5 +1,4 @@
 using CalibrationErrors
-using Distances
 using Distributions
 using StatsBase
 

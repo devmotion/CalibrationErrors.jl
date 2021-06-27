@@ -13,19 +13,19 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 deps = ["DataStructures", "Distances", "KernelFunctions", "LinearAlgebra", "Reexport", "Statistics", "StatsBase", "UnPack"]
 path = ".."
 uuid = "33913031-fe46-5864-950f-100836f47845"
-version = "0.5.19"
+version = "0.5.20"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "8b31cc69cbc38c5c826aaa1c890c694be3622d99"
+git-tree-sha1 = "be770c08881f7bb928dfd86d1ba83798f76cf62a"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.10.3"
+version = "0.10.9"
 
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "e4e2b39db08f967cc1360951f01e8a75ec441cab"
+git-tree-sha1 = "dc7dedc2c2aa9faf59a55c622760a25cbefbe941"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "3.30.0"
+version = "3.31.0"
 
 [[CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -37,9 +37,9 @@ uuid = "a33af91c-f02d-484b-be07-31d278c5ca2b"
 version = "0.1.0"
 
 [[DataAPI]]
-git-tree-sha1 = "dfb3b7e89e395be1e25c2ad6d7690dc29cc53b1d"
+git-tree-sha1 = "ee400abb2298bd13bfc3df1c412ed228061a2385"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
-version = "1.6.0"
+version = "1.7.0"
 
 [[DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -73,9 +73,9 @@ version = "0.8.5"
 
 [[Documenter]]
 deps = ["Base64", "Dates", "DocStringExtensions", "IOCapture", "InteractiveUtils", "JSON", "LibGit2", "Logging", "Markdown", "REPL", "Test", "Unicode"]
-git-tree-sha1 = "5acbebf1be22db43589bc5aa1bb5fcc378b17780"
+git-tree-sha1 = "621850838b3e74dd6dd047b5432d2e976877104e"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-version = "0.27.0"
+version = "0.27.2"
 
 [[Downloads]]
 deps = ["ArgTools", "LibCURL", "NetworkOptions"]
@@ -94,10 +94,10 @@ uuid = "d9f16b24-f501-4c13-a1f2-28368ffc5196"
 version = "0.2.1"
 
 [[IOCapture]]
-deps = ["Logging"]
-git-tree-sha1 = "1868e4e7ad2f93d8de0904d89368c527b46aa6a1"
+deps = ["Logging", "Random"]
+git-tree-sha1 = "f7be53659ab06ddc986428d3a9dcc95f6fa6705a"
 uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.2.1"
+version = "0.2.2"
 
 [[InteractiveUtils]]
 deps = ["Markdown"]
@@ -117,9 +117,9 @@ version = "0.21.1"
 
 [[KernelFunctions]]
 deps = ["ChainRulesCore", "Compat", "CompositionsBase", "Distances", "FillArrays", "Functors", "LinearAlgebra", "Random", "Requires", "SpecialFunctions", "StatsBase", "StatsFuns", "TensorCore", "Test", "ZygoteRules"]
-git-tree-sha1 = "c7b25bc625ca2ee217021d29e3ddf031967bf0ff"
+git-tree-sha1 = "e8b5ba31b6d18695fd46bfcd8557682839023195"
 uuid = "ec8451be-7e33-11e9-00cf-bbf324bd1392"
-version = "0.10.5"
+version = "0.10.6"
 
 [[LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]

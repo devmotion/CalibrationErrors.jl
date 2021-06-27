@@ -3,7 +3,7 @@ module CalibrationErrors
 using Reexport
 
 using DataStructures
-using Distances
+@reexport using Distances
 @reexport using KernelFunctions
 using StatsBase
 using UnPack
