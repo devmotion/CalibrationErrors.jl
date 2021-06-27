@@ -5,7 +5,6 @@
 using CairoMakie
 using CalibrationErrors
 using DataFrames
-using Distances
 using Distributions
 using PalmerPenguins
 using Query
