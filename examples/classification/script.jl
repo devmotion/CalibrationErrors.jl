@@ -53,7 +53,7 @@ val_penguins = penguins[.!train, :];
 
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 plt =
-    data(df) *
+    data(penguins) *
     mapping(
         :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
     ) *
