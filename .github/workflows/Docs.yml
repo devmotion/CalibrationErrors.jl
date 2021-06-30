@@ -36,5 +36,7 @@ jobs:
             doctest(CalibrationErrors)'
       - run: julia --project=docs docs/make.jl
         env:
+          DATADEPS_ALWAYS_ACCEPT: true # Bypass the accept download prompt
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JULIA_DEBUG: Documenter # Print `@debug` statements (https://github.com/JuliaDocs/Documenter.jl/issues/955)
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}

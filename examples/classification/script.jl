@@ -2,6 +2,7 @@
 #
 # ## Packages
 
+using AlgebraOfGraphics
 using CairoMakie
 using CalibrationErrors
 using DataFrames
@@ -11,8 +12,9 @@ using Query
 
 using Random
 
-## Set color cycle globally
-set_theme!(; palette=(color=Makie.wong_colors(0.8)[1:3],))
+## Plotting settings
+set_aog_theme!()
+CairoMakie.activate!(; type="svg")
 
 # ## Data
 #
@@ -24,51 +26,33 @@ set_theme!(; palette=(color=Makie.wong_colors(0.8)[1:3],))
 
 penguins = dropmissing(DataFrame(PalmerPenguins.load()))
 
-f = Figure()
-ax = Axis(f[1, 1]; xlabel="bill length [mm]", ylabel="flipper length [mm]")
-for (i, (key, df)) in enumerate(pairs(groupby(penguins, :species)))
-    scatter!(df.bill_length_mm, df.flipper_length_mm; label=key.species)
-end
-Legend(f[1, 2], ax, "species")
-#!jl save("./figures/penguins.svg", f);
-
-#!jl # ![](./figures/penguins.svg)
+penguins_mapping =
+    data(penguins) * mapping(
+        :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
+    )
+draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
 
 # We split the data randomly into a training and validation dataset. The training dataset
 # contains around 60% of the samples.
 
 Random.seed!(1234)
-idxs = shuffle(axes(penguins, 1))
-k = floor(Int, 0.6 * length(idxs))
-train_idxs = @view idxs[1:k]
-val_idxs = @view idxs[(k + 1):end]
+n = nrow(penguins)
+k = floor(Int, 0.7 * n)
+Random.seed!(100)
+train = shuffle!(vcat(trues(k), falses(n - k)))
 
-train_penguins = penguins[train_idxs, :]
-val_penguins = penguins[val_idxs, :];
+penguins.train = train
+
+train_penguins = penguins[train, :]
+val_penguins = penguins[.!train, :];
 
 #-
 
-f = Figure()
-ax = Axis(f[1, 1]; xlabel="bill length [mm]", ylabel="flipper length [mm]")
-for df in (train_penguins, val_penguins), subdf in groupby(df, :species)
-    scatter!(subdf.bill_length_mm, subdf.flipper_length_mm; cycle=[:color, :marker])
-end
-group_marker = [
-    MarkerElement(; marker=m, color=:black, strokecolor=:transparent) for
-    m in theme(ax.scene, :palette).marker[][1:2]
-]
-group_color = [
-    PolyElement(; color=c, strokecolor=:black) for c in theme(ax.scene, :palette).color[]
-]
-Legend(
-    f[1, 2],
-    [group_marker, group_color],
-    [["training", "validation"], string.(levels(penguins.species))],
-    ["dataset", "species"],
+dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
+draw(
+    penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7);
+    axis=(height=300,),
 )
-#!jl save("./figures/penguins_datasets.svg", f);
-
-#!jl # ![](./figures/penguins_datasets.svg)
 
 # ## Fitting normal distributions
 #
@@ -109,14 +93,10 @@ function plot_normal_fit(dists, species, xlabel)
 end
 
 plot_normal_fit(penguins_fit.bill, penguins_fit.species, "bill length [mm]")
-#!jl save("./figures/normal_fit_bill.svg", current_figure());
 
-#!jl # ![](./figures/normal_fit_bill.svg)
+#-
 
 plot_normal_fit(penguins_fit.flipper, penguins_fit.species, "flipper length [mm]")
-#!jl save("./figures/normal_fit_flipper.svg", current_figure());
-
-#!jl # ![](./figures/normal_fit_flipper.svg)
 
 # ## Naive Bayes classifier
 #

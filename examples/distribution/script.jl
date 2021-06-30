@@ -11,6 +11,8 @@ using LinearAlgebra
 using Random
 using Statistics
 
+CairoMakie.activate!(; type="svg")
+
 # ## Introduction
 #
 # This example is taken from the publication
@@ -209,9 +211,6 @@ end
 Random.seed!(1234)
 data = estimates(_ -> ECE(UniformBinning(10), TotalVariation()))
 plot_estimates(data; ece=true)
-#!jl save("./figures/ece_uniform.svg", current_figure());
-
-#!jl # ![](./figures/ece_uniform.svg)
 
 # ### Non-uniform binning
 #
@@ -226,9 +225,6 @@ plot_estimates(data; ece=true)
 Random.seed!(1234)
 data = estimates(_ -> ECE(MedianVarianceBinning(10), TotalVariation()))
 plot_estimates(data; ece=true)
-#!jl save("./figures/ece_medianvariance.svg", current_figure());
-
-#!jl # ![](./figures/ece_medianvariance.svg)
 
 # ## Biased estimator of the squared kernel calibration error
 #
@@ -236,9 +232,6 @@ plot_estimates(data; ece=true)
 Random.seed!(1234)
 data = estimates(BiasedSKCE ∘ MedianHeuristicKernel(250))
 plot_estimates(data)
-#!jl save("./figures/skce_biased.svg", current_figure());
-
-#!jl # ![](./figures/skce_biased.svg)
 
 # ## Unbiased estimators of the squared kernel calibration error
 #
@@ -246,13 +239,7 @@ plot_estimates(data)
 Random.seed!(1234)
 data = estimates(UnbiasedSKCE ∘ MedianHeuristicKernel(250))
 plot_estimates(data)
-#!jl save("./figures/skce_unbiased.svg", current_figure());
-
-#!jl # ![](./figures/skce_unbiased.svg)
 
 Random.seed!(1234)
 data = estimates(BlockUnbiasedSKCE ∘ MedianHeuristicKernel(250))
 plot_estimates(data)
-#!jl save("./figures/skce_blockunbiased.svg", current_figure());
-
-#!jl # ![](./figures/skce_blockunbiased.svg)
