@@ -47,7 +47,7 @@ train = shuffle!(vcat(trues(k), falses(n - k)))
 penguins.train = train
 
 train_penguins = penguins[train, :]
-val_penguins = penguins[!train, :];
+val_penguins = penguins[.!train, :];
 
 #-
 
