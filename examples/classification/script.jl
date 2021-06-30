@@ -13,7 +13,7 @@ using Query
 using Random
 
 ## Set color cycle globally
-set_theme!(; palette=(color=Makie.wong_colors(0.8)[1:3],))
+set_aog_theme!()
 CairoMakie.activate!(; type="svg")
 
 # ## Data
@@ -26,14 +26,11 @@ CairoMakie.activate!(; type="svg")
 
 penguins = dropmissing(DataFrame(PalmerPenguins.load()))
 
-plt =
-    data(penguins) *
+penguins_mapping = data(penguins) *
     mapping(
         :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
-    ) *
-    mapping(; color=:species) *
-    visual(; alpha=0.7)
-draw(plt)
+    )
+draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
 
 # We split the data randomly into a training and validation dataset. The training dataset
 # contains around 60% of the samples.
@@ -52,14 +49,10 @@ val_penguins = penguins[.!train, :];
 #-
 
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
-plt =
-    data(penguins) *
-    mapping(
-        :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
-    ) *
-    mapping(; color=:species, col=dataset) *
-    visual(; alpha=0.7)
-draw(plt)
+draw(
+    penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7);
+    height=300
+)
 
 # ## Fitting normal distributions
 #
