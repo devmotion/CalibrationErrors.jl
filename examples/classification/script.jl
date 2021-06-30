@@ -51,7 +51,7 @@ val_penguins = penguins[.!train, :];
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 draw(
     penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7);
-    height=300,
+    axis=(height=300,),
 )
 
 # ## Fitting normal distributions
