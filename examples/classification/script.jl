@@ -26,8 +26,8 @@ CairoMakie.activate!(; type="svg")
 
 penguins = dropmissing(DataFrame(PalmerPenguins.load()))
 
-penguins_mapping = data(penguins) *
-    mapping(
+penguins_mapping =
+    data(penguins) * mapping(
         :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
     )
 draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
@@ -51,7 +51,7 @@ val_penguins = penguins[.!train, :];
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 draw(
     penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7);
-    height=300
+    height=300,
 )
 
 # ## Fitting normal distributions
