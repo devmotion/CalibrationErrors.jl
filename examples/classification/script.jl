@@ -12,7 +12,7 @@ using Query
 
 using Random
 
-## Set color cycle globally
+## Plotting settings
 set_aog_theme!()
 CairoMakie.activate!(; type="svg")
 
