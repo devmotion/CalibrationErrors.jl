@@ -1,16 +1,20 @@
 [deps]
+AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 CalibrationErrors = "33913031-fe46-5864-950f-100836f47845"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 PalmerPenguins = "8b842266-38fa-440a-9b57-31493939ab85"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 
 [compat]
+AlgebraOfGraphics = "0.4"
 CairoMakie = "0.6"
 CalibrationErrors = "0.5.13"
 DataFrames = "0.22.5, 1.0"
 Distributions = "0.24.15, 0.25"
+Literate = "2.8"
 PalmerPenguins = "0.1.2"
 Query = "1.0"
 julia = "1.3"
