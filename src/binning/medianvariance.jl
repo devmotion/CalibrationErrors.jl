@@ -50,7 +50,7 @@ function perform(
             (idxs_predictions, argmax_var_predictions) => max_var_predictions,
             Base.Order.Reverse,
         )
-        bins = Vector{typeof(Bin(predictions,targets))}(undef, 0)
+        bins = Vector{typeof(Bin(predictions, targets))}(undef, 0)
 
         nbins = 1
         while nbins < maxbins && !isempty(queue)
