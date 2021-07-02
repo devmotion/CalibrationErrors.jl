@@ -41,9 +41,7 @@
 
                 # compute indices of all predictions in the same bin
                 idxs = filter(
-                    i ->
-                        idx ==
-                        CalibrationErrors.binindex(predictions[i], nbins),
+                    i -> idx == CalibrationErrors.binindex(predictions[i], nbins),
                     1:nsamples,
                 )
 
