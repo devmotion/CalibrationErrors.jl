@@ -22,6 +22,36 @@
         @test_throws ArgumentError CalibrationErrors.binindex([1.5, 0.5], 10, Val(2))
     end
 
+    @testset "Basic tests" begin
+        # sample predictions and targets
+        nsamples = 1_000
+        predictions = rand(nsamples)
+        targets = rand(Bool, nsamples)
+
+        for nbins in (1, 10, 100, 500, 1_000)
+            # bin data in bins of uniform width
+            bins = @inferred(
+                CalibrationErrors.perform(UniformBinning(nbins), predictions, targets)
+            )
+
+            # check all bins
+            for bin in bins
+                # compute index of bin from average prediction
+                idx = CalibrationErrors.binindex(bin.mean_predictions, nbins)
+
+                # compute indices of all predictions in the same bin
+                idxs = filter(
+                    i -> idx == CalibrationErrors.binindex(predictions[i], nbins),
+                    1:nsamples,
+                )
+
+                @test bin.nsamples == length(idxs)
+                @test bin.mean_predictions ≈ mean(predictions[idxs])
+                @test bin.proportions_targets ≈ mean(targets[idxs])
+            end
+        end
+    end
+
     @testset "Basic tests ($nclasses classes)" for nclasses in (2, 10, 100)
         # sample predictions and targets
         nsamples = 1_000

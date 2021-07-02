@@ -16,9 +16,41 @@ end
 
 function perform(
     binning::UniformBinning,
-    predictions::AbstractVector{<:AbstractVector{T}},
+    predictions::AbstractVector{<:Real},
+    targets::AbstractVector{Bool},
+)
+    @unpack nbins = binning
+
+    # create dictionary of bins
+    T = eltype(float(zero(eltype(predictions))))
+    bins = Dict{Int,Bin{T}}()
+
+    # reserve some memory (very rough guess)
+    nsamples = length(predictions)
+    sizehint!(bins, min(nbins, nsamples))
+
+    # for all other samples
+    @inbounds for (prediction, target) in zip(predictions, targets)
+        # compute index of bin
+        index = binindex(prediction, nbins)
+
+        # create new bin or update existing one
+        bin = get(bins, index, nothing)
+        if bin === nothing
+            bins[index] = Bin(prediction, target)
+        else
+            adddata!(bin, prediction, target)
+        end
+    end
+
+    return values(bins)
+end
+
+function perform(
+    binning::UniformBinning,
+    predictions::AbstractVector{<:AbstractVector{<:Real}},
     targets::AbstractVector{<:Integer},
-) where {T<:Real}
+)
     return _perform(binning, predictions, targets, Val(length(predictions[1])))
 end
 
@@ -36,8 +68,9 @@ function _perform(
 
     # reserve some memory (very rough guess)
     nsamples = length(predictions)
-    sizehint!(bins, nsamples)
-    sizehint!(binindices, nsamples)
+    guess = min(nbins, nsamples)
+    sizehint!(bins, guess)
+    sizehint!(binindices, guess)
 
     # for all other samples
     @inbounds for i in 2:nsamples

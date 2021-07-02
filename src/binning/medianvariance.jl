@@ -25,9 +25,9 @@ MedianVarianceBinning(minsize::Int=10) = MedianVarianceBinning(minsize, typemax(
 
 function perform(
     alg::MedianVarianceBinning,
-    predictions::AbstractVector{<:AbstractVector{T}},
+    predictions::AbstractVector{<:AbstractVector{<:Real}},
     targets::AbstractVector{<:Integer},
-) where {T<:Real}
+)
     @unpack minsize, maxbins = alg
 
     # check if binning is not possible
@@ -50,8 +50,7 @@ function perform(
             (idxs_predictions, argmax_var_predictions) => max_var_predictions,
             Base.Order.Reverse,
         )
-        S = typeof(zero(T) / 1)
-        bins = Vector{Bin{S}}(undef, 0)
+        bins = Vector{typeof(Bin(predictions, targets))}(undef, 0)
 
         nbins = 1
         while nbins < maxbins && !isempty(queue)

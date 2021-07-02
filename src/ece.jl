@@ -31,14 +31,11 @@ In particular, distance measures of the package
 ECE(binning::AbstractBinningAlgorithm) = ECE(binning, TotalVariation())
 
 # estimate ECE
-function (ece::ECE)(
-    predictions::AbstractVector{<:AbstractVector{<:Real}},
-    targets::AbstractVector{<:Integer},
-)
+function (ece::ECE)(predictions::AbstractVector, targets::AbstractVector)
     @unpack binning, distance = ece
 
     # check number of samples
-    nsamples = check_nsamples(predictions, targets)
+    check_nsamples(predictions, targets)
 
     # bin predictions and labels
     bins = perform(binning, predictions, targets)
@@ -50,7 +47,7 @@ function (ece::ECE)(
 
     # evaluate the distance in the first bin
     @inbounds begin
-        bin = bins[1]
+        bin, state = iterate(bins) # there is always at least one bin
         x = distance(bin.mean_predictions, bin.proportions_targets)
 
         # initialize the estimate
@@ -58,9 +55,12 @@ function (ece::ECE)(
 
         # for all other bins
         n = bin.nsamples
-        for i in 2:nbins
+        while true
+            bin_state = iterate(bins, state)
+            bin_state === nothing && break
+
             # evaluate the distance
-            bin = bins[i]
+            bin, state = bin_state
             x = distance(bin.mean_predictions, bin.proportions_targets)
 
             # update the estimate
