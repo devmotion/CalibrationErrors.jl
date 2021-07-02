@@ -47,7 +47,7 @@ function (ece::ECE)(predictions::AbstractVector, targets::AbstractVector)
 
     # evaluate the distance in the first bin
     @inbounds begin
-        bin = bins[1]
+        bin, state = iterate(bins) # there is always at least one bin
         x = distance(bin.mean_predictions, bin.proportions_targets)
 
         # initialize the estimate
@@ -55,9 +55,12 @@ function (ece::ECE)(predictions::AbstractVector, targets::AbstractVector)
 
         # for all other bins
         n = bin.nsamples
-        for i in 2:nbins
+        while true
+            bin_state = iterate(bins, state)
+            bin_state === nothing && break
+
             # evaluate the distance
-            bin = bins[i]
+            bin, state = bin_state
             x = distance(bin.mean_predictions, bin.proportions_targets)
 
             # update the estimate
