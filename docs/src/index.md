@@ -17,6 +17,16 @@ statistical hypothesis tests of calibration.
 
 [rcalibration](https://github.com/devmotion/rcalibration) is an R interface for CalibrationErrors.jl, CalibrationErrorsDistributions.jl, and CalibrationTests.jl.
 
+## Talk at JuliaCon 2021
+
+```@raw html
+<center>
+<iframe width="560" style="height:315px" src="https://www.youtube-nocookie.com/embed/PrLsXFvwzuA" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
+```
+
+The slides of the talk are available as [Pluto notebook](https://talks.widmann.dev/2021/07/calibration/).
+
 ## Citing
 
 If you use CalibrationsErrors.jl as part of your research, teaching, or other activities,
