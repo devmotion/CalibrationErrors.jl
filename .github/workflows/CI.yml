@@ -27,9 +27,6 @@ jobs:
           - x64
         include:
           - version: '1'
-            os: ubuntu-latest
-            arch: x86
-          - version: '1'
             os: macOS-latest
             arch: x64
           - version: '1'
@@ -56,7 +53,7 @@ jobs:
         with:
           coverage: ${{ matrix.version == '1' && matrix.os == 'ubuntu-latest' }}
       - uses: julia-actions/julia-processcoverage@v1
-        if: matrix.coverage
+        if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
       - uses: codecov/codecov-action@v1
         if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
         with:
