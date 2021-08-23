@@ -8,7 +8,7 @@
         predictions_σ = rand(nsamples)
         predictions_normal = map(Normal, predictions_μ, predictions_σ)
         predictions_mvnormal = map(predictions_μ, predictions_σ) do μ, σ
-            MvNormal([μ], σ)
+            MvNormal([μ], σ^2 * I)
         end
 
         # create targets
@@ -20,7 +20,7 @@
         testpredictions_σ = rand(ntestsamples)
         testpredictions_normal = map(Normal, testpredictions_μ, testpredictions_σ)
         testpredictions_mvnormal = map(testpredictions_μ, testpredictions_σ) do μ, σ
-            MvNormal([μ], σ)
+            MvNormal([μ], σ^2 * I)
         end
         testtargets_normal = randn(ntestsamples)
         testtargets_mvnormal = map(vcat, testtargets_normal)
@@ -55,11 +55,11 @@
 
         for dim in (1, 10)
             # create predictions and targets
-            predictions = [MvNormal(randn(dim), rand()) for _ in 1:nsamples]
+            predictions = [MvNormal(randn(dim), rand() * I) for _ in 1:nsamples]
             targets = [randn(dim) for _ in 1:nsamples]
 
             # create random test locations
-            testpredictions = [MvNormal(randn(dim), rand()) for _ in 1:ntestsamples]
+            testpredictions = [MvNormal(randn(dim), rand() * I) for _ in 1:ntestsamples]
             testtargets = [randn(dim) for _ in 1:ntestsamples]
 
             for γ in (1.0, rand())
@@ -118,7 +118,9 @@
         A = randn(dim, dim)
 
         for d in (
-            MvNormal(μ, rand()), MvNormal(μ, rand(dim)), MvNormal(μ, Symmetric(I + A' * A))
+            MvNormal(μ, rand() * I),
+            MvNormal(μ, Diagonal(rand(dim))),
+            MvNormal(μ, Symmetric(I + A' * A)),
         )
             # unscaled transformation
             for t in (

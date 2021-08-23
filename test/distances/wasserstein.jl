@@ -10,12 +10,12 @@
         @test SqWasserstein()(normal1, normal2) == (μ1 - μ2)^2 + (σ1 - σ2)^2
 
         for (d1, d2) in Iterators.product((normal1, normal2), (normal1, normal2))
-            mvnormal1 = MvNormal([mean(d1)], [std(d1)])
-            mvnormal2 = MvNormal([mean(d2)], [std(d2)])
+            mvnormal1 = MvNormal([mean(d1)], fill(var(d1), 1, 1))
+            mvnormal2 = MvNormal([mean(d2)], fill(var(d2), 1, 1))
             @test SqWasserstein()(mvnormal1, mvnormal2) == SqWasserstein()(d1, d2)
 
-            mvnormal_fill1 = MvNormal(fill(mean(d1), 10), fill(std(d1), 10))
-            mvnormal_fill2 = MvNormal(fill(mean(d2), 10), fill(std(d2), 10))
+            mvnormal_fill1 = MvNormal(fill(mean(d1), 10), Diagonal(fill(var(d1), 10)))
+            mvnormal_fill2 = MvNormal(fill(mean(d2), 10), Diagonal(fill(var(d2), 10)))
             @test SqWasserstein()(mvnormal_fill1, mvnormal_fill2) ≈
                   10 * SqWasserstein()(d1, d2)
         end
@@ -55,13 +55,13 @@
         @test Wasserstein()(normal1, normal2) == sqrt(SqWasserstein()(normal1, normal2))
 
         for (d1, d2) in Iterators.product((normal1, normal2), (normal1, normal2))
-            mvnormal1 = MvNormal([mean(d1)], [std(d1)])
-            mvnormal2 = MvNormal([mean(d2)], [std(d2)])
+            mvnormal1 = MvNormal([mean(d1)], fill(var(d1), 1, 1))
+            mvnormal2 = MvNormal([mean(d2)], fill(var(d2), 1, 1))
             @test Wasserstein()(mvnormal1, mvnormal2) == Wasserstein()(d1, d2)
             @test Wasserstein()(mvnormal1, mvnormal2) == sqrt(SqWasserstein()(d1, d2))
 
-            mvnormal_fill1 = MvNormal(fill(mean(d1), 10), fill(std(d1), 10))
-            mvnormal_fill2 = MvNormal(fill(mean(d2), 10), fill(std(d2), 10))
+            mvnormal_fill1 = MvNormal(fill(mean(d1), 10), Diagonal(fill(var(d1), 10)))
+            mvnormal_fill2 = MvNormal(fill(mean(d2), 10), Diagonal(fill(var(d2), 10)))
             @test Wasserstein()(mvnormal_fill1, mvnormal_fill2) ≈
                   sqrt(10) * Wasserstein()(d1, d2)
             @test Wasserstein()(mvnormal_fill1, mvnormal_fill2) ==
