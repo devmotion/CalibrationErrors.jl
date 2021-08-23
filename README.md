@@ -65,4 +65,4 @@ classification: A unifying framework](https://proceedings.neurips.cc/paper/2019/
 
 Widmann, D., Lindsten, F., & Zachariah, D. (2021).
 [Calibration tests beyond classification](https://openreview.net/forum?id=-bxf89v3Nx).
-To be presented at *ICLR 2021*.
+*International Conference on Learning Representations (ICLR 2021)*.
