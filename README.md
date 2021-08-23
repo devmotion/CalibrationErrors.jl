@@ -46,6 +46,12 @@ statistical hypothesis tests of calibration.
 
 [rcalibration](https://github.com/devmotion/rcalibration) is an R interface for CalibrationErrors.jl, CalibrationErrorsDistributions.jl, and CalibrationTests.jl.
 
+## Talk at JuliaCon 2021
+
+[![Calibration analysis of probabilistic models in Julia](http://img.youtube.com/vi/PrLsXFvwzuA/0.jpg)](http://www.youtube.com/watch?v=PrLsXFvwzuA)
+
+The slides of the talk are available as [Pluto notebook](https://talks.widmann.dev/2021/07/calibration/).
+
 ## References
 
 If you use CalibrationsErrors.jl as part of your research, teaching, or other activities,
@@ -57,4 +63,4 @@ classification: A unifying framework](https://proceedings.neurips.cc/paper/2019/
 
 Widmann, D., Lindsten, F., & Zachariah, D. (2021).
 [Calibration tests beyond classification](https://openreview.net/forum?id=-bxf89v3Nx).
-To be presented at *ICLR 2021*.
+*International Conference on Learning Representations (ICLR 2021)*.
