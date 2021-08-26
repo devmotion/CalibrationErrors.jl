@@ -222,7 +222,7 @@ ece(val_probs, val_yint)
 # with length scale $\nu > 0$ for predictions $\mu,\mu'$ and corresponding targets $y, y'$.
 # For simplicity, we estimate length scale $\nu$ with the median heuristic.
 
-distances = pairwise(SqEuclidean(), train_probs)
+distances = pairwise(SqEuclidean(), RowVecs(pdf(train_predict, MLJ.classes(y))))
 ν = sqrt(median(distances[i] for i in CartesianIndices(distances) if i[1] < i[2]))
 kernel = with_lengthscale(GaussianKernel(), ν) ⊗ WhiteKernel();
 
