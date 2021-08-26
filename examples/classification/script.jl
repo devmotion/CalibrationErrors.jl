@@ -42,8 +42,7 @@ k = floor(Int, 0.7 * n)
 Random.seed!(100)
 penguins.train = shuffle!(vcat(trues(k), falses(n - k)))
 
-#-
-
+## Plot the training and validation data
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 plt = penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7)
 draw(plt; axis=(height=300,))
@@ -61,7 +60,7 @@ y, X = unpack(
     :bill_length_mm => MLJ.Continuous,
     :flipper_length_mm => MLJ.Continuous,
 )
-model = fit!(machine(GaussianNBClassifier(), X, y); rows=penguins.train)
+model = fit!(machine(GaussianNBClassifier(), X, y); rows=penguins.train);
 
 # We plot the estimated normal distributions.
 
@@ -126,16 +125,11 @@ fg
 #
 # ### Log-likelihood
 #
-# We compute the average log-likelihood of the training and validation data. It is
-# equivalent to the negative cross-entropy.
-
-train_y = y[penguins.train]
--cross_entropy(train_predict, train_y)
-
-#-
+# We compute the average log-likelihood of the validation data. It is equivalent to the
+# negative cross-entropy.
 
 val_y = y[.!penguins.train]
--cross_entropy(val_predict, val_y)
+-mean(cross_entropy(val_predict, val_y))
 
 # ### Brier score
 #
@@ -144,11 +138,7 @@ val_y = y[.!penguins.train]
 # The Brier score is another strictly proper scoring rule that can be used for evaluating
 # probabilistic predictions.
 
-brier_score(train_predict, train_y)
-
-#-
-
-brier_score(val_predict, val_y)
+mean(brier_score(val_predict, val_y))
 
 # ### Expected calibration error
 #
@@ -186,7 +176,7 @@ brier_score(val_predict, val_y)
 #
 # One approach is to use bins of uniform size.
 
-ece = ECE(UniformBinning(10), (μ, y) -> kl_divergence(y, μ))
+ece = ECE(UniformBinning(10), (μ, y) -> kl_divergence(y, μ));
 
 # We have to work with a numerical encoding of the true penguin species and a
 # corresponding vector of predictions. We use [`RowVecs`](https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#KernelFunctions.RowVecs)
@@ -194,27 +184,16 @@ ece = ECE(UniformBinning(10), (μ, y) -> kl_divergence(y, μ))
 # are the predictions. If we would provide predictions as columns of a matrix, we would have
 # to use [`ColVecs`](https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#KernelFunctions.ColVecs).
 
-train_yint = map(MLJ.levelcode, train_y)
 val_yint = map(MLJ.levelcode, val_y)
-
-train_probs = RowVecs(pdf(train_predict, MLJ.classes(y)))
 val_probs = RowVecs(pdf(val_predict, MLJ.classes(y)));
 
-#-
-
-ece(train_probs, train_yint)
-
-#-
+# We compute the estimate on the validation data:
 
 ece(val_probs, val_yint)
 
 # For the squared Euclidean distance we obtain:
 
 ece = ECE(UniformBinning(10), SqEuclidean())
-ece(train_probs, train_yint)
-
-#-
-
 ece(val_probs, val_yint)
 
 # Alternatively, one can use a data-dependent binning scheme that tries to split the
@@ -223,19 +202,11 @@ ece(val_probs, val_yint)
 # With the KL divergence we get:
 
 ece = ECE(MedianVarianceBinning(5), (μ, y) -> kl_divergence(y, μ))
-ece(train_probs, train_yint)
-
-#-
-
 ece(val_probs, val_yint)
 
 # For the squared Euclidean distance we obtain:
 
 ece = ECE(MedianVarianceBinning(5), SqEuclidean())
-ece(train_probs, train_yint)
-
-#-
-
 ece(val_probs, val_yint)
 
 # We see that the estimates (of the same theoretical quantity!) are highly dependent on the
@@ -255,13 +226,9 @@ distances = pairwise(SqEuclidean(), train_probs)
 ν = sqrt(median(distances[i] for i in CartesianIndices(distances) if i[1] < i[2]))
 kernel = with_lengthscale(GaussianKernel(), ν) ⊗ WhiteKernel();
 
-# We obtain the following biased estimates of the squared KCE (SKCE):
+# We obtain the following biased estimate of the squared KCE (SKCE):
 
 skce = BiasedSKCE(kernel)
-skce(train_probs, train_yint)
-
-#-
-
 skce(val_probs, val_yint)
 
 # Similar to the biased estimates of the ECE, the biased estimates of the SKCE are always
@@ -269,10 +236,6 @@ skce(val_probs, val_yint)
 # is (close to being) calibrated:
 
 skce = UnbiasedSKCE(kernel)
-skce(train_probs, train_yint)
-
-#-
-
 skce(val_probs, val_yint)
 
 # When the datasets are large, the quadratic sample complexity of the standard biased and
@@ -284,8 +247,4 @@ skce(val_probs, val_yint)
 # with linear sample complexity:
 
 skce = BlockUnbiasedSKCE(kernel, 2)
-skce(train_probs, train_yint)
-
-#-
-
 skce(val_probs, val_yint)
