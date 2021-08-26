@@ -185,16 +185,16 @@ function (f::MedianHeuristicKernel)((predictions, targets))
     distances = f.distances
     cache = f.cache
 
-    ## compute inverse lengthscale with median heuristic
+    ## compute lengthscale with median heuristic
     pairwise!(distances, TotalVariation(), predictions)
     k = 0
     @inbounds for j in axes(distances, 2), i in 1:(j - 1)
         cache[k += 1] = distances[i, j]
     end
-    γ = inv(median!(cache))
+    λ = median!(cache)
 
     ## create tensor product kernel
-    kernel_predictions = ExponentialKernel(; metric=TotalVariation()) ∘ ScaleTransform(γ)
+    kernel_predictions = with_lengthscale(ExponentialKernel(; metric=TotalVariation()), λ)
     kernel_targets = WhiteKernel()
 
     return kernel_predictions ⊗ kernel_targets
