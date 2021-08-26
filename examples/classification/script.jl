@@ -7,8 +7,9 @@ using CairoMakie
 using CalibrationErrors
 using DataFrames
 using Distributions
+using MLJ
+using MLJNaiveBayesInterface
 using PalmerPenguins
-using Query
 
 using Random
 
@@ -39,64 +40,45 @@ Random.seed!(1234)
 n = nrow(penguins)
 k = floor(Int, 0.7 * n)
 Random.seed!(100)
-train = shuffle!(vcat(trues(k), falses(n - k)))
+penguins.train = shuffle!(vcat(trues(k), falses(n - k)))
 
-penguins.train = train
-
-train_penguins = penguins[train, :]
-val_penguins = penguins[.!train, :];
-
-#-
-
+## Plot the training and validation data
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
-draw(
-    penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7);
-    axis=(height=300,),
-)
+plt = penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7)
+draw(plt; axis=(height=300,))
 
 # ## Fitting normal distributions
 #
 # For each species, we fit independent normal distributions to the observations of the bill
 # and flipper length in the training data, using maximum likelihood estimation.
 
-penguins_fit = @from i in train_penguins begin
-    @group i by i.species into g
-    @select {
-        species = key(g),
-        proportion = length(g) / nrow(train_penguins),
-        bill = fit(Normal, g.bill_length_mm),
-        flipper = fit(Normal, g.flipper_length_mm),
-    }
-    @collect DataFrame
-end
+y, X = unpack(
+    penguins,
+    ==(:species),
+    x -> x === :bill_length_mm || x === :flipper_length_mm;
+    :species => Multiclass,
+    :bill_length_mm => MLJ.Continuous,
+    :flipper_length_mm => MLJ.Continuous,
+)
+model = fit!(machine(GaussianNBClassifier(), X, y); rows=penguins.train);
 
 # We plot the estimated normal distributions.
 
-function xrange(dists, alpha=0.0001)
-    xmin = minimum(Base.Fix2(quantile, alpha), dists)
-    xmax = maximum(Base.Fix2(quantile, 1 - alpha), dists)
-    return range(xmin, xmax; length=1_000)
-end
+## plot datasets
+fg = draw(plt; axis=(height=300,))
 
-function plot_normal_fit(dists, species, xlabel)
-    f = Figure()
-    Axis(f[1, 1]; xlabel=xlabel, ylabel="density")
-    xs = xrange(dists)
-    plots = map(dists) do dist
-        ys = pdf.(dist, xs)
-        l = lines!(xs, ys)
-        b = band!(xs, 0, ys)
-        return [l, b]
+## plot Gaussian distributions
+xgrid = range(extrema(penguins.bill_length_mm)...; length=100)
+ygrid = range(extrema(penguins.flipper_length_mm)...; length=100)
+let f = (x, y, dist) -> pdf(dist, [x, y])
+    for (class, color) in zip(classes(y), Makie.wong_colors())
+        pdfs = f.(xgrid, ygrid', Ref(model.fitresult.gaussians[class]))
+        contour!(fg.figure[1, 1], xgrid, ygrid, pdfs; color=color)
+        contour!(fg.figure[1, 2], xgrid, ygrid, pdfs; color=color)
     end
-    Legend(f[1, 2], plots, species, "species")
-    return f
 end
 
-plot_normal_fit(penguins_fit.bill, penguins_fit.species, "bill length [mm]")
-
-#-
-
-plot_normal_fit(penguins_fit.flipper, penguins_fit.species, "flipper length [mm]")
+fg
 
 # ## Naive Bayes classifier
 #
@@ -117,51 +99,37 @@ plot_normal_fit(penguins_fit.flipper, penguins_fit.species, "flipper length [mm]
 # $\mathbb{P}(\mathrm{flipper} \,|\, \mathrm{species})$ for each penguin species from
 # the training data. For the conditional distributions we used a Gaussian approximation.
 
-function predict_naive_bayes_classifier(fit, data)
-    ## Compute unnormalized probabilities
-    z =
-        log.(permutedims(fit.proportion)) .+
-        logpdf.(permutedims(fit.bill), data.bill_length_mm) .+
-        logpdf.(permutedims(fit.flipper), data.flipper_length_mm)
+predictions = MLJ.predict(model)
+train_predict = predictions[penguins.train]
+val_predict = predictions[.!penguins.train]
 
-    ## Normalize probabilities
-    u = maximum(z; dims=2)
-    z .= exp.(z .- u)
-    sum!(u, z)
-    z ./= u
+## Plot datasets
+fg = draw(plt; axis=(height=300,))
 
-    return DataFrame(z, fit.species)
+## Plot predictions
+predictions_grid = reshape(
+    MLJ.predict(model, reduce(hcat, vcat.(xgrid, ygrid'))'), length(xgrid), length(ygrid)
+)
+for (class, color) in zip(classes(y), Makie.wong_colors())
+    p = pdf.(predictions_grid, class)
+    contour!(fg.figure[1, 1], xgrid, ygrid, p; color=color)
+    contour!(fg.figure[1, 2], xgrid, ygrid, p; color=color)
 end
 
-train_predict = predict_naive_bayes_classifier(penguins_fit, train_penguins)
-val_predict = predict_naive_bayes_classifier(penguins_fit, val_penguins);
+fg
 
 # ## Evaluation
 #
 # We evaluate the probabilistic predictions of the naive Bayes classifier that we just
-# trained. It is easier to work with a numerical encoding of the true penguin species and a
-# corresponding vector of predictions.
-
-train_species = convert(Vector{Int}, indexin(train_penguins.species, names(train_predict)))
-train_probs = RowVecs(Matrix{Float64}(train_predict))
-
-val_species = convert(Vector{Int}, indexin(val_penguins.species, names(val_predict)))
-val_probs = RowVecs(Matrix{Float64}(val_predict));
-
+# trained.
+#
 # ### Log-likelihood
 #
-# We compute the average log-likelihood of the training and validation data. It is
-# equivalent to the negative cross-entropy.
+# We compute the average log-likelihood of the validation data. It is equivalent to the
+# negative cross-entropy.
 
-function mean_loglikelihood(species, probs)
-    return mean(log(p[s]) for (s, p) in zip(species, probs))
-end
-
-mean_loglikelihood(train_species, train_probs)
-
-#-
-
-mean_loglikelihood(val_species, val_probs)
+val_y = y[.!penguins.train]
+-mean(cross_entropy(val_predict, val_y))
 
 # ### Brier score
 #
@@ -170,18 +138,7 @@ mean_loglikelihood(val_species, val_probs)
 # The Brier score is another strictly proper scoring rule that can be used for evaluating
 # probabilistic predictions.
 
-function brier_score(species, probs)
-    return mean(
-        sum(abs2(pi - (i == s)) for (i, pi) in enumerate(p)) for
-        (s, p) in zip(species, probs)
-    )
-end
-
-brier_score(train_species, train_probs)
-
-#-
-
-brier_score(val_species, val_probs)
+mean(brier_score(val_predict, val_y))
 
 # ### Expected calibration error
 #
@@ -219,21 +176,25 @@ brier_score(val_species, val_probs)
 #
 # One approach is to use bins of uniform size.
 
-ece = ECE(UniformBinning(10), (μ, y) -> kl_divergence(y, μ))
-ece(train_probs, train_species)
+ece = ECE(UniformBinning(10), (μ, y) -> kl_divergence(y, μ));
 
-#-
+# We have to work with a numerical encoding of the true penguin species and a
+# corresponding vector of predictions. We use [`RowVecs`](https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#KernelFunctions.RowVecs)
+# to indicate that the rows in the matrix of probabilities returned by `pdf`
+# are the predictions. If we would provide predictions as columns of a matrix, we would have
+# to use [`ColVecs`](https://juliagaussianprocesses.github.io/KernelFunctions.jl/stable/api/#KernelFunctions.ColVecs).
 
-ece(val_probs, val_species)
+val_yint = map(MLJ.levelcode, val_y)
+val_probs = RowVecs(pdf(val_predict, MLJ.classes(y)));
+
+# We compute the estimate on the validation data:
+
+ece(val_probs, val_yint)
 
 # For the squared Euclidean distance we obtain:
 
 ece = ECE(UniformBinning(10), SqEuclidean())
-ece(train_probs, train_species)
-
-#-
-
-ece(val_probs, val_species)
+ece(val_probs, val_yint)
 
 # Alternatively, one can use a data-dependent binning scheme that tries to split the
 # predictions in a way that minimizes the variance in each bin.
@@ -241,20 +202,12 @@ ece(val_probs, val_species)
 # With the KL divergence we get:
 
 ece = ECE(MedianVarianceBinning(5), (μ, y) -> kl_divergence(y, μ))
-ece(train_probs, train_species)
-
-#-
-
-ece(val_probs, val_species)
+ece(val_probs, val_yint)
 
 # For the squared Euclidean distance we obtain:
 
 ece = ECE(MedianVarianceBinning(5), SqEuclidean())
-ece(train_probs, train_species)
-
-#-
-
-ece(val_probs, val_species)
+ece(val_probs, val_yint)
 
 # We see that the estimates (of the same theoretical quantity!) are highly dependent on the
 # chosen binning scheme.
@@ -269,29 +222,21 @@ ece(val_probs, val_species)
 # with length scale $\nu > 0$ for predictions $\mu,\mu'$ and corresponding targets $y, y'$.
 # For simplicity, we estimate length scale $\nu$ with the median heuristic.
 
-distances = pairwise(SqEuclidean(), train_probs)
-λ = sqrt(median(distances[i] for i in CartesianIndices(distances) if i[1] < i[2]))
-kernel = (GaussianKernel() ∘ ScaleTransform(inv(λ))) ⊗ WhiteKernel();
+distances = pairwise(SqEuclidean(), RowVecs(pdf(train_predict, MLJ.classes(y))))
+ν = sqrt(median(distances[i] for i in CartesianIndices(distances) if i[1] < i[2]))
+kernel = with_lengthscale(GaussianKernel(), ν) ⊗ WhiteKernel();
 
-# We obtain the following biased estimates of the squared KCE (SKCE):
+# We obtain the following biased estimate of the squared KCE (SKCE):
 
 skce = BiasedSKCE(kernel)
-skce(train_probs, train_species)
-
-#-
-
-skce(val_probs, val_species)
+skce(val_probs, val_yint)
 
 # Similar to the biased estimates of the ECE, the biased estimates of the SKCE are always
 # non-negative. The unbiased estimates can be negative as well, in particular if the model
 # is (close to being) calibrated:
 
 skce = UnbiasedSKCE(kernel)
-skce(train_probs, train_species)
-
-#-
-
-skce(val_probs, val_species)
+skce(val_probs, val_yint)
 
 # When the datasets are large, the quadratic sample complexity of the standard biased and
 # unbiased estimators of the SKCE can become prohibitive. In these cases, one can resort to
@@ -302,8 +247,4 @@ skce(val_probs, val_species)
 # with linear sample complexity:
 
 skce = BlockUnbiasedSKCE(kernel, 2)
-skce(train_probs, train_species)
-
-#-
-
-skce(val_probs, val_species)
+skce(val_probs, val_yint)
