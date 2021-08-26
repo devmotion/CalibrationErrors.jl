@@ -129,10 +129,12 @@ fg
 # We compute the average log-likelihood of the training and validation data. It is
 # equivalent to the negative cross-entropy.
 
+train_y = y[penguins.train]
 -cross_entropy(train_predict, train_y)
 
 #-
 
+val_y = y[.!penguins.train]
 -cross_entropy(val_predict, val_y)
 
 # ### Brier score
