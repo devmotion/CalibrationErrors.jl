@@ -10,7 +10,7 @@ MLJNaiveBayesInterface = "33e4bacb-b9e2-458e-9a13-5d9a90b235fa"
 PalmerPenguins = "8b842266-38fa-440a-9b57-31493939ab85"
 
 [compat]
-AlgebraOfGraphics = "0.5"
+AlgebraOfGraphics = "0.5, 0.6"
 CairoMakie = "0.6"
 CalibrationErrors = "0.5.13"
 DataFrames = "1.0"
