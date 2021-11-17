@@ -102,6 +102,14 @@ scale_cov(Σ::PDMats.ScalMat, v) = PDMats.PDiagMat(v .^ 2 .* Σ.value)
 scale_cov(Σ::PDMats.PDiagMat, v) = PDMats.PDiagMat(v .^ 2 .* Σ.diag)
 scale_cov(Σ::PDMats.AbstractPDMat, v) = PDMats.X_A_Xt(Σ, LinearAlgebra.diagm(v))
 
-invquad_diff(A::PDMats.ScalMat, x, y) = A.inv_value * Distances.sqeuclidean(x, y)
-invquad_diff(A::PDMats.PDiagMat, x, y) = Distances.wsqeuclidean(x, y, A.inv_diag)
+invquad_diff(A::PDMats.ScalMat, x, y) = Distances.sqeuclidean(x, y) / A.value
+function invquad_diff(
+    A::PDMats.PDiagMat, x::AbstractVector{<:Real}, y::AbstractVector{<:Real}
+)
+    n = length(x)
+    length(y) == n || throw(DimensionMismatch("x and y must be of the same length"))
+    size(A) == (n, n) ||
+        throw(DimensionMismatch("size of A is not consistent with x and y"))
+    return sum(abs2(xi - yi) / wi for (xi, yi, wi) in zip(x, y, A.diag))
+end
 invquad_diff(A::PDMats.AbstractPDMat, x, y) = PDMats.invquad(A, x .- y)

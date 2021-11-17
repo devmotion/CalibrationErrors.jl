@@ -9,10 +9,10 @@
         normal2 = Normal(1, 2)
         @test @inferred(skce([normal1, normal1], [0, 0])) ≈ 1 - sqrt(2) + 1 / sqrt(3)
         @test @inferred(skce([normal1, normal2], [1, 0])) ≈
-              exp(-sqrt(2)) *
+            exp(-sqrt(2)) *
               (exp(-1 / 2) - 1 / sqrt(2) - 1 / sqrt(5) + exp(-1 / 12) / sqrt(6))
         @test @inferred(skce([normal1, normal2], [0, 1])) ≈
-              exp(-sqrt(2)) * (
+            exp(-sqrt(2)) * (
             exp(-1 / 2) - exp(-1 / 4) / sqrt(2) - exp(-1 / 10) / sqrt(5) +
             exp(-1 / 12) / sqrt(6)
         )
@@ -28,12 +28,12 @@
         normal1 = Normal(0, 1)
         normal2 = Normal(1, 2)
         @test @inferred(skce([normal1, normal1], [0, 0])) ≈
-              1 - 2 / sqrt(1.25) + 1 / sqrt(1.5)
+            1 - 2 / sqrt(1.25) + 1 / sqrt(1.5)
         @test @inferred(skce([normal1, normal2], [1, 0])) ≈
-              exp(-sqrt(2)) *
+            exp(-sqrt(2)) *
               (exp(-1 / 8) - 1 / sqrt(1.25) - 1 / sqrt(2) + exp(-1 / 18) / sqrt(2.25))
         @test @inferred(skce([normal1, normal2], [0, 1])) ≈
-              exp(-sqrt(2)) * (
+            exp(-sqrt(2)) * (
             exp(-1 / 8) - exp(-1 / 10) / sqrt(1.25) - exp(-1 / 16) / sqrt(2) +
             exp(-1 / 18) / sqrt(2.25)
         )
@@ -67,7 +67,7 @@
         normal1 = Normal(0, 1)
         normal2 = Normal(1, 2)
         @test @inferred(ucme([normal1, normal2], [0, 0.5])) ≈
-              (
+            (
             exp(-1 / sqrt(2)) * (exp(-1 / 2) - exp(-1 / 4) / sqrt(2)) +
             exp(-sqrt(5 / 2)) * (exp(-1 / 8) - 1 / sqrt(5))
         )^2 / 4
@@ -79,7 +79,7 @@
             [1, -0.5],
         )
         @test @inferred(ucme([normal1, normal2], [0, 0.5])) ≈
-              (
+            (
             (
                 exp(-1 / sqrt(2)) * (exp(-1 / 2) - exp(-1 / 4) / sqrt(2)) +
                 exp(-sqrt(5 / 2)) * (exp(-1 / 8) - 1 / sqrt(5))

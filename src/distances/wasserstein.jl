@@ -19,13 +19,13 @@ function (::SqWasserstein)(a::AbstractMvNormal, b::AbstractMvNormal)
     μ2 = mean(b)
     Σ1 = cov(a)
     Σ2 = cov(b)
-    return Distances.sqeuclidean(μ1, μ2) + sqbures(Σ1, Σ2)
+    return Distances.sqeuclidean(μ1, μ2) + OT.sqbures(Σ1, Σ2)
 end
 
 function (::SqWasserstein)(a::MvNormal, b::MvNormal)
     μa, Σa = params(a)
     μb, Σb = params(b)
-    return Distances.sqeuclidean(μa, μb) + sqbures(Σa, Σb)
+    return Distances.sqeuclidean(μa, μb) + OT.sqbures(Σa, Σb)
 end
 
 # evaluations for Laplace distributions
@@ -73,7 +73,7 @@ end
 
 function (s::SqMixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)
     C = Distances.pairwise(SqWasserstein(), components(a), components(b))
-    return OptimalTransport.emd2(probs(a), probs(b), C, deepcopy(s.lpsolver))
+    return OT.emd2(probs(a), probs(b), C, deepcopy(s.lpsolver))
 end
 
 function (m::MixtureWasserstein)(a::AbstractMixtureModel, b::AbstractMixtureModel)

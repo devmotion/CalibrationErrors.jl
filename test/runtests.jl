@@ -12,9 +12,6 @@ Random.seed!(1234)
 
 @testset "CalibrationErrorsDistributions" begin
     @testset "distances" begin
-        @testset "Bures metric" begin
-            include("distances/bures.jl")
-        end
         @testset "Wasserstein distance" begin
             include("distances/wasserstein.jl")
         end

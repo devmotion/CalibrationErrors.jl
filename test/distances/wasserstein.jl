@@ -17,7 +17,7 @@
             mvnormal_fill1 = MvNormal(fill(mean(d1), 10), Diagonal(fill(var(d1), 10)))
             mvnormal_fill2 = MvNormal(fill(mean(d2), 10), Diagonal(fill(var(d2), 10)))
             @test SqWasserstein()(mvnormal_fill1, mvnormal_fill2) ≈
-                  10 * SqWasserstein()(d1, d2)
+                10 * SqWasserstein()(d1, d2)
         end
 
         laplace1 = Laplace(μ1, σ1)
@@ -63,9 +63,9 @@
             mvnormal_fill1 = MvNormal(fill(mean(d1), 10), Diagonal(fill(var(d1), 10)))
             mvnormal_fill2 = MvNormal(fill(mean(d2), 10), Diagonal(fill(var(d2), 10)))
             @test Wasserstein()(mvnormal_fill1, mvnormal_fill2) ≈
-                  sqrt(10) * Wasserstein()(d1, d2)
+                sqrt(10) * Wasserstein()(d1, d2)
             @test Wasserstein()(mvnormal_fill1, mvnormal_fill2) ==
-                  sqrt(SqWasserstein()(mvnormal_fill1, mvnormal_fill2))
+                sqrt(SqWasserstein()(mvnormal_fill1, mvnormal_fill2))
         end
 
         laplace1 = Laplace(μ1, σ1)
@@ -97,23 +97,23 @@
             mixture1 = MixtureModel(T, [(randn(), rand())], [1.0])
             mixture2 = MixtureModel(T, [(randn(), rand())], [1.0])
             @test SqMixtureWasserstein()(mixture1, mixture2) ≈
-                  SqWasserstein()(first(components(mixture1)), first(components(mixture2)))
+                SqWasserstein()(first(components(mixture1)), first(components(mixture2)))
 
             mixture1 = MixtureModel(T, [(randn(), rand()), (randn(), rand())], [1.0, 0.0])
             mixture2 = MixtureModel(T, [(randn(), rand()), (randn(), rand())], [0.0, 1.0])
             @test SqMixtureWasserstein()(mixture1, mixture2) ≈
-                  SqWasserstein()(first(components(mixture1)), last(components(mixture2)))
+                SqWasserstein()(first(components(mixture1)), last(components(mixture2)))
 
             mixture1 = MixtureModel(T, fill((randn(), rand()), 10))
             mixture2 = MixtureModel(T, fill((randn(), rand()), 10))
             @test SqMixtureWasserstein()(mixture1, mixture2) ≈
-                  SqWasserstein()(first(components(mixture1)), first(components(mixture2))) rtol =
+                SqWasserstein()(first(components(mixture1)), first(components(mixture2))) rtol =
                 10 * sqrt(eps())
 
             mixture1 = MixtureModel(T, fill((randn(), rand()), 10))
             mixture2 = MixtureModel(T, [(randn(), rand())])
             @test SqMixtureWasserstein()(mixture1, mixture2) ≈
-                  SqWasserstein()(first(components(mixture1)), first(components(mixture2)))
+                SqWasserstein()(first(components(mixture1)), first(components(mixture2)))
         end
     end
 
@@ -122,31 +122,31 @@
             mixture1 = MixtureModel(T, [(randn(), rand())], [1.0])
             mixture2 = MixtureModel(T, [(randn(), rand())], [1.0])
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  Wasserstein()(first(components(mixture1)), first(components(mixture2)))
+                Wasserstein()(first(components(mixture1)), first(components(mixture2)))
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  sqrt(SqMixtureWasserstein()(mixture1, mixture2))
+                sqrt(SqMixtureWasserstein()(mixture1, mixture2))
 
             mixture1 = MixtureModel(T, [(randn(), rand()), (randn(), rand())], [1.0, 0.0])
             mixture2 = MixtureModel(T, [(randn(), rand()), (randn(), rand())], [0.0, 1.0])
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  Wasserstein()(first(components(mixture1)), last(components(mixture2)))
+                Wasserstein()(first(components(mixture1)), last(components(mixture2)))
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  sqrt(SqMixtureWasserstein()(mixture1, mixture2))
+                sqrt(SqMixtureWasserstein()(mixture1, mixture2))
 
             mixture1 = MixtureModel(T, fill((randn(), rand()), 10))
             mixture2 = MixtureModel(T, fill((randn(), rand()), 10))
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  Wasserstein()(first(components(mixture1)), first(components(mixture2))) rtol =
+                Wasserstein()(first(components(mixture1)), first(components(mixture2))) rtol =
                 10 * sqrt(eps())
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  sqrt(SqMixtureWasserstein()(mixture1, mixture2))
+                sqrt(SqMixtureWasserstein()(mixture1, mixture2))
 
             mixture1 = MixtureModel(T, fill((randn(), rand()), 10))
             mixture2 = MixtureModel(T, [(randn(), rand())])
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  Wasserstein()(first(components(mixture1)), first(components(mixture2)))
+                Wasserstein()(first(components(mixture1)), first(components(mixture2)))
             @test MixtureWasserstein()(mixture1, mixture2) ≈
-                  sqrt(SqMixtureWasserstein()(mixture1, mixture2))
+                sqrt(SqMixtureWasserstein()(mixture1, mixture2))
         end
     end
 end
