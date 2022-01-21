@@ -92,9 +92,8 @@ function unsafe_ucme_eval(
     return res
 end
 function unsafe_ucme_eval(kernel::Kernel, p::Real, y::Bool, testp::Real, testy::Bool)
-    noty = !y
-    return (y - p) * kernel((p, y), (testp, testy)) +
-           (noty - p) * kernel((p, noty), (testp, testy))
+    return (y - p) * kernel((p, true), (testp, testy)) +
+           (!y - p) * kernel((p, false), (testp, testy))
 end
 
 function unsafe_ucme_eval(kernel::KernelTensorProduct, p, y, testp, testy)
@@ -132,8 +131,7 @@ end
 function unsafe_ucme_eval_targets(
     kernel::Kernel, p::Real, y::Bool, testp::Real, testy::Bool
 )
-    noty = !y
-    res = (y - p) * kernel(y, testy) + (noty - p) * kernel(noty, testy)
+    res = (y - p) * kernel(true, testy) + (!y - p) * kernel(false, testy)
     return res
 end
 

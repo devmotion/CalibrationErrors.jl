@@ -20,9 +20,9 @@
         for estimator in (ece, skce1, skce2, skce3, ucme)
             estimate = estimator(predictions, targets)
             @test @test_deprecated(calibrationerror(estimator, predictions, targets)) ==
-                  estimate
+                estimate
             @test @test_deprecated(calibrationerror(estimator, (predictions, targets))) ==
-                  estimate
+                estimate
             @test @test_deprecated(
                 calibrationerror(estimator, reduce(hcat, predictions), targets)
             ) == estimate
