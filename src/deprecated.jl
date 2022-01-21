@@ -43,4 +43,3 @@
 @deprecate MixtureWassersteinExponentialKernel() ExponentialKernel(;
     metric=MixtureWasserstein()
 )
-
