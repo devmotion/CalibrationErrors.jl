@@ -6,9 +6,9 @@ Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
-CairoMakie = "0.6"
-CalibrationErrors = "0.5.13"
-Distributions = "0.24.15, 0.25"
+CairoMakie = "0.7"
+CalibrationErrors = "0.6"
+Distributions = "0.25"
 Literate = "2.8"
 StatsBase = "0.33"
 julia = "1.3"
