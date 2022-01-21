@@ -19,6 +19,8 @@ This package implements different estimators of the expected calibration error
 (ECE), the squared kernel calibration error (SKCE), and the
 unnormalized calibration mean embedding (UCME) in the Julia language.
 
+This package supports calibration error estimation of classification models that output vectors of class probabilities. In addition, SKCE and UCME can be estimated for more general probabilistic predictive models that output probability distributions defined in [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) such as normal and Laplace distributions.
+
 ## Example
 
 Calibration errors can be estimated from a data set of predicted probability distributions
@@ -35,16 +37,12 @@ UCME.
 
 ## Related packages
 
-[CalibrationErrorsDistributions.jl](https://github.com/devmotion/CalibrationErrorsDistributions.jl)
-extends calibration error estimation in this package to more general probabilistic
-predictive models that output arbitrary probability distributions.
-
 [CalibrationTests.jl](https://github.com/devmotion/CalibrationTests.jl) implements
 statistical hypothesis tests of calibration.
 
-[pycalibration](https://github.com/devmotion/pycalibration) is a Python interface for CalibrationErrors.jl, CalibrationErrorsDistributions.jl, and CalibrationTests.jl.
+[pycalibration](https://github.com/devmotion/pycalibration) is a Python interface for CalibrationErrors.jl and CalibrationTests.jl.
 
-[rcalibration](https://github.com/devmotion/rcalibration) is an R interface for CalibrationErrors.jl, CalibrationErrorsDistributions.jl, and CalibrationTests.jl.
+[rcalibration](https://github.com/devmotion/rcalibration) is an R interface for CalibrationErrors.jl and CalibrationTests.jl.
 
 ## Talk at JuliaCon 2021
 

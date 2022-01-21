@@ -38,3 +38,9 @@
 ) false
 
 @deprecate TVExponentialKernel() ExponentialKernel(; metric=TotalVariation())
+
+@deprecate WassersteinExponentialKernel() ExponentialKernel(; metric=Wasserstein())
+@deprecate MixtureWassersteinExponentialKernel() ExponentialKernel(;
+    metric=MixtureWasserstein()
+)
+
