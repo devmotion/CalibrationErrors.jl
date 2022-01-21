@@ -98,7 +98,7 @@
             @test bins[i].nsamples == length(idxs)
             @test bins[i].mean_predictions == mean(predictions[idxs])
             @test bins[i].proportions_targets ==
-                  vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims=2))
+                vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims=2))
         end
 
         bins = CalibrationErrors.perform(UniformBinning(1), predictions, targets)
@@ -134,7 +134,7 @@
             @test bins[i].nsamples == length(idxs)
             @test bins[i].mean_predictions == mean(predictions[idxs])
             @test bins[i].proportions_targets ==
-                  vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims=2))
+                vec(mean(Matrix{Float64}(I, 3, 3)[:, targets[idxs]]; dims=2))
         end
 
         bins = CalibrationErrors.perform(UniformBinning(1), predictions, targets)

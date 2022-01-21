@@ -32,7 +32,7 @@
 
         @test unsafe_skce_eval(kernelfull ⊗ WhiteKernel(), pfull, yint, p̃full, ỹint) ≈ val
         @test unsafe_skce_eval(kernelfull ⊗ WhiteKernel2(), pfull, yint, p̃full, ỹint) ≈
-              val
+            val
         @test unsafe_skce_eval(
             TensorProduct2(kernelfull, WhiteKernel()), pfull, yint, p̃full, ỹint
         ) ≈ val

@@ -92,9 +92,8 @@ function unsafe_ucme_eval(
     return res
 end
 function unsafe_ucme_eval(kernel::Kernel, p::Real, y::Bool, testp::Real, testy::Bool)
-    noty = !y
-    return (y - p) * kernel((p, y), (testp, testy)) +
-           (noty - p) * kernel((p, noty), (testp, testy))
+    return (kernel((p, true), (testp, testy)) - kernel((p, false), (testp, testy))) *
+           (y - p)
 end
 
 function unsafe_ucme_eval(kernel::KernelTensorProduct, p, y, testp, testy)
@@ -126,15 +125,12 @@ function unsafe_ucme_eval_targets(
     testp::AbstractVector{<:Real},
     testy::Integer,
 )
-    res = sum(((z == y) - pz) * kernel(z, testy) for (z, pz) in enumerate(p))
-    return res
+    return sum(((z == y) - pz) * kernel(z, testy) for (z, pz) in enumerate(p))
 end
 function unsafe_ucme_eval_targets(
     kernel::Kernel, p::Real, y::Bool, testp::Real, testy::Bool
 )
-    noty = !y
-    res = (y - p) * kernel(y, testy) + (noty - p) * kernel(noty, testy)
-    return res
+    return (kernel(true, testy) - kernel(false, testy)) * (y - p)
 end
 
 function unsafe_ucme_eval_targets(
@@ -144,11 +140,10 @@ function unsafe_ucme_eval_targets(
     testp::AbstractVector{<:Real},
     testy::Integer,
 )
-    @inbounds res = (y == testy) - p[testy]
-    return res
+    return @inbounds (y == testy) - p[testy]
 end
 function unsafe_ucme_eval_targets(
     kernel::WhiteKernel, p::Real, y::Bool, testp::Real, testy::Bool
 )
-    return (2 * testy - 1) * (y - p)
+    return (testy - !testy) * (y - p)
 end

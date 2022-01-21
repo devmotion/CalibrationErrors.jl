@@ -93,37 +93,44 @@
     end
 
     @testset "binary classification" begin
-        # probabilities and boolean targets
+        # probabilities and corresponding full categorical distribution
         p, testp = rand(2)
-        y, testy = rand(Bool, 2)
+        pfull = [p, 1 - p]
+        testpfull = [testp, 1 - testp]
+
+        # kernel for probabilities and corresponding one for full categorical distributions
         scale = rand()
         kernel = SqExponentialKernel() ∘ ScaleTransform(scale)
-        val = unsafe_ucme_eval(kernel ⊗ WhiteKernel(), p, y, testp, testy)
-        @test unsafe_ucme_eval(kernel ⊗ WhiteKernel2(), p, y, testp, testy) ≈ val
-        @test unsafe_ucme_eval(TensorProduct2(kernel, WhiteKernel()), p, y, testp, testy) ≈
-              val
-        @test unsafe_ucme_eval(TensorProduct2(kernel, WhiteKernel2()), p, y, testp, testy) ≈
-              val
-
-        # corresponding values and kernel for full categorical distribution
-        pfull = [p, 1 - p]
-        yint = 2 - y
-        testpfull = [testp, 1 - testp]
-        testyint = 2 - testy
         kernelfull = SqExponentialKernel() ∘ ScaleTransform(scale / sqrt(2))
 
-        @test unsafe_ucme_eval(
-            kernelfull ⊗ WhiteKernel(), pfull, yint, testpfull, testyint
-        ) ≈ val
-        @test unsafe_ucme_eval(
-            kernelfull ⊗ WhiteKernel2(), pfull, yint, testpfull, testyint
-        ) ≈ val
-        @test unsafe_ucme_eval(
-            TensorProduct2(kernelfull, WhiteKernel()), pfull, yint, testpfull, testyint
-        ) ≈ val
-        @test unsafe_ucme_eval(
-            TensorProduct2(kernelfull, WhiteKernel2()), pfull, yint, testpfull, testyint
-        ) ≈ val
+        # for different targets
+        for y in (true, false), testy in (true, false)
+            # check values for probabilities
+            val = unsafe_ucme_eval(kernel ⊗ WhiteKernel(), p, y, testp, testy)
+            @test unsafe_ucme_eval(kernel ⊗ WhiteKernel2(), p, y, testp, testy) ≈ val
+            @test unsafe_ucme_eval(
+                TensorProduct2(kernel, WhiteKernel()), p, y, testp, testy
+            ) ≈ val
+            @test unsafe_ucme_eval(
+                TensorProduct2(kernel, WhiteKernel2()), p, y, testp, testy
+            ) ≈ val
+
+            # check values for categorical distributions
+            yint = 2 - y
+            testyint = 2 - testy
+            @test unsafe_ucme_eval(
+                kernelfull ⊗ WhiteKernel(), pfull, yint, testpfull, testyint
+            ) ≈ val
+            @test unsafe_ucme_eval(
+                kernelfull ⊗ WhiteKernel2(), pfull, yint, testpfull, testyint
+            ) ≈ val
+            @test unsafe_ucme_eval(
+                TensorProduct2(kernelfull, WhiteKernel()), pfull, yint, testpfull, testyint
+            ) ≈ val
+            @test unsafe_ucme_eval(
+                TensorProduct2(kernelfull, WhiteKernel2()), pfull, yint, testpfull, testyint
+            ) ≈ val
+        end
     end
 
     @testset "multi-class classification" begin
@@ -140,8 +147,8 @@
 
         @test unsafe_ucme_eval(kernel ⊗ WhiteKernel2(), p, y, testp, testy) ≈ val
         @test unsafe_ucme_eval(TensorProduct2(kernel, WhiteKernel()), p, y, testp, testy) ≈
-              val
+            val
         @test unsafe_ucme_eval(TensorProduct2(kernel, WhiteKernel2()), p, y, testp, testy) ≈
-              val
+            val
     end
 end
