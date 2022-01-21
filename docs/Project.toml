@@ -3,6 +3,6 @@ CalibrationErrors = "33913031-fe46-5864-950f-100836f47845"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 
 [compat]
-CalibrationErrors = "0.5.13"
+CalibrationErrors = "0.6"
 Documenter = "0.27"
 julia = "1.5"

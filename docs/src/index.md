@@ -6,16 +6,12 @@ A package for estimating calibration errors from data sets of predictions and ta
 
 ## Related packages
 
-[CalibrationErrorsDistributions.jl](https://github.com/devmotion/CalibrationErrorsDistributions.jl)
-extends calibration error estimation in this package to more general probabilistic
-predictive models that output arbitrary probability distributions.
-
 [CalibrationTests.jl](https://github.com/devmotion/CalibrationTests.jl) implements
 statistical hypothesis tests of calibration.
 
-[pycalibration](https://github.com/devmotion/pycalibration) is a Python interface for CalibrationErrors.jl, CalibrationErrorsDistributions.jl, and CalibrationTests.jl.
+[pycalibration](https://github.com/devmotion/pycalibration) is a Python interface for CalibrationErrors.jl and CalibrationTests.jl.
 
-[rcalibration](https://github.com/devmotion/rcalibration) is an R interface for CalibrationErrors.jl, CalibrationErrorsDistributions.jl, and CalibrationTests.jl.
+[rcalibration](https://github.com/devmotion/rcalibration) is an R interface for CalibrationErrors.jl and CalibrationTests.jl.
 
 ## Talk at JuliaCon 2021
 
