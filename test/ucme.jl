@@ -95,7 +95,7 @@
     @testset "binary classification" begin
         # probabilities and corresponding full categorical distribution
         p, testp = rand(2)
-        pful = [p, 1 - p]
+        pfull = [p, 1 - p]
         testpfull = [testp, 1 - testp]
 
         # kernel for probabilities and corresponding one for full categorical distributions
