@@ -56,14 +56,10 @@ Random.seed!(1234)
 
     @testset "distributions" begin
         @testset "Normal" begin
-            include("normal.jl")
+            include("distributions/normal.jl")
         end
         @testset "MvNormal" begin
-            include("mvnormal.jl")
+            include("distributions/mvnormal.jl")
         end
-    end
-
-    @testset "deprecations" begin
-        include("deprecated.jl")
     end
 end

@@ -41,11 +41,9 @@ include("skce/unbiased.jl")
 
 include("ucme.jl")
 
-include("normal.jl")
-include("laplace.jl")
-include("mvnormal.jl")
-include("mixturemodel.jl")
-
-include("deprecated.jl")
+include("distributions/normal.jl")
+include("distributions/laplace.jl")
+include("distributions/mvnormal.jl")
+include("distributions/mixturemodel.jl")
 
 end # module
