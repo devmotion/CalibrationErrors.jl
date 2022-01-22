@@ -7,7 +7,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 CairoMakie = "0.7"
-CalibrationErrors = "0.6"
+CalibrationErrors = "0.6, 0.5"
 Distributions = "0.25"
 Literate = "2.8"
 StatsBase = "0.33"
