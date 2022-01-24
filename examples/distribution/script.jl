@@ -230,16 +230,20 @@ plot_estimates(data; ece=true)
 #
 
 Random.seed!(1234)
-data = estimates(SKCE(MedianHeuristicKernel(250)))
+data = estimates(SKCE ∘ MedianHeuristicKernel(250))
 plot_estimates(data)
 
 Random.seed!(1234)
-data = estimates(SKCE(MedianHeuristicKernel(250); blocksize=2))
+data = estimates() do predictions_targets
+    return SKCE(MedianHeuristicKernel(250)(predictions_targets); blocksize=2)
+end
 plot_estimates(data)
 
 # ## Biased estimator of the squared kernel calibration error
 #
 
 Random.seed!(1234)
-data = estimates(SKCE(MedianHeuristicKernel(250); unbiased=false))
+data = estimates() do predictions_targets
+    return SKCE(MedianHeuristicKernel(250)(predictions_targets); unbiased=false)
+end
 plot_estimates(data)
