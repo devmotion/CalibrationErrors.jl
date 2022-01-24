@@ -226,20 +226,20 @@ Random.seed!(1234)
 data = estimates(_ -> ECE(MedianVarianceBinning(10), TotalVariation()))
 plot_estimates(data; ece=true)
 
-# ## Biased estimator of the squared kernel calibration error
-#
-
-Random.seed!(1234)
-data = estimates(BiasedSKCE ∘ MedianHeuristicKernel(250))
-plot_estimates(data)
-
 # ## Unbiased estimators of the squared kernel calibration error
 #
 
 Random.seed!(1234)
-data = estimates(UnbiasedSKCE ∘ MedianHeuristicKernel(250))
+data = estimates(SKCE(MedianHeuristicKernel(250)))
 plot_estimates(data)
 
 Random.seed!(1234)
-data = estimates(BlockUnbiasedSKCE ∘ MedianHeuristicKernel(250))
+data = estimates(SKCE(MedianHeuristicKernel(250); blocksize=2))
+plot_estimates(data)
+
+# ## Biased estimator of the squared kernel calibration error
+#
+
+Random.seed!(1234)
+data = estimates(SKCE(MedianHeuristicKernel(250); unbiased=false))
 plot_estimates(data)

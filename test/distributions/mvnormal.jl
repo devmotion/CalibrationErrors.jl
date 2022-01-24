@@ -33,7 +33,7 @@
             (SqExponentialKernel() ∘ ARDTransform([rand()])),
         )
             for estimator in
-                (BiasedSKCE(kernel), UnbiasedSKCE(kernel), BlockUnbiasedSKCE(kernel, 5))
+                (SKCE(kernel), SKCE(kernel; unbiased=false), SKCE(kernel; blocksize=5))
                 skce_mvnormal = estimator(predictions_mvnormal, targets_mvnormal)
                 skce_normal = estimator(predictions_normal, targets_normal)
                 @test skce_mvnormal ≈ skce_normal
@@ -93,7 +93,7 @@
                 end
 
                 # check estimates
-                for estimator in (UnbiasedSKCE, x -> UCME(x, testpredictions, testtargets))
+                for estimator in (SKCE, x -> UCME(x, testpredictions, testtargets))
                     estimate1 = estimator(kernel1)(predictions, targets)
                     estimate2 = estimator(kernel2)(predictions, targets)
                     estimate3 = estimator(kernel3)(predictions, targets)

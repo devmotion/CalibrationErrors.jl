@@ -228,14 +228,14 @@ kernel = with_lengthscale(GaussianKernel(), ν) ⊗ WhiteKernel();
 
 # We obtain the following biased estimate of the squared KCE (SKCE):
 
-skce = BiasedSKCE(kernel)
+skce = SKCE(kernel; unbiased=false)
 skce(val_probs, val_yint)
 
 # Similar to the biased estimates of the ECE, the biased estimates of the SKCE are always
 # non-negative. The unbiased estimates can be negative as well, in particular if the model
 # is (close to being) calibrated:
 
-skce = UnbiasedSKCE(kernel)
+skce = SKCE(kernel)
 skce(val_probs, val_yint)
 
 # When the datasets are large, the quadratic sample complexity of the standard biased and
@@ -246,5 +246,5 @@ skce(val_probs, val_yint)
 # Here we consider the extreme case of blocks with two samples, which yields an estimator
 # with linear sample complexity:
 
-skce = BlockUnbiasedSKCE(kernel, 2)
+skce = SKCE(kernel; blocksize=2)
 skce(val_probs, val_yint)

@@ -1,8 +1,6 @@
 @testset "normal.jl" begin
     @testset "SKCE: basic example" begin
-        skce = UnbiasedSKCE(
-            ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel()
-        )
+        skce = SKCE(ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel())
 
         # only two predictions, i.e., one term in the estimator
         normal1 = Normal(0, 1)
@@ -19,7 +17,7 @@
     end
 
     @testset "SKCE: basic example (transformed)" begin
-        skce = UnbiasedSKCE(
+        skce = SKCE(
             ExponentialKernel(; metric=Wasserstein()) ⊗
             (SqExponentialKernel() ∘ ScaleTransform(0.5)),
         )
@@ -40,9 +38,7 @@
     end
 
     @testset "SKCE: basic properties" begin
-        skce = UnbiasedSKCE(
-            ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel()
-        )
+        skce = SKCE(ExponentialKernel(; metric=Wasserstein()) ⊗ SqExponentialKernel())
 
         estimates = map(1:10_000) do _
             predictions = map(Normal, randn(20), rand(20))
@@ -129,7 +125,7 @@
             end
 
             # check estimates
-            for estimator in (UnbiasedSKCE, x -> UCME(x, testpredictions, testtargets))
+            for estimator in (SKCE, x -> UCME(x, testpredictions, testtargets))
                 estimate1 = estimator(kernel1)(predictions, targets)
                 estimate2 = estimator(kernel2)(predictions, targets)
                 @test estimate2 ≈ estimate1
