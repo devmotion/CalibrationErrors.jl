@@ -21,7 +21,7 @@ const OT = ExactOptimalTransport
 export calibrationerror
 
 # estimators
-export ECE, BiasedSKCE, UnbiasedSKCE, BlockUnbiasedSKCE, UCME
+export ECE, SKCE, UCME
 
 # binning algorithms
 export UniformBinning, MedianVarianceBinning
@@ -35,9 +35,7 @@ include("binning/uniform.jl")
 include("binning/medianvariance.jl")
 include("ece.jl")
 
-include("skce/generic.jl")
-include("skce/biased.jl")
-include("skce/unbiased.jl")
+include("skce.jl")
 
 include("ucme.jl")
 

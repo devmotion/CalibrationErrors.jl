@@ -31,9 +31,8 @@ estimator(predictions, targets)
 
 The sets of predictions and targets have to be provided as vectors.
 
-This package implements the estimator `ECE` of the ECE, the estimators
-`BiasedSKCE`, `UnbiasedSKCE`, and `BlockUnbiasedSKCE` for the SKCE, and `UCME` for the
-UCME.
+This package implements the estimator `ECE` of the ECE, the estimator `SKCE` for the SKCE
+(unbiased and biased variants with different sample complexity), and `UCME` for the UCME.
 
 ## Related packages
 

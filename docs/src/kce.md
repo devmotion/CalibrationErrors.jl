@@ -74,28 +74,12 @@ which only the most-confident predictions are considered.[^WLZ19]
 
 [^WLZ21]: Widmann, D., Lindsten, F., & Zachariah, D. (2021). [Calibration tests beyond classification](https://openreview.net/forum?id=-bxf89v3Nx). To be presented at *ICLR 2021*.
 
-## Estimators
+## Estimator
 
 For the SKCE biased and unbiased estimators exist. In CalibrationErrors.jl
-three types of estimators are available, namely [`BiasedSKCE`](@ref),
-[`UnbiasedSKCE`](@ref), and [`BlockUnbiasedSKCE`](@ref). Unsurprisingly,
-[`BiasedSKCE`](@ref) is a biased estimator whereas the other two
-estimators are unbiased. [`BiasedSKCE`](@ref) and [`UnbiasedSKCE`](@ref)
-have quadratic sample complexity whereas [`BlockUnbiasedSKCE`](@ref)
-is an estimator with linear sample complexity.
-
-### Biased estimator
+[`SKCE`](@ref) lets you construct unbiased and biased estimators with quadratic
+and sub-quadratic sample complexity.
 
 ```@docs
-BiasedSKCE
-```
-
-### Unbiased estimators
-
-```@docs
-UnbiasedSKCE
-```
-
-```@docs
-BlockUnbiasedSKCE
+SKCE
 ```
