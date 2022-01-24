@@ -37,7 +37,7 @@ Let ``(P_{X_i}, Y_i)_{i=1,\ldots,n}`` be a data set of predictions and correspon
 targets. The estimator with block size ``m`` is defined as
 ```math
 {\bigg\lfloor \frac{n}{m} \bigg\rfloor}^{-1} \sum_{b=1}^{\lfloor n/m \rfloor}
-|B_b|^{-1} \sum_{(i, j) in B_b} h_k\big((P_{X_i}, Y_i), (P_{X_j}, Y_j)\big),
+|B_b|^{-1} \sum_{(i, j) \in B_b} h_k\big((P_{X_i}, Y_i), (P_{X_j}, Y_j)\big),
 ```
 where
 ```math
@@ -52,7 +52,7 @@ and blocks ``B_b`` (``b = 1, \ldots, \lfloor n/m \rfloor``) are defined as
 ```math
 B_b = \begin{cases}
 \{(i, j): (b - 1) m < i < j \leq bm \} & \text{(unbiased)}, \\
-\{(i, j): (b - 1) B < i, j \leq bm \} & \text{(biased)}.
+\{(i, j): (b - 1) m < i, j \leq bm \} & \text{(biased)}.
 \end{cases}
 ```
 
