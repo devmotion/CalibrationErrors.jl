@@ -51,7 +51,7 @@ The slides of the talk are available as [Pluto notebook](https://talks.widmann.d
 
 ## References
 
-If you use CalibrationsErrors.jl as part of your research, teaching, or other activities,
+If you use CalibrationErrors.jl as part of your research, teaching, or other activities,
 please consider citing the following publications:
 
 Widmann, D., Lindsten, F., & Zachariah, D. (2019). [Calibration tests in multi-class
