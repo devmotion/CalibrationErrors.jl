@@ -102,7 +102,7 @@ Literate.markdown(
     dirname(OUTDIR);
     name=EXAMPLE,
     documenter=true,
-    execute=false,
+    execute=true,
     preprocess=preprocess,
 )
 Literate.notebook(
