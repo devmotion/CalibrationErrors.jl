@@ -31,7 +31,9 @@ penguins_mapping =
     data(penguins) * mapping(
         :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
     )
-draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
+fg = draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
+showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
+fg
 
 # We split the data randomly into a training and validation dataset. The training dataset
 # contains around 60% of the samples.
