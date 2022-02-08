@@ -32,8 +32,11 @@ penguins_mapping =
         :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
     )
 fg = draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
-showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
-fg
+if showable(MIME("text/html"), fg)
+    error("figure $(typeof(fg)) supports the wrong format!")
+else
+    fg
+end
 
 # We split the data randomly into a training and validation dataset. The training dataset
 # contains around 60% of the samples.
@@ -48,8 +51,11 @@ penguins.train = shuffle!(vcat(trues(k), falses(n - k)))
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 plt = penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7)
 fg = draw(plt; axis=(height=300,))
-showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
-fg
+if showable(MIME("text/html"), fg)
+    error("figure $(typeof(fg)) supports the wrong format!")
+else
+    fg
+end
 
 # ## Fitting normal distributions
 #
@@ -82,8 +88,11 @@ let f = (x, y, dist) -> pdf(dist, [x, y])
     end
 end
 
-showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
-fg
+if showable(MIME("text/html"), fg)
+    error("figure $(typeof(fg)) supports the wrong format!")
+else
+    fg
+end
 
 # ## Naive Bayes classifier
 #
@@ -121,8 +130,11 @@ for (class, color) in zip(classes(y), Makie.wong_colors())
     contour!(fg.figure[1, 2], xgrid, ygrid, p; color=color)
 end
 
-showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
-fg
+if showable(MIME("text/html"), fg)
+    error("figure $(typeof(fg)) supports the wrong format!")
+else
+    fg
+end
 
 # ## Evaluation
 #
