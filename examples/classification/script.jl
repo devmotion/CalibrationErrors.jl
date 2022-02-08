@@ -47,7 +47,9 @@ penguins.train = shuffle!(vcat(trues(k), falses(n - k)))
 ## Plot the training and validation data
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 plt = penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7)
-draw(plt; axis=(height=300,))
+fg = draw(plt; axis=(height=300,))
+showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
+fg
 
 # ## Fitting normal distributions
 #
@@ -80,6 +82,7 @@ let f = (x, y, dist) -> pdf(dist, [x, y])
     end
 end
 
+showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
 fg
 
 # ## Naive Bayes classifier
@@ -118,6 +121,7 @@ for (class, color) in zip(classes(y), Makie.wong_colors())
     contour!(fg.figure[1, 2], xgrid, ygrid, p; color=color)
 end
 
+showable(MIME("text/html"), fg) && error("figure $(typeof(fg)) supports the wrong format!")
 fg
 
 # ## Evaluation
