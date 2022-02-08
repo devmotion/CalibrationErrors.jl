@@ -13,18 +13,25 @@ on:
       # When a new release is available
       - 'v*'
   pull_request:
-    types: [labeled]
+    branches:
+      - main
+
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
   docs:
     name: Documentation
-    if: github.event.action != 'labeled' || github.event.label.name == 'preview_docs'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
+      - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - uses: julia-actions/julia-docdeploy@v1
         env:
