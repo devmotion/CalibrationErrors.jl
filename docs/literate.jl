@@ -21,8 +21,8 @@ using Pkg: Pkg
 Pkg.instantiate()
 
 # Query package status and computer info, and save Manifest.toml
-const PKG_STATUS = chomp(replace(sprint(io -> Pkg.status(; io=io)); r"^"m => "# "))
-const VERSION_INFO = chomp(replace(sprint(InteractiveUtils.version_info); r"^"m => "# "))
+const PKG_STATUS = chomp(replace(sprint(io -> Pkg.status(; io=io)), r"^"m => "# "))
+const VERSION_INFO = chomp(replace(sprint(InteractiveUtils.version_info), r"^"m => "# "))
 cp(
     Pkg.Types.manifestfile_path(EXAMPLEDIR; strict=true),
     joinpath(OUTDIR, "Manifest.toml");
