@@ -5,7 +5,7 @@ end
 const RELOUTDIR = ARGS[1]
 const EXAMPLEDIR = dirname(Base.active_project())
 const EXAMPLE = basename(EXAMPLEDIR)
-const OUTDIR = joinpath(@__DIR, "src", RELOUTDIR, EXAMPLE)
+const OUTDIR = joinpath(@__DIR__, "src", RELOUTDIR, EXAMPLE)
 mkpath(OUTDIR)
 
 # Add current directory to LOAD_PATH: by stacking environments we can load Literate
