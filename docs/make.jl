@@ -92,7 +92,9 @@ let
     end
 
     # Check that all examples were run successfully
-    isempty(processes) || success(processes) || error("some examples were not run successfully")
+    isempty(processes) ||
+        success(processes) ||
+        error("some examples were not run successfully")
 end
 
 # Build documentation

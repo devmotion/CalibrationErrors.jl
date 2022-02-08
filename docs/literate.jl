@@ -23,7 +23,11 @@ Pkg.instantiate()
 # Query package status and computer info, and save Manifest.toml
 const PKG_STATUS = chomp(replace(sprint(io -> Pkg.status(; io=io)); r"^"m => "# "))
 const VERSION_INFO = chomp(replace(sprint(InteractiveUtils.version_info); r"^"m => "# "))
-cp(Pkg.Types.manifestfile_path(EXAMPLEDIR; strict=true), joinpath(OUTDIR, "Manifest.toml"); force=true)
+cp(
+    Pkg.Types.manifestfile_path(EXAMPLEDIR; strict=true),
+    joinpath(OUTDIR, "Manifest.toml");
+    force=true,
+)
 
 # Strip build version from a tag (cf. JuliaDocs/Documenter.jl#1298, Literate.jl#162)
 function version_tag_strip_build(tag)
@@ -94,7 +98,12 @@ end
 # Convert to markdown and notebook
 const SCRIPTJL = joinpath(EXAMPLEDIR, "script.jl")
 Literate.markdown(
-    SCRIPTJL, dirname(OUTDIR); name=EXAMPLE, documenter=true, execute=false, preprocess=preprocess
+    SCRIPTJL,
+    dirname(OUTDIR);
+    name=EXAMPLE,
+    documenter=true,
+    execute=false,
+    preprocess=preprocess,
 )
 Literate.notebook(
     SCRIPTJL, OUTDIR; name=EXAMPLE, documenter=true, execute=true, preprocess=preprocess
