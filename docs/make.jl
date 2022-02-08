@@ -68,20 +68,21 @@ Pkg.instantiate()
 """
 end
 
-# Install and precompile all packages
-# Workaround for https://github.com/JuliaLang/Pkg.jl/issues/2219
-examples = filter!(isdir, readdir(joinpath(@__DIR__, "..", "examples"); join=true))
-let script = instantiate_script(CalibrationErrors; org="devmotion")
+let
+    # Install and precompile all packages
+    # Workaround for https://github.com/JuliaLang/Pkg.jl/issues/2219
+    examples = filter!(isdir, readdir(joinpath(@__DIR__, "..", "examples"); join=true))
+    script = instantiate_script(CalibrationErrors; org="devmotion")
     for example in examples
         run(`$(Base.julia_cmd()) --project=$example -e $script`)
     end
-end
-# Run examples asynchronously
-processes = let literatejl = joinpath(@__DIR__, "literate.jl")
-    map(examples) do example
+
+    # Run examples asynchronously
+    literatejl = joinpath(@__DIR__, "literate.jl")
+    processes = map(examples) do example
         return run(
             pipeline(
-                `$(Base.julia_cmd()) $literatejl $(basename(example)) $EXAMPLES_OUT`;
+                `$(Base.julia_cmd()) --project=$example $literatejl examples`;
                 stdin=devnull,
                 stdout=devnull,
                 stderr=stderr,
@@ -89,10 +90,10 @@ processes = let literatejl = joinpath(@__DIR__, "literate.jl")
             wait=false,
         )::Base.Process
     end
-end
 
-# Check that all examples were run successfully
-isempty(processes) || success(processes) || error("some examples were not run successfully")
+    # Check that all examples were run successfully
+    isempty(processes) || success(processes) || error("some examples were not run successfully")
+end
 
 # Build documentation
 makedocs(;
