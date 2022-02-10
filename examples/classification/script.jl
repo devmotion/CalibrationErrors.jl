@@ -31,12 +31,10 @@ penguins_mapping =
     data(penguins) * mapping(
         :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
     )
-fg = draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
-if showable(MIME("text/html"), fg)
-    error("figure $(typeof(fg)) supports the wrong format!")
-else
-    fg
-end
+draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
+#md save("penguins.svg", current_figure()); nothing #hide
+
+#md # ![](penguins.svg)
 
 # We split the data randomly into a training and validation dataset. The training dataset
 # contains around 60% of the samples.
@@ -50,12 +48,10 @@ penguins.train = shuffle!(vcat(trues(k), falses(n - k)))
 ## Plot the training and validation data
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 plt = penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7)
-fg = draw(plt; axis=(height=300,))
-if showable(MIME("text/html"), fg)
-    error("figure $(typeof(fg)) supports the wrong format!")
-else
-    fg
-end
+draw(plt; axis=(height=300,))
+#md save("penguins_datasets.svg", current_figure()); nothing #hide
+
+#md # ![](penguins_datasets.svg)
 
 # ## Fitting normal distributions
 #
@@ -88,11 +84,10 @@ let f = (x, y, dist) -> pdf(dist, [x, y])
     end
 end
 
-if showable(MIME("text/html"), fg)
-    error("figure $(typeof(fg)) supports the wrong format!")
-else
-    fg
-end
+#md save("penguins_normal_fit.svg", fg)
+#!md fg
+
+#md # ![](penguins_normal_fit.svg)
 
 # ## Naive Bayes classifier
 #
@@ -130,11 +125,10 @@ for (class, color) in zip(classes(y), Makie.wong_colors())
     contour!(fg.figure[1, 2], xgrid, ygrid, p; color=color)
 end
 
-if showable(MIME("text/html"), fg)
-    error("figure $(typeof(fg)) supports the wrong format!")
-else
-    fg
-end
+#md save("penguins_predictions.svg", fg)
+#!md fg
+
+#md # ![](penguins_predictions.svg)
 
 # ## Evaluation
 #
