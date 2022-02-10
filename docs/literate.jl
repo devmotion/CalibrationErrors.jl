@@ -17,9 +17,6 @@ using Literate: Literate # from stacked environment
 using InteractiveUtils: InteractiveUtils
 using Pkg: Pkg
 
-# Instantiate environment of example
-Pkg.instantiate()
-
 # Query package status and computer info, and save Manifest.toml
 const PKG_STATUS = chomp(replace(sprint(io -> Pkg.status(; io=io)), r"^"m => "# "))
 const VERSION_INFO = chomp(replace(sprint(InteractiveUtils.versioninfo), r"^"m => "# "))
@@ -66,15 +63,11 @@ $PKG_STATUS
 $VERSION_INFO
 # ```
 # #### Manifest
-# To reproduce the project environment of this example you can [download the full Manifest.toml](Manifest.toml).
+# To reproduce the project environment of this example you can [download the full Manifest.toml](./Manifest.toml).
 """
 function preprocess(content)
     sub = SubstitutionString(
         """
-#md # ```@meta
-#md # EditURL = "@__REPO_ROOT_URL__/$RELEXAMPLEDIR/script.jl"
-#md # ```
-#md #
 \\0
 #
 #md # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/$RELOUTDIR/@__NAME__/@__NAME__.ipynb)
@@ -101,10 +94,9 @@ Literate.markdown(
     SCRIPTJL,
     dirname(OUTDIR);
     name=EXAMPLE,
-    documenter=true,
     execute=true,
     preprocess=preprocess,
 )
 Literate.notebook(
-    SCRIPTJL, OUTDIR; name=EXAMPLE, documenter=true, execute=true, preprocess=preprocess
+    SCRIPTJL, OUTDIR; name=EXAMPLE, execute=true, preprocess=preprocess
 )

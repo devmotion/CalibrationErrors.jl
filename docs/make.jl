@@ -104,7 +104,7 @@ makedocs(;
     repo="https://github.com/devmotion/CalibrationErrors.jl/blob/{commit}{path}#L{line}",
     sitename="CalibrationErrors.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
+        prettyurls=true,
         canonical="https://devmotion.github.io/CalibrationErrors.jl",
         assets=String[],
     ),
