@@ -71,7 +71,7 @@ end
 let
     # Install and precompile all packages
     # Workaround for https://github.com/JuliaLang/Pkg.jl/issues/2219
-    examples = [joinpath(@__DIR__, "..", "examples", "classification")] # filter!(isdir, readdir(joinpath(@__DIR__, "..", "examples"); join=true))
+    examples = filter!(isdir, readdir(joinpath(@__DIR__, "..", "examples"); join=true))
     script = instantiate_script(CalibrationErrors; org="devmotion")
     for example in examples
         run(`$(Base.julia_cmd()) --project=$example -e $script`)

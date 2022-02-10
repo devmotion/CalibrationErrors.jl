@@ -32,9 +32,6 @@ penguins_mapping =
         :bill_length_mm => "bill length (mm)", :flipper_length_mm => "flipper length (mm)"
     )
 draw(penguins_mapping * mapping(; color=:species) * visual(; alpha=0.7))
-#md save("./penguins.svg", current_figure()); nothing #hide
-
-#md # ![](./penguins.svg)
 
 # We split the data randomly into a training and validation dataset. The training dataset
 # contains around 60% of the samples.
@@ -49,9 +46,6 @@ penguins.train = shuffle!(vcat(trues(k), falses(n - k)))
 dataset = :train => renamer(true => "training", false => "validation") => "Dataset"
 plt = penguins_mapping * mapping(; color=:species, col=dataset) * visual(; alpha=0.7)
 draw(plt; axis=(height=300,))
-#md save("./penguins_datasets.svg", current_figure()); nothing #hide
-
-#md # ![](./penguins_datasets.svg)
 
 # ## Fitting normal distributions
 #
@@ -84,10 +78,7 @@ let f = (x, y, dist) -> pdf(dist, [x, y])
     end
 end
 
-#md save("./penguins_normal_fit.svg", fg); nothing #hide
-#!md fg
-
-#md # ![](./penguins_normal_fit.svg)
+fg
 
 # ## Naive Bayes classifier
 #
@@ -125,10 +116,7 @@ for (class, color) in zip(classes(y), Makie.wong_colors())
     contour!(fg.figure[1, 2], xgrid, ygrid, p; color=color)
 end
 
-#md save("./penguins_predictions.svg", fg); nothing #hide
-#!md fg
-
-#md # ![](./penguins_predictions.svg)
+fg
 
 # ## Evaluation
 #
