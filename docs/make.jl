@@ -115,8 +115,8 @@ makedocs(;
         "kce.md",
         "others.md",
         "Examples" =>
-            map(filter!(filename -> endswith(filename, ".md"), readdir(EXAMPLES_OUT))) do x
-                return joinpath("examples", x)
+            map(filter!(isdir, readdir(EXAMPLES_OUT; join=true))) do x
+                return joinpath("examples", basename(x), "index.md")
             end,
     ],
     strict=true,
