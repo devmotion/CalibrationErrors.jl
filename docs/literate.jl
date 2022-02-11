@@ -124,7 +124,5 @@ end
 
 # Convert to markdown and notebook
 const SCRIPTJL = joinpath(EXAMPLEDIR, "script.jl")
-Literate.markdown(
-    SCRIPTJL, OUTDIR; name="index", execute=true, preprocess=preprocess
-)
+Literate.markdown(SCRIPTJL, OUTDIR; name="index", execute=true, preprocess=preprocess)
 Literate.notebook(SCRIPTJL, OUTDIR; name=EXAMPLE, execute=true, preprocess=preprocess)
