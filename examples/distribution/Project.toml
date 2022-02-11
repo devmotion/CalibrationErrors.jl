@@ -2,13 +2,11 @@
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 CalibrationErrors = "33913031-fe46-5864-950f-100836f47845"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 CairoMakie = "0.7"
 CalibrationErrors = "0.6"
 Distributions = "0.25"
-Literate = "2.8"
 StatsBase = "0.33"
 julia = "1.3"
