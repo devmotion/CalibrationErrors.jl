@@ -39,36 +39,38 @@ function version_tag_strip_build(tag)
     return "$s0$s1$s2$s3$s4"
 end
 
+# Obtain name of deploy folder
+function deployfolder(; devurl="dev")
+    github_ref = get(ENV, "GITHUB_REF", "")
+    if get(ENV, "GITHUB_EVENT_NAME", nothing) == "push"
+        if (m = match(r"^refs\/tags\/(.*)$", github_ref)) !== nothing
+            # new tags: correspond to a new version
+            return version_tag_strip_build(String(m.captures[1]))
+        end
+    elseif (m = match(r"refs\/pull\/(\d+)\/merge", github_ref)) !== nothing
+        # pull request: build preview
+        "previews/PR$(m.captures[1])"
+    end
+
+    # fallback: development branch
+    return devurl
+end
+
 # Add link to nbviewer below the first heading of level 1 and add footer
 const RELEXAMPLEDIR = relpath(EXAMPLEDIR, joinpath(@__DIR__, ".."))
-const DEPLOYFOLDER = if get(ENV, "GITHUB_EVENT_NAME", nothing) == "push"
-    if (m = match(r"^refs\/tags\/(.*)$", get(ENV, "GITHUB_REF", ""))) !== nothing
-        version_tag_strip_build(String(m.captures[1]))
-    else
-        get(user_config, "devurl", "dev")
-    end
-elseif (m = match(r"refs\/pull\/(\d+)\/merge", get(ENV, "GITHUB_REF", ""))) !== nothing
-    "previews/PR$(m.captures[1])"
-else
-    "dev"
-end
-const FOOTER = """
-# ### Package and system information
-# #### Package version
-# ```julia
-$PKG_STATUS
-# ```
-# #### Computer information
-# ```
-$VERSION_INFO
-# ```
-# #### Manifest
-# To reproduce the project environment of this example you can [download the full Manifest.toml](./Manifest.toml).
-"""
+const DEPLOYFOLDER = deployfolder()
 function preprocess(content)
-    sub = SubstitutionString(
-        """
-\\0
+    io = IOBuffer()
+
+    # Print initial lines, up to and including the first heading of level 1
+    lines = eachline(content)
+    for line in lines
+        write(io, line, '\n')
+        startswith(line, "# # ") && break
+    end
+
+    # Add header
+    write(io, """
 #
 #md # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/$RELOUTDIR/@__NAME__/@__NAME__.ipynb)
 #md #
@@ -81,21 +83,48 @@ function preprocess(content)
 #md # notebook can be viewed in [nbviewer](@__NBVIEWER_ROOT_URL__/$RELOUTDIR/@__NAME__/@__NAME__.ipynb).*
 #nb # HTML output can be viewed [here](https://devmotion.github.io/CalibrationErrors.jl/$DEPLOYFOLDER/$RELOUTDIR/@__NAME__/).*
 #
-        """,
-    )
-    content = replace(content, r"^# # [^\n]*"m => sub; count=1)
+""")
 
-    return content * FOOTER
+    # Print remaining lines
+    for line in lines
+        write(io, line, '\n')
+    end
+
+    # Add footer
+    write(
+        io,
+        """
+# ### Package and system information
+# #### Package version
+# ```julia
+""",
+        PKG_STATUS,
+        """
+# ```
+# #### Computer information
+# ```
+""",
+        VERSION_INFO,
+        """
+# ```
+# #### Manifest
+# To reproduce the project environment of this example you can
+""",
+        "#md # [download the full Manifest.toml](./",
+        RELOUTDIR,
+        "/",
+        EXAMPLE,
+        "/Manifest.toml).\n",
+        "#nb # [download the full Manifest.toml](Manifest.toml).\n",
+    )
+
+    return String(take!(io))
 end
 
 # Convert to markdown and notebook
 const SCRIPTJL = joinpath(EXAMPLEDIR, "script.jl")
 Literate.markdown(
-    SCRIPTJL,
-    dirname(OUTDIR);
-    name=EXAMPLE,
-    execute=true,
-    preprocess=preprocess,
+    SCRIPTJL, dirname(OUTDIR); name=EXAMPLE, execute=true, preprocess=preprocess
 )
 Literate.notebook(
     SCRIPTJL, OUTDIR; name=EXAMPLE, execute=true, preprocess=preprocess
