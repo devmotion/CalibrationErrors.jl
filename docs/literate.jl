@@ -93,7 +93,6 @@ function preprocess(content)
 
     # Add footer
     println(io, "# ### Package and system information")
-    
     ## Add package status
     iopkg = IOBuffer()
     Pkg.status(; io=iopkg)
@@ -102,7 +101,6 @@ function preprocess(content)
         println(io, "# ", l)
     end
     println(io, "# ```")
-    
     ## Add computer info
     ioversion = IOBuffer()
     InteractiveUtils.versioninfo(ioversion)
