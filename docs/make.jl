@@ -37,14 +37,14 @@ function instantiate_script(mod; org, name=string(nameof(mod)), devbranch="main"
                 @info "Run examples with $name version $tag_nobuild"
                 return """
 using Pkg
-Pkg.add(PackageSpec(; name="$name", version="$version"))
+Pkg.add(PackageSpec(; name="$name", version="$tag_nobuild"))
 Pkg.instantiate()
 """
             end
         else
             # no release tag
             match_branch = match(r"^refs\/heads\/(.*)$", github_ref)
-            if match_branch !== nothing && string(m.captures[1]) == devbranch
+            if match_branch !== nothing && string(match_branch.captures[1]) == devbranch
                 sha = get(ENV, "GITHUB_SHA", nothing)
                 if sha !== nothing
                     @info "Run examples with $name commit $sha"
