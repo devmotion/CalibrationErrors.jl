@@ -63,7 +63,7 @@ function preprocess(content)
     io = IOBuffer()
 
     # Print initial lines, up to and including the first heading of level 1
-    lines = eachline(content)
+    lines = eachline(IOBuffer(content))
     for line in lines
         write(io, line, '\n')
         startswith(line, "# # ") && break
