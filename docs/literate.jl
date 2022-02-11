@@ -96,7 +96,7 @@ function preprocess(content)
     
     ## Add package status
     iopkg = IOBuffer()
-    Pkg.status(; io=iopkg))
+    Pkg.status(; io=iopkg)
     println(io, "# #### Package version\n# ```julia")
     for l in eachline(iopkg)
         println(io, "# ", l)
