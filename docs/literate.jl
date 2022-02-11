@@ -113,11 +113,7 @@ function preprocess(content)
 # #### Manifest
 # To reproduce the project environment of this example you can
 """,
-        "#md # [download the full Manifest.toml](./",
-        RELOUTDIR,
-        "/",
-        EXAMPLE,
-        "/Manifest.toml).\n",
+        "#md # [download the full Manifest.toml](./@__NAME__/Manifest.toml).\n",
         "#nb # [download the full Manifest.toml](Manifest.toml).\n",
     )
 
