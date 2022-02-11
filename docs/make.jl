@@ -114,10 +114,9 @@ makedocs(;
         "ece.md",
         "kce.md",
         "others.md",
-        "Examples" =>
-            map(filter!(isdir, readdir(EXAMPLES_OUT; join=true))) do x
-                return joinpath("examples", basename(x), "index.md")
-            end,
+        "Examples" => map(filter!(isdir, readdir(EXAMPLES_OUT; join=true))) do x
+            return joinpath("examples", basename(x), "index.md")
+        end
     ],
     strict=true,
     checkdocs=:exports,
