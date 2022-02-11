@@ -70,7 +70,9 @@ function preprocess(content)
     end
 
     # Add header
-    write(io, """
+    write(
+        io,
+        """
 #
 #md # [![](https://img.shields.io/badge/show-nbviewer-579ACA.svg)](@__NBVIEWER_ROOT_URL__/$RELOUTDIR/@__NAME__/@__NAME__.ipynb)
 #md #
@@ -83,7 +85,8 @@ function preprocess(content)
 #md # notebook can be viewed in [nbviewer](@__NBVIEWER_ROOT_URL__/$RELOUTDIR/@__NAME__/@__NAME__.ipynb).*
 #nb # HTML output can be viewed [here](https://devmotion.github.io/CalibrationErrors.jl/$DEPLOYFOLDER/$RELOUTDIR/@__NAME__/).*
 #
-""")
+""",
+    )
 
     # Print remaining lines
     for line in lines
