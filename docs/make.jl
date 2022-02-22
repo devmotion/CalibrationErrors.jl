@@ -79,10 +79,13 @@ let
 
     # Run examples asynchronously
     literatejl = joinpath(@__DIR__, "literate.jl")
+    # Add current directory to LOAD_PATH: by stacking environments we can load Literate
+    # without adding it to each example
+    cmd = addenv(Base.julia_cmd(), "JULIA_LOAD_PATH" => (iswindows() ? ";" : ":") * @__DIR__)
     processes = map(examples) do example
         return run(
             pipeline(
-                `$(Base.julia_cmd()) --project=$example $literatejl examples`;
+                `$cmd --project=$example $literatejl examples`;
                 stdin=devnull,
                 stdout=devnull,
                 stderr=stderr,
