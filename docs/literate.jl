@@ -8,10 +8,6 @@ const EXAMPLE = basename(EXAMPLEDIR)
 const OUTDIR = joinpath(@__DIR__, "src", RELOUTDIR, EXAMPLE)
 mkpath(OUTDIR)
 
-# Add current directory to LOAD_PATH: by stacking environments we can load Literate
-# without adding it to each example
-push!(LOAD_PATH, @__DIR__)
-
 # Load non-example specific packages
 using Literate: Literate # from stacked environment
 using InteractiveUtils: InteractiveUtils
