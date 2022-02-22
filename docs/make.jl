@@ -81,7 +81,9 @@ let
     literatejl = joinpath(@__DIR__, "literate.jl")
     # Add current directory to LOAD_PATH: by stacking environments we can load Literate
     # without adding it to each example
-    cmd = addenv(Base.julia_cmd(), "JULIA_LOAD_PATH" => (iswindows() ? ";" : ":") * @__DIR__)
+    cmd = addenv(
+        Base.julia_cmd(), "JULIA_LOAD_PATH" => (Sys.iswindows() ? ";" : ":") * @__DIR__
+    )
     processes = map(examples) do example
         return run(
             pipeline(
