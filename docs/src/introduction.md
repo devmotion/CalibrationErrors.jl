@@ -12,7 +12,7 @@ of observations of features and corresponding targets are available).[^1]
 
 In the [classification example](../examples/classification) we study the
 [Palmer penguins dataset](https://github.com/allisonhorst/palmerpenguins) with
-measurements of three different penguin species and consider the task of predictin
+measurements of three different penguin species and consider the task of predicting
 the probability of a penguin species (*target*) given the bill and flipper length
 (*feature*). For this classification task there exist many different probabilistic
 predictive models. We denote the feature by $X$ and the target by $Y$, and let
