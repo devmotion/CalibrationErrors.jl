@@ -127,7 +127,7 @@ function plot_estimates(set::EstimatesSet; ece=false)
         estimates = set.estimates[i, j]
 
         ## create new axis
-        ax = Axis(f[i, j]; ticks=LinearTicks(4))
+        ax = Axis(f[i, j]; xticks=LinearTicks(4))
         i < nrows && hidexdecorations!(ax; grid=false)
         j > 1 && hideydecorations!(ax; grid=false)
 
