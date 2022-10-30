@@ -10,8 +10,6 @@ using Statistics
 using Test
 
 using CalibrationErrors: unsafe_skce_eval, unsafe_ucme_eval
-using CalibrationErrors:
-    Wasserstein, SqWasserstein, MixtureWasserstein, SqMixtureWasserstein
 
 Random.seed!(1234)
 

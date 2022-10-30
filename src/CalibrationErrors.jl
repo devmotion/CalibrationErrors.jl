@@ -26,6 +26,9 @@ export ECE, SKCE, UCME
 # binning algorithms
 export UniformBinning, MedianVarianceBinning
 
+# Wasserstein distances
+export Wasserstein, SqWasserstein, MixtureWasserstein, SqMixtureWasserstein
+
 include("distances/types.jl")
 include("distances/wasserstein.jl")
 
