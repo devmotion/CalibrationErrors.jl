@@ -3,13 +3,10 @@ name: Format
 on:
   push:
     branches:
-      # This is where pull requests from "bors r+" are built.
-      - staging
-      # This is where pull requests from "bors try" are built.
-      - trying
-      # Build the master branch.
+      # Build the default branch.
       - main
   pull_request:
+  merge_group:
 
 jobs:
   format:
