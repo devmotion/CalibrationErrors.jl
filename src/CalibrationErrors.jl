@@ -8,9 +8,9 @@ using DataStructures
 using ExactOptimalTransport: ExactOptimalTransport
 @reexport using KernelFunctions
 using PDMats: PDMats
+using SimpleUnPack: @unpack
 using StatsBase: StatsBase
 using Tulip: Tulip
-using UnPack: @unpack
 
 using LinearAlgebra
 using Statistics
