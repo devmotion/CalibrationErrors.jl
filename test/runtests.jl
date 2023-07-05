@@ -14,22 +14,18 @@ using CalibrationErrors: unsafe_skce_eval, unsafe_ucme_eval
 Random.seed!(1234)
 
 @testset "CalibrationErrors" begin
+    @testset "General" begin
+        include("aqua.jl")
+    end
+
     @testset "binning" begin
-        @testset "generic" begin
-            include("binning/generic.jl")
-        end
-        @testset "uniform" begin
-            include("binning/uniform.jl")
-        end
-        @testset "median variance" begin
-            include("binning/medianvariance.jl")
-        end
+        include("binning/generic.jl")
+        include("binning/uniform.jl")
+        include("binning/medianvariance.jl")
     end
 
     @testset "distances" begin
-        @testset "Wasserstein distance" begin
-            include("distances/wasserstein.jl")
-        end
+        include("distances/wasserstein.jl")
     end
 
     @testset "ECE" begin
@@ -45,11 +41,7 @@ Random.seed!(1234)
     end
 
     @testset "distributions" begin
-        @testset "Normal" begin
-            include("distributions/normal.jl")
-        end
-        @testset "MvNormal" begin
-            include("distributions/mvnormal.jl")
-        end
+        include("distributions/normal.jl")
+        include("distributions/mvnormal.jl")
     end
 end
