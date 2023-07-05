@@ -47,7 +47,7 @@ statistical hypothesis tests of calibration.
 
 [![Calibration analysis of probabilistic models in Julia](http://img.youtube.com/vi/PrLsXFvwzuA/0.jpg)](http://www.youtube.com/watch?v=PrLsXFvwzuA)
 
-The slides of the talk are available as [Pluto notebook](https://talks.widmann.dev/2021/07/calibration/).
+The slides of the talk are available as [Pluto notebook](https://talks.widmann.dev/2021/07/Calibration/).
 
 ## Citing
 
