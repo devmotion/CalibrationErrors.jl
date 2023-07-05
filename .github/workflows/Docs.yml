@@ -3,17 +3,11 @@ name: Docs
 on:
   push:
     branches:
-      # This is where pull requests from "bors r+" are built.
-      - staging
-      # This is where pull requests from "bors try" are built.
-      - trying
-      # Build master branch.
       - main
     tags:
       # When a new release is available
       - 'v*'
   pull_request:
-    types: [opened, reopened, synchronize, labeled]
 
 concurrency:
   # Skip intermediate builds: always.
@@ -23,19 +17,25 @@ concurrency:
 
 jobs:
   docs:
+    permissions:
+      contents: write
+      statuses: write
     name: Documentation
-    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'preview_docs')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
-      - uses: julia-actions/julia-docdeploy@v1
+      - run: |
+          julia --project=docs -e '
+            using Pkg
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.instantiate()'
+      - run: julia --project=docs docs/make.jl
         env:
           DATADEPS_ALWAYS_ACCEPT: true # Bypass the accept download prompt
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JULIA_DEBUG: Documenter # Print `@debug` statements
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}

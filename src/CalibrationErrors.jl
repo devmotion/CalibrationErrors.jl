@@ -17,9 +17,6 @@ using Statistics
 
 const OT = ExactOptimalTransport
 
-# estimation
-export calibrationerror
-
 # estimators
 export ECE, SKCE, UCME
 

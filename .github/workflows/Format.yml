@@ -3,19 +3,20 @@ name: Format
 on:
   push:
     branches:
-      # This is where pull requests from "bors r+" are built.
-      - staging
-      # This is where pull requests from "bors try" are built.
-      - trying
-      # Build the master branch.
       - main
   pull_request:
+
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: julia-actions/setup-julia@latest
         with:
           version: 1
