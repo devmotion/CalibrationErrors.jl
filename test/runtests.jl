@@ -1,4 +1,5 @@
 using CalibrationErrors
+using Aqua
 using Distances
 using Distributions
 using PDMats
