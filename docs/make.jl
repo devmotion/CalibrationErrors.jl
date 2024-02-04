@@ -123,7 +123,6 @@ makedocs(;
             return joinpath("examples", basename(x), "index.md")
         end,
     ],
-    strict=true,
     checkdocs=:exports,
 )
 
