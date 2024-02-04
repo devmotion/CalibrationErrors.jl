@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Distribution of calibration error estimates · CalibrationErrors.jl</title><link rel="canonical" href="https://devmotion.github.io/CalibrationErrors.jl/examples/distribution/"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">CalibrationErrors.jl</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">CalibrationErrors.jl</a></li><li><a class="tocitem" href="../../introduction/">Introduction</a></li><li><a class="tocitem" href="../../ece/">Expected calibration error (ECE)</a></li><li><a class="tocitem" href="../../kce/">Kernel calibration error (KCE)</a></li><li><a class="tocitem" href="../../others/">Other calibration errors</a></li><li><span class="tocitem">Examples</span><ul><li><a class="tocitem" href="../classification/">Classification of penguin species</a></li><li class="is-active"><a class="tocitem" href>Distribution of calibration error estimates</a><ul class="internal"><li><a class="tocitem" href="#Packages"><span>Packages</span></a></li><li><a class="tocitem" href="#Introduction"><span>Introduction</span></a></li><li><a class="tocitem" href="#Estimates"><span>Estimates</span></a></li><li><a class="tocitem" href="#Kernel-choice"><span>Kernel choice</span></a></li><li><a class="tocitem" href="#Expected-calibration-error"><span>Expected calibration error</span></a></li><li><a class="tocitem" href="#Biased-estimator-of-the-squared-kernel-calibration-error"><span>Biased estimator of the squared kernel calibration error</span></a></li><li><a class="tocitem" href="#Unbiased-estimators-of-the-squared-kernel-calibration-error"><span>Unbiased estimators of the squared kernel calibration error</span></a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Distribution of calibration error estimates</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Distribution of calibration error estimates</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/devmotion/CalibrationErrors.jl/blob/master/examples/distribution/script.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Distribution-of-calibration-error-estimates"><a class="docs-heading-anchor" href="#Distribution-of-calibration-error-estimates">Distribution of calibration error estimates</a><a id="Distribution-of-calibration-error-estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Distribution-of-calibration-error-estimates" title="Permalink"></a></h1><p><a href="https://nbviewer.jupyter.org/github/devmotion/CalibrationErrors.jl/blob/gh-pages/v0.5.15/examples/distribution.ipynb"><img src="https://img.shields.io/badge/show-nbviewer-579ACA.svg" alt/></a></p><p>You are seeing the HTML output generated by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a> from the <a href="https://github.com/devmotion/CalibrationErrors.jl/blob/master/examples/distribution/script.jl">Julia source file</a>. The corresponding notebook can be viewed in <a href="https://nbviewer.jupyter.org/github/devmotion/CalibrationErrors.jl/blob/gh-pages/v0.5.15/examples/distribution.ipynb">nbviewer</a>.</p><h2 id="Packages"><a class="docs-heading-anchor" href="#Packages">Packages</a><a id="Packages-1"></a><a class="docs-heading-anchor-permalink" href="#Packages" title="Permalink"></a></h2><pre><code class="language-julia">using CairoMakie
+using CalibrationErrors
+using Distances
+using Distributions
+using StatsBase
+
+using LinearAlgebra
+using Random
+using Statistics
+
+using CairoMakie.AbstractPlotting.ColorSchemes: Dark2_8</code></pre><h2 id="Introduction"><a class="docs-heading-anchor" href="#Introduction">Introduction</a><a id="Introduction-1"></a><a class="docs-heading-anchor-permalink" href="#Introduction" title="Permalink"></a></h2><p>This example is taken from the publication <a href="https://proceedings.neurips.cc/paper/2019/hash/1c336b8080f82bcc2cd2499b4c57261d-Abstract.html">&quot;Calibration tests in multi-class classification: A unifying framework&quot;</a> by Widmann, Lindsten, and Zachariah (2019).</p><p>We estimate calibration errors of the model</p><p class="math-container">\[\begin{aligned}
+   g(X) &amp;\sim \mathrm{Dir}(\alpha),\\
+   Z &amp;\sim \mathrm{Ber}(\pi),\\
+   Y \,|\, g(X) = \gamma, Z = 1 &amp;\sim \mathrm{Categorical}(\beta),\\
+   Y \,|\, g(X) = \gamma, Z = 0 &amp;\sim \mathrm{Categorical}(\gamma),
+\end{aligned}\]</p><p>where <span>$\alpha \in \mathbb{R}_{&gt;0}^m$</span> determines the distribution of predictions <span>$g(X)$</span>, <span>$\pi &gt; 0$</span> determines the degree of miscalibration, and <span>$\beta$</span> defines a fixed categorical distribution.</p><p>Here we consider only the choices <span>$\alpha = (0.1, \ldots, 0.1)$</span>, mimicking a distribution after training that is pushed towards the edges of the probability simplex, and <span>$\beta = (1, 0, \ldots, 0)$</span>.</p><p>In our experiments we sample 250 predictions from the Dirichlet distribution <span>$\textrm{Dir}(\alpha)$</span>, and then we generate corresponding labels according to the model stated above, for different choices of <span>$\pi$</span> and number of classes <span>$m$</span>.</p><p>We evaluate the standard estimators of expected calibration error (ECE) based on a uniform binning scheme and a data-dependent binning scheme, and the biased estimator of the squared kernel calibration error (SKCE), the quadratic unbiased estimator of the SKCE, and the linear unbiased estimator of the SKCE for a specific choice of matrix-valued kernels.</p><p>The sampling procedure and the evaluation are repeated 100 times, to obtain a sample of 100 estimates for each considered setting of <span>$\pi$</span> and <span>$m$</span>.</p><p>For our choice of <span>$\alpha$</span> and <span>$\beta$</span>, the analytical ECE with respect to the total variation distance <span>$\|.\|_{\mathrm{TV}}$</span> is</p><p class="math-container">\[\mathrm{ECE}_{\mathrm{TV}} = \frac{\pi(m-1)}{m}.\]</p><h2 id="Estimates"><a class="docs-heading-anchor" href="#Estimates">Estimates</a><a id="Estimates-1"></a><a class="docs-heading-anchor-permalink" href="#Estimates" title="Permalink"></a></h2><pre><code class="language-julia">function estimates(estimator, π::Real, m::Int)
+    # cache array for predictions, modified predictions, and labels
+    predictions = [Vector{Float64}(undef, m) for _ in 1:250]
+    targets = Vector{Int}(undef, 250)
+    data = (predictions, targets)
+
+    # define sampler of predictions
+    sampler_predictions = sampler(Dirichlet(m, 0.1))
+
+    # initialize estimates
+    estimates = Vector{Float64}(undef, 100)
+
+    # for each run
+    @inbounds for i in eachindex(estimates)
+        # sample predictions
+        rand!.((sampler_predictions,), predictions)
+
+        # sample targets
+        for (j, p) in enumerate(predictions)
+            if rand() &lt; π
+                targets[j] = 1
+            else
+                targets[j] = rand(Categorical(p))
+            end
+        end
+
+        # evaluate estimator
+        estimates[i] = estimator(data)(predictions, targets)
+    end
+
+    return estimates
+end;</code></pre><p>We use a helper function to run the experiment for all desired parameter settings.</p><pre><code class="language-julia">struct EstimatesSet
+    m::Vector{Int}
+    π::Vector{Float64}
+    estimates::Matrix{Vector{Float64}}
+end
+
+function estimates(estimator)
+    # for all combinations of m and π
+    mvec = [2, 10, 100]
+    πvec = [0.0, 0.5, 1.0]
+    estimatesmat = estimates.((estimator,), πvec&#39;, mvec)
+
+    return EstimatesSet(mvec, πvec, estimatesmat)
+end;</code></pre><p>As mentioned above, we can calculate the analytic expected calibration error. For the squared kernel calibration error, we take the mean of the estimates of the unbiased quadratic estimator as approximation of the true value.</p><p>We provide simple histogram plots of our results. The mean value of the estimates is indicated by a solid black vertical line and the analytic calibration error is visualized as a dashed red line.</p><pre><code class="language-julia">function plot(set::EstimatesSet; ece=false)
+    # create figure
+    f = Figure(; resolution=(1080, 960))
+
+    # add subplots
+    nrows, ncols = size(set.estimates)
+    for (j, π) in enumerate(set.π), (i, m) in enumerate(set.m)
+        # obtain data
+        estimates = set.estimates[i, j]
+
+        # create new axis
+        ax = Axis(f[i, j]; ticks=LinearTicks(4))
+        i &lt; nrows &amp;&amp; hidexdecorations!(current_axis(); grid=false)
+        j &gt; 1 &amp;&amp; hideydecorations!(current_axis(); grid=false)
+
+        # plot histogram of estimates
+        h = fit(Histogram, estimates)
+        plot!(h; color=(Dark2_8[1], 0.5), strokecolor=:black, strokewidth=0.5)
+
+        # indicate analytic calibration error for ECE
+        if ece
+            vlines!(ax, [π * (m - 1) / m]; color=Dark2_8[2], linewidth=2)
+        end
+
+        # indicate mean of estimates
+        vlines!(ax, [mean(estimates)]; color=Dark2_8[3], linewidth=2)
+    end
+
+    # add labels and link axes
+    for (j, π) in enumerate(set.π)
+        Box(f[1, j, Top()]; color=:gray90)
+        Label(f[1, j, Top()], &quot;π = $π&quot;; padding=(0, 0, 5, 5))
+        linkxaxes!(contents(f[:, j])...)
+    end
+    for (i, m) in enumerate(set.m)
+        Box(f[i, ncols, Right()]; color=:gray90)
+        Label(f[i, ncols, Right()], &quot;$m classes&quot;; rotation=-π / 2, padding=(5, 5, 0, 0))
+        linkyaxes!(contents(f[i, :])...)
+    end
+    Label(f[nrows, 1:ncols, Bottom()], &quot;calibration error estimate&quot;; padding=(0, 0, 0, 75))
+    Label(f[1:nrows, 1, Left()], &quot;# runs&quot;; rotation=π / 2, padding=(0, 75, 0, 0))
+
+    return f
+end;</code></pre><h2 id="Kernel-choice"><a class="docs-heading-anchor" href="#Kernel-choice">Kernel choice</a><a id="Kernel-choice-1"></a><a class="docs-heading-anchor-permalink" href="#Kernel-choice" title="Permalink"></a></h2><p>We use a tensor product kernel consisting of an exponential kernel <span>$k(\mu, \mu&#39;) = \exp{(- \gamma \|p - p&#39;\|)}$</span> on the space of predicted categorical distributions and a white kernel <span>$k(y, y&#39;) = \delta(y - y&#39;)$</span> on the space of targets <span>$\{1,\ldots,m\}$</span>. The total variation distance is chosen as the norm on the space of predictions, and the inverse lengthscale <span>$\gamma$</span> is set according to the median heuristic.</p><pre><code class="language-julia">struct MedianHeuristicKernel
+    distances::Matrix{Float64}
+    cache::Vector{Float64}
+end
+
+function MedianHeuristicKernel(n::Int)
+    return MedianHeuristicKernel(
+        Matrix{Float64}(undef, n, n), Vector{Float64}(undef, (n * (n - 1)) ÷ 2)
+    )
+end
+
+function (f::MedianHeuristicKernel)((predictions, targets))
+    distances = f.distances
+    cache = f.cache
+
+    # compute inverse lengthscale with median heuristic
+    pairwise!(distances, TotalVariation(), predictions)
+    k = 0
+    @inbounds for j in axes(distances, 2), i in 1:(j - 1)
+        cache[k += 1] = distances[i, j]
+    end
+    γ = inv(median!(cache))
+
+    # create tensor product kernel
+    return transform(TVExponentialKernel(), γ) ⊗ WhiteKernel()
+end</code></pre><h2 id="Expected-calibration-error"><a class="docs-heading-anchor" href="#Expected-calibration-error">Expected calibration error</a><a id="Expected-calibration-error-1"></a><a class="docs-heading-anchor-permalink" href="#Expected-calibration-error" title="Permalink"></a></h2><h3 id="Uniform-binning"><a class="docs-heading-anchor" href="#Uniform-binning">Uniform binning</a><a id="Uniform-binning-1"></a><a class="docs-heading-anchor-permalink" href="#Uniform-binning" title="Permalink"></a></h3><p>We start by analyzing the expected calibration error (ECE). For our estimation we use 10 bins of uniform width in each dimension.</p><pre><code class="language-julia">Random.seed!(1234)
+data = estimates(_ -&gt; ECE(UniformBinning(10), TotalVariation()))
+plot(data; ece=true)
+save(&quot;./figures/ece_uniform.svg&quot;, current_figure());</code></pre><p><img src="../figures/ece_uniform.svg" alt/></p><h3 id="Non-uniform-binning"><a class="docs-heading-anchor" href="#Non-uniform-binning">Non-uniform binning</a><a id="Non-uniform-binning-1"></a><a class="docs-heading-anchor-permalink" href="#Non-uniform-binning" title="Permalink"></a></h3><p>We repeat our experiments with a different data-dependent binning scheme. This time the bins will be computed dynamically by splitting the predictions at the median of the classes with the highest variance, as long as the number of bins does not exceed a given threshold and the number of samples per bin is above a certain lower bound. In our experiments we do not impose any restriction on the number of bins but only stop splitting if the number of samples is less than 10.</p><pre><code class="language-julia">Random.seed!(1234)
+data = estimates(_ -&gt; ECE(MedianVarianceBinning(10), TotalVariation()))
+plot(data; ece=true)
+save(&quot;./figures/ece_medianvariance.svg&quot;, current_figure());</code></pre><p><img src="../figures/ece_medianvariance.svg" alt/></p><h2 id="Biased-estimator-of-the-squared-kernel-calibration-error"><a class="docs-heading-anchor" href="#Biased-estimator-of-the-squared-kernel-calibration-error">Biased estimator of the squared kernel calibration error</a><a id="Biased-estimator-of-the-squared-kernel-calibration-error-1"></a><a class="docs-heading-anchor-permalink" href="#Biased-estimator-of-the-squared-kernel-calibration-error" title="Permalink"></a></h2><pre><code class="language-julia">Random.seed!(1234)
+data = estimates(BiasedSKCE ∘ MedianHeuristicKernel(250))
+plot(data)
+save(&quot;./figures/skce_biased.svg&quot;, current_figure());</code></pre><p><img src="../figures/skce_biased.svg" alt/></p><h2 id="Unbiased-estimators-of-the-squared-kernel-calibration-error"><a class="docs-heading-anchor" href="#Unbiased-estimators-of-the-squared-kernel-calibration-error">Unbiased estimators of the squared kernel calibration error</a><a id="Unbiased-estimators-of-the-squared-kernel-calibration-error-1"></a><a class="docs-heading-anchor-permalink" href="#Unbiased-estimators-of-the-squared-kernel-calibration-error" title="Permalink"></a></h2><pre><code class="language-julia">Random.seed!(1234)
+data = estimates(UnbiasedSKCE ∘ MedianHeuristicKernel(250))
+plot(data)
+save(&quot;./figures/skce_unbiased.svg&quot;, current_figure());</code></pre><p><img src="../figures/skce_unbiased.svg" alt/></p><pre><code class="language-julia">Random.seed!(1234)
+data = estimates(BlockUnbiasedSKCE ∘ MedianHeuristicKernel(250))
+plot(data)
+save(&quot;./figures/skce_blockunbiased.svg&quot;, current_figure());</code></pre><p><img src="../figures/skce_blockunbiased.svg" alt/></p><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../classification/">« Classification of penguin species</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 27 April 2021 12:48">Tuesday 27 April 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
