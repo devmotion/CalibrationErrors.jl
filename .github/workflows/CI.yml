@@ -51,6 +51,9 @@ jobs:
         if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
         with:
           file: lcov.info
+          fail_ci_if_error: true
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - uses: coverallsapp/github-action@v2
         if: matrix.version == '1' && matrix.os == 'ubuntu-latest'
         with:
