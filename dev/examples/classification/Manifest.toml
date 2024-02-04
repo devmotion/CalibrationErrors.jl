@@ -208,8 +208,8 @@ version = "0.5.1"
 
 [[deps.CalibrationErrors]]
 deps = ["DataStructures", "Distances", "Distributions", "ExactOptimalTransport", "KernelFunctions", "LinearAlgebra", "PDMats", "Reexport", "SimpleUnPack", "Statistics", "StatsBase", "Tulip"]
-git-tree-sha1 = "0df6c97ad350f6b76792f6a10300073adf9f22f8"
-repo-rev = "3048ebcdf3d211300d1122317a5e8453f38043b3"
+git-tree-sha1 = "70c8e28323f0377a457bb9788a0271bca1b92811"
+repo-rev = "8dfa9943ebde54079b505059170ea05f0b9c27f5"
 repo-url = "https://github.com/devmotion/CalibrationErrors.jl.git"
 uuid = "33913031-fe46-5864-950f-100836f47845"
 version = "0.6.4"
