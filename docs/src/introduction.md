@@ -10,7 +10,7 @@ target with absolute certainty) or caused by insufficient knowledge of the
 underlying relation between feature and target (e.g., if only a small number
 of observations of features and corresponding targets are available).[^1]
 
-In the [classification example](./examples/classification) we study the
+In the [classification example](@ref "Classification of penguin species") we study the
 [Palmer penguins dataset](https://github.com/allisonhorst/palmerpenguins) with
 measurements of three different penguin species and consider the task of predicting
 the probability of a penguin species (*target*) given the bill and flipper length
